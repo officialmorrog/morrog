@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morrog — Community Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #090909;
+  --bg2:     #111111;
+  --bg3:     #181818;
+  --bg4:     #202020;
+  --bg5:     #282828;
+  --white:   #FFFFFF;
+  --white2:  #CECECE;
+  --white3:  #888888;
+  --dim:     #333333;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --gold:    #C8A84A;
+  --gold2:   #E8C870;
+  --streak:  #3DAB6A;
+  --here:    #C85050;
+  --sub:     #6858CC;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--white2);
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 58px;
+  background: rgba(9,9,9,0.94);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+}
+
+.nav-logo { height: 24px; margin-right: 48px; opacity: 0.92; flex-shrink: 0; }
+.nav-logo-fb { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:900; letter-spacing:3px; color:var(--white); margin-right:48px; text-transform:uppercase; }
+
+.nav-links { display:flex; gap:2px; flex:1; }
+
+.nav-link {
+  padding: 0 16px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--white3);
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.nav-link:hover { color: var(--white2); }
+.nav-link.active { color: var(--white); border-bottom-color: var(--white); }
+
+.nav-live {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--streak);
+  padding: 6px 14px;
+  border: 1px solid rgba(61,171,106,0.3);
+  border-radius: 3px;
+  background: rgba(61,171,106,0.06);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.nav-live:hover { background: rgba(61,171,106,0.12); }
+.nav-live-dot { width:6px; height:6px; border-radius:50%; background:var(--streak); animation:pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+
+/* ── VIEWS ── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── SHARED ── */
+.section { max-width:1080px; margin:0 auto; padding:80px 32px; }
+
+.eyebrow {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.eyebrow::before { content:''; display:block; width:24px; height:1px; background:var(--gold); }
+
+.section-title { font-family:'Barlow Condensed',sans-serif; font-size:clamp(30px,4vw,48px); font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--white); line-height:1; margin-bottom:14px; }
+.section-desc  { font-size:15px; color:var(--white3); line-height:1.75; font-weight:300; max-width:540px; margin-bottom:48px; }
+
+/* ── HERO ── */
+.hero { min-height:100vh; display:flex; align-items:center; padding:120px 40px 80px; position:relative; overflow:hidden; }
+
+.hero-inner { max-width:1080px; margin:0 auto; width:100%; display:grid; grid-template-columns:1fr 400px; gap:80px; align-items:center; }
+
+.hero-tag { display:inline-flex; align-items:center; gap:8px; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--white3); border:1px solid var(--border2); padding:5px 12px; border-radius:2px; margin-bottom:24px; }
+
+.hero-title { font-family:'Barlow Condensed',sans-serif; font-size:clamp(52px,8vw,96px); font-weight:900; text-transform:uppercase; letter-spacing:-1px; line-height:0.9; color:var(--white); margin-bottom:28px; }
+.hero-title .gold   { color: var(--gold); }
+.hero-title .italic { font-style:italic; font-weight:400; color:var(--white3); font-size:0.65em; display:block; letter-spacing:2px; margin-bottom:4px; }
+
+.hero-desc { font-size:16px; color:var(--white3); line-height:1.75; font-weight:300; max-width:420px; margin-bottom:36px; }
+
+.hero-btns { display:flex; gap:12px; flex-wrap:wrap; }
+
+.btn { display:inline-flex; align-items:center; gap:8px; padding:12px 24px; font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; border-radius:3px; border:none; cursor:pointer; text-decoration:none; transition:opacity 0.15s, transform 0.1s; }
+.btn:hover { opacity:.85; }
+.btn:active { transform:scale(.98); }
+.btn-white { background:var(--white); color:var(--bg); }
+.btn-ghost  { background:transparent; color:var(--white2); border:1px solid var(--border2); }
+
+.hero-stats { display:flex; flex-direction:column; gap:1px; background:var(--border); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+
+.hero-stat { background:var(--bg2); padding:20px 24px; display:flex; align-items:center; gap:16px; transition:background 0.15s; cursor:pointer; }
+.hero-stat:hover { background:var(--bg3); }
+
+.hero-stat-num  { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:800; color:var(--white); line-height:1; min-width:80px; }
+.hero-stat-info { flex:1; }
+.hero-stat-label{ font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--white); margin-bottom:2px; }
+.hero-stat-sub  { font-size:12px; color:var(--white3); }
+.hero-stat-arrow{ color:var(--dim); font-size:16px; }
+
+/* ── LOYALTY ── */
+.loyalty-grid { display:grid; grid-template-columns:1fr 360px; gap:32px; align-items:start; }
+
+.factors-table { display:flex; flex-direction:column; }
+.factor-row { display:flex; align-items:center; gap:20px; padding:16px 0; border-bottom:1px solid var(--border); }
+.factor-row:first-child { border-top:1px solid var(--border); }
+.factor-weight { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:800; color:var(--white); min-width:48px; }
+.factor-info   { flex:1; }
+.factor-name   { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:var(--white); margin-bottom:2px; }
+.factor-desc   { font-size:12px; color:var(--white3); }
+.factor-bar-track { width:80px; height:3px; background:var(--dim); border-radius:2px; overflow:hidden; }
+.factor-bar-fill  { height:100%; border-radius:2px; background:var(--white); }
+
+.lb-card { background:var(--bg2); border:1px solid var(--border2); border-radius:8px; overflow:hidden; }
+.lb-card-head { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.lb-card-title { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--white3); }
+.lb-rows { padding:8px 0; }
+
+.lb-row { display:flex; align-items:center; gap:10px; padding:10px 16px; transition:background 0.12s; }
+.lb-row:hover { background:var(--bg3); }
+.lb-row.me { background:rgba(255,255,255,0.03); border-left:2px solid var(--white); }
+
+.lb-pos        { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; width:20px; text-align:center; color:var(--white3); flex-shrink:0; }
+.lb-pos.gold   { color:#D4AF37; }
+.lb-pos.silver { color:#A8A8A8; }
+.lb-pos.bronze { color:#A06030; }
+
+.lb-av { width:26px; height:26px; border-radius:50%; background:var(--bg4); border:1px solid var(--border); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; }
+.lb-av.me { border-color:var(--white); }
+
+.lb-name    { flex:1; font-size:13px; color:var(--white2); }
+.lb-name.me { color:var(--white); font-weight:500; }
+
+.lb-badge          { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:600; letter-spacing:.5px; padding:1px 5px; border-radius:2px; text-transform:uppercase; }
+.lb-badge.legende  { background:rgba(200,168,74,0.12);  color:var(--gold);  border:1px solid rgba(200,168,74,0.25); }
+.lb-badge.veteraan { background:rgba(168,168,168,0.1);  color:#C0C0C0;      border:1px solid rgba(168,168,168,0.2); }
+.lb-badge.toegewijde{ background:rgba(104,88,204,0.12); color:#9080EE;      border:1px solid rgba(104,88,204,0.25); }
+
+.lb-score { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; color:var(--white); min-width:52px; text-align:right; }
+.lb-sep   { text-align:center; font-size:10px; color:var(--dim); letter-spacing:3px; padding:6px 0; }
+
+.rang-cards { display:flex; flex-direction:column; gap:6px; margin-top:16px; }
+.rang-card  { display:flex; align-items:center; gap:12px; padding:10px 14px; background:var(--bg3); border:1px solid var(--border); border-radius:4px; }
+.rang-dot   { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.rang-name  { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--white); flex:1; }
+.rang-pts   { font-size:12px; color:var(--white3); }
+
+.streak-box { background:var(--bg3); border:1px solid rgba(61,171,106,0.2); border-radius:6px; padding:16px; margin-bottom:16px; }
+.streak-box-title { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--streak); margin-bottom:12px; }
+.streak-tiers { display:flex; gap:6px; }
+.streak-tier  { flex:1; background:var(--bg4); border:1px solid var(--border); border-radius:4px; padding:10px 6px; text-align:center; }
+.streak-tier-count { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:800; color:var(--white3); line-height:1; margin-bottom:2px; }
+.streak-tier-bonus { font-size:11px; color:var(--dim); }
+
+.iwh-events { display:flex; flex-direction:column; gap:6px; margin-top:32px; }
+.iwh-event  { display:flex; align-items:center; gap:14px; padding:14px 18px; background:var(--bg2); border:1px solid var(--border); border-radius:6px; }
+.iwh-event.earned  { border-left:2px solid var(--white); }
+.iwh-event.missed  { opacity:.45; }
+.iwh-event.upcoming{ border-left:2px solid var(--white3); }
+.iwh-icon { font-size:20px; flex-shrink:0; }
+.iwh-info { flex:1; }
+.iwh-name { font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--white); margin-bottom:2px; }
+.iwh-date { font-size:12px; color:var(--white3); }
+.iwh-pts  { font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; color:var(--white); }
+.iwh-pts.dim { color:var(--dim); }
+
+/* ── CHALLENGES ── */
+.challenges-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(480px,1fr)); gap:16px; margin-bottom:60px; }
+
+.challenge-card { background:var(--bg2); border:1px solid var(--border); border-radius:8px; overflow:hidden; transition:border-color 0.2s; }
+.challenge-card:hover { border-color:var(--border2); }
+
+.challenge-head { padding:18px 20px 14px; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:14px; }
+.challenge-game-badge { flex-shrink:0; width:48px; height:48px; border-radius:6px; background:var(--bg4); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:24px; }
+.challenge-meta  { flex:1; }
+.challenge-type  { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--white3); margin-bottom:3px; }
+.challenge-title { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; color:var(--white); line-height:1.1; margin-bottom:4px; }
+
+.challenge-status { display:inline-flex; align-items:center; gap:5px; font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; padding:2px 8px; border-radius:2px; }
+.status-done     { background:rgba(255,255,255,0.06); color:var(--white3); }
+.status-active   { background:rgba(61,171,106,0.1); color:var(--streak); border:1px solid rgba(61,171,106,0.25); }
+.status-upcoming { background:rgba(200,168,74,0.1); color:var(--gold); border:1px solid rgba(200,168,74,0.25); }
+
+.sr-row { display:flex; align-items:center; gap:12px; padding:12px 20px; border-bottom:1px solid var(--border); transition:background 0.12s; }
+.sr-row:last-child { border-bottom:none; }
+.sr-row:hover  { background:var(--bg3); }
+.sr-row.record { background:rgba(200,168,74,0.04); }
+
+.sr-pos    { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:800; width:24px; text-align:center; flex-shrink:0; }
+.sr-pos.p1 { color:var(--gold); }
+.sr-pos.p2 { color:#A8A8A8; }
+.sr-pos.p3 { color:#A06030; }
+
+.sr-avatar { width:32px; height:32px; border-radius:50%; background:var(--bg4); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+
+.sr-info { flex:1; }
+.sr-name { font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; color:var(--white); display:flex; align-items:center; gap:6px; }
+.sr-sub  { font-size:11px; color:var(--white3); }
+
+.sr-time        { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:800; color:var(--white); letter-spacing:.5px; text-align:right; }
+.sr-time.record-time { color:var(--gold); }
+.sr-date        { font-size:10px; color:var(--white3); text-align:right; margin-top:1px; }
+.record-crown   { font-size:12px; }
+
+.card-footer { padding:10px 20px; border-top:1px solid var(--border); background:var(--bg3); display:flex; align-items:center; justify-content:space-between; }
+.card-footer-txt  { font-size:11px; color:var(--white3); }
+.card-footer-link { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--white3); text-decoration:none; transition:color .15s; }
+.card-footer-link:hover { color:var(--white); }
+
+/* ── AGENDA ── */
+.agenda-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
+
+.agenda-card { background:var(--bg2); border:1px solid var(--border); border-radius:8px; overflow:hidden; transition:border-color 0.2s, transform 0.2s; }
+.agenda-card:hover { border-color:var(--border2); transform:translateY(-2px); }
+
+.agenda-card-top    { padding:24px 24px 20px; position:relative; }
+.agenda-category    { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--white3); margin-bottom:10px; }
+.agenda-icon        { font-size:32px; margin-bottom:12px; display:block; }
+.agenda-title       { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; color:var(--white); line-height:1.1; margin-bottom:8px; }
+.agenda-desc        { font-size:13px; color:var(--white3); line-height:1.65; }
+
+.agenda-card-bottom { padding:14px 24px; border-top:1px solid var(--border); background:var(--bg3); display:flex; align-items:center; justify-content:space-between; }
+.agenda-when        { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--white3); }
+
+.agenda-status { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; padding:3px 10px; border-radius:2px; }
+.agenda-status.binnenkort { background:rgba(200,168,74,0.12);  color:var(--gold);   border:1px solid rgba(200,168,74,0.25); }
+.agenda-status.gepland    { background:rgba(104,88,204,0.12);  color:#9080EE;       border:1px solid rgba(104,88,204,0.25); }
+.agenda-status.bezig      { background:rgba(61,171,106,0.1);   color:var(--streak); border:1px solid rgba(61,171,106,0.25); }
+
+.agenda-card.charity { border-color:rgba(61,171,106,0.2); }
+.agenda-card.charity:hover { border-color:rgba(61,171,106,0.4); }
+
+.charity-goal       { margin-top:12px; }
+.charity-goal-label { font-size:11px; color:var(--white3); margin-bottom:5px; }
+.charity-bar-track  { height:4px; background:var(--bg5); border-radius:2px; overflow:hidden; }
+.charity-bar-fill   { height:100%; background:var(--streak); border-radius:2px; width:0%; transition:width 1s ease; }
+.charity-goal-meta  { display:flex; justify-content:space-between; font-size:11px; color:var(--white3); margin-top:4px; }
+
+/* ── ANIMATIONS ── */
+.fade-up { opacity:0; transform:translateY(20px); transition:opacity 0.55s ease, transform 0.55s ease; }
+.fade-up.visible { opacity:1; transform:translateY(0); }
+
+/* ── FOOTER ── */
+footer { border-top:1px solid var(--border); padding:32px 40px; display:flex; align-items:center; justify-content:space-between; max-width:1080px; margin:0 auto; }
+.footer-logo { height:18px; opacity:.2; }
+.footer-fb   { font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:800; letter-spacing:2px; color:var(--dim); text-transform:uppercase; }
+.footer-txt  { font-size:12px; color:var(--dim); }
+.footer-links{ display:flex; gap:20px; }
+.footer-link { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--dim); text-decoration:none; transition:color .15s; }
+.footer-link:hover { color:var(--white3); }
+
+@media (max-width:900px) {
+  nav { padding:0 20px; }
+  .nav-links { gap:0; }
+  .nav-link { padding:0 10px; font-size:10px; }
+  .hero { padding:100px 20px 60px; }
+  .hero-inner { grid-template-columns:1fr; gap:40px; }
+  .hero-stats { display:none; }
+  .section { padding:60px 20px; }
+  .loyalty-grid { grid-template-columns:1fr; }
+  .challenges-grid { grid-template-columns:1fr; }
+  footer { flex-direction:column; gap:16px; text-align:center; padding:24px 20px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <img class="nav-logo" src="https://shop.morrog.nl/cdn/shop/files/Morrog-Logo_90x.png?v=1701878792"
+    alt="Morrog" onerror="this.style.display='none';document.getElementById('nav-logo-fb').style.display='block'">
+  <span id="nav-logo-fb" class="nav-logo-fb" style="display:none">MORROG</span>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="switchView('home',this)">Home</button>
+    <button class="nav-link" onclick="switchView('loyalty',this)">Loyaliteit</button>
+    <button class="nav-link" onclick="switchView('challenges',this)">Challenges &amp; Speedruns</button>
+    <button class="nav-link" onclick="switchView('agenda',this)">Agenda</button>
+  </div>
+  <a class="nav-live" href="https://twitch.tv/morrog" target="_blank">
+    <span class="nav-live-dot"></span>Kijk live
+  </a>
+</nav>
+
+<!-- HOME -->
+<div id="view-home" class="view active">
+  <div class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-tag">🇳🇱 #1 Nederlandse WoW streamer</div>
+        <h1 class="hero-title">
+          <span class="italic">de community van</span>
+          MORROG<span class="gold">.</span>
+        </h1>
+        <p class="hero-desc">Alles op één plek — jouw loyaliteitsrang, challenge leaderboards, speedrun records en wat er aankomt op het kanaal.</p>
+        <div class="hero-btns">
+          <button class="btn btn-white" onclick="switchView('loyalty',document.querySelectorAll('.nav-link')[1])">Mijn loyaliteitsrang</button>
+          <button class="btn btn-ghost" onclick="switchView('challenges',document.querySelectorAll('.nav-link')[2])">Bekijk challenges →</button>
+        </div>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat" onclick="switchView('loyalty',document.querySelectorAll('.nav-link')[1])">
+          <div class="hero-stat-num">9.993</div>
+          <div class="hero-stat-info"><div class="hero-stat-label">Loyale kijkers</div><div class="hero-stat-sub">Geregistreerd in het systeem</div></div>
+          <div class="hero-stat-arrow">→</div>
+        </div>
+        <div class="hero-stat" onclick="switchView('challenges',document.querySelectorAll('.nav-link')[2])">
+          <div class="hero-stat-num">4</div>
+          <div class="hero-stat-info"><div class="hero-stat-label">Challenge records</div><div class="hero-stat-sub">Speedruns &amp; duels met streamers</div></div>
+          <div class="hero-stat-arrow">→</div>
+        </div>
+        <div class="hero-stat" onclick="switchView('agenda',document.querySelectorAll('.nav-link')[3])">
+          <div class="hero-stat-num">3</div>
+          <div class="hero-stat-info"><div class="hero-stat-label">Aankomende events</div><div class="hero-stat-sub">Marathons, charity &amp; challenges</div></div>
+          <div class="hero-stat-arrow">→</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">206K</div>
+          <div class="hero-stat-info"><div class="hero-stat-label">Twitch volgers</div><div class="hero-stat-sub">Actief sinds juli 2014</div></div>
+          <div class="hero-stat-arrow">↗</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOYALITEIT -->
+<div id="view-loyalty" class="view">
+<div class="section">
+  <div class="eyebrow fade-up">Loyaliteitssysteem</div>
+  <h2 class="section-title fade-up">Jouw rang in de<br>Morrog community</h2>
+  <p class="section-desc fade-up">Hoe langer en actiever je kijkt, hoe hoger je rang. Follow age weegt het zwaarst — wie er al jaren bij is hoeft niet harder zijn best te doen.</p>
+  <div class="loyalty-grid">
+    <div>
+      <div class="factors-table fade-up">
+        <div class="factor-row"><div class="factor-weight">35%</div><div class="factor-info"><div class="factor-name">Follow age ⭐</div><div class="factor-desc">+50 punten per maand gevolgd · automatisch via Twitch</div></div><div class="factor-bar-track"><div class="factor-bar-fill" style="width:100%"></div></div></div>
+        <div class="factor-row"><div class="factor-weight">20%</div><div class="factor-info"><div class="factor-name">Watch time</div><div class="factor-desc">+1 punt per uur gekeken · bijgehouden via StreamElements</div></div><div class="factor-bar-track"><div class="factor-bar-fill" style="width:57%"></div></div></div>
+        <div class="factor-row"><div class="factor-weight">15%</div><div class="factor-info"><div class="factor-name">Streams bijgewoond</div><div class="factor-desc">+10 punten per stream aanwezig</div></div><div class="factor-bar-track"><div class="factor-bar-fill" style="width:43%"></div></div></div>
+        <div class="factor-row"><div class="factor-weight">10%</div><div class="factor-info"><div class="factor-name">Chat activiteit</div><div class="factor-desc">+0.5 per bericht · max 20 punten per stream</div></div><div class="factor-bar-track"><div class="factor-bar-fill" style="width:29%"></div></div></div>
+        <div class="factor-row"><div class="factor-weight">8%</div><div class="factor-info"><div class="factor-name">Sub streak</div><div class="factor-desc">+25 punten per maand actieve sub streak</div></div><div class="factor-bar-track"><div class="factor-bar-fill" style="width:23%"></div></div></div>
+        <div class="factor-row"><div class="factor-weight">7%</div><div class="factor-info"><div class="factor-name">Ik Was Hier</div><div class="factor-desc">+100 per speciaal kanaalmoment</div></div><div class="factor-bar-track"><div class="factor-bar-fill" style="width:20%"></div></div></div>
+        <div class="factor-row"><div class="factor-weight">5%</div><div class="factor-info"><div class="factor-name">Clips &amp; raids</div><div class="factor-desc">+15 per clip · +20 per raid meegedaan</div></div><div class="factor-bar-track"><div class="factor-bar-fill" style="width:14%"></div></div></div>
+      </div>
+      <div class="streak-box fade-up" style="margin-top:32px">
+        <div class="streak-box-title">🔥 Aanwezigheidsstreak bonus</div>
+        <div class="streak-tiers">
+          <div class="streak-tier"><div class="streak-tier-count">3×</div><div class="streak-tier-bonus">+10% bonus</div></div>
+          <div class="streak-tier"><div class="streak-tier-count">5×</div><div class="streak-tier-bonus">+25% bonus</div></div>
+          <div class="streak-tier"><div class="streak-tier-count">10×</div><div class="streak-tier-bonus">+50% bonus</div></div>
+        </div>
+      </div>
+      <div style="margin-top:48px" class="fade-up">
+        <div class="eyebrow">Ik Was Hier momenten</div>
+        <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;text-transform:uppercase;color:var(--white);margin-bottom:8px">Historische kanaalmoment</h3>
+        <p style="font-size:13px;color:var(--white3);margin-bottom:0">Aanwezig bij een bijzonder moment? +100 bonuspunten en voor altijd in de archieven.</p>
+        <div class="iwh-events">
+          <div class="iwh-event earned"><div class="iwh-icon">🏆</div><div class="iwh-info"><div class="iwh-name">Rank 1 Wereldkampioen WoW</div><div class="iwh-date">14 maart 2024</div></div><div class="iwh-pts">+100 pts</div></div>
+          <div class="iwh-event missed"><div class="iwh-icon">—</div><div class="iwh-info"><div class="iwh-name">200.000 volgers milestone</div><div class="iwh-date">2 februari 2025</div></div><div class="iwh-pts dim">+100 pts</div></div>
+          <div class="iwh-event missed"><div class="iwh-icon">—</div><div class="iwh-info"><div class="iwh-name">10-jarig jubileum stream</div><div class="iwh-date">5 juli 2024</div></div><div class="iwh-pts dim">+100 pts</div></div>
+          <div class="iwh-event upcoming"><div class="iwh-icon">⏳</div><div class="iwh-info"><div class="iwh-name">Hardcore Death Challenge</div><div class="iwh-date">Binnenkort — let op de aankondiging</div></div><div class="iwh-pts dim">+100 pts</div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="lb-card fade-up">
+        <div class="lb-card-head">
+          <div class="lb-card-title">Top kijkers</div>
+          <div style="font-size:11px;color:var(--white3)">9.993 geregistreerd</div>
+        </div>
+        <div class="lb-rows">
+          <div class="lb-row"><div class="lb-pos gold">1</div><div class="lb-av">👤</div><div class="lb-name">warhead_l_m</div><span class="lb-badge legende">Legende</span><div class="lb-score">8.170</div></div>
+          <div class="lb-row"><div class="lb-pos silver">2</div><div class="lb-av">👤</div><div class="lb-name">oziie97</div><span class="lb-badge veteraan">Veteraan</span><div class="lb-score">7.137</div></div>
+          <div class="lb-row"><div class="lb-pos bronze">3</div><div class="lb-av">👤</div><div class="lb-name">janwillem00</div><span class="lb-badge veteraan">Veteraan</span><div class="lb-score">4.729</div></div>
+          <div class="lb-row"><div class="lb-pos">4</div><div class="lb-av">👤</div><div class="lb-name">dennisdehoon</div><span class="lb-badge veteraan">Veteraan</span><div class="lb-score">4.346</div></div>
+          <div class="lb-row"><div class="lb-pos">5</div><div class="lb-av">👤</div><div class="lb-name">unknown_</div><span class="lb-badge veteraan">Veteraan</span><div class="lb-score">4.079</div></div>
+          <div class="lb-row"><div class="lb-pos">6</div><div class="lb-av">👤</div><div class="lb-name">jitsiboy</div><span class="lb-badge veteraan">Veteraan</span><div class="lb-score">4.075</div></div>
+          <div class="lb-row"><div class="lb-pos">7</div><div class="lb-av">👤</div><div class="lb-name">kasifynl</div><span class="lb-badge veteraan">Veteraan</span><div class="lb-score">4.013</div></div>
+          <div class="lb-row"><div class="lb-pos">8</div><div class="lb-av">👤</div><div class="lb-name">yeejn</div><span class="lb-badge toegewijde">Toegewijde</span><div class="lb-score">3.844</div></div>
+          <div class="lb-row"><div class="lb-pos">9</div><div class="lb-av">👤</div><div class="lb-name">djustinkamp</div><span class="lb-badge toegewijde">Toegewijde</span><div class="lb-score">3.843</div></div>
+          <div class="lb-row"><div class="lb-pos">10</div><div class="lb-av">👤</div><div class="lb-name">jeffskye</div><span class="lb-badge toegewijde">Toegewijde</span><div class="lb-score">3.785</div></div>
+          <div class="lb-sep">· · ·</div>
+          <div class="lb-row me"><div class="lb-pos">?</div><div class="lb-av me">👤</div><div class="lb-name me">Jij</div><span class="lb-badge toegewijde">Toegewijde</span><div class="lb-score">—</div></div>
+        </div>
+      </div>
+      <div style="margin-top:16px" class="fade-up">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--white3);margin-bottom:10px">Rangen</div>
+        <div class="rang-cards">
+          <div class="rang-card"><div class="rang-dot" style="background:var(--gold)"></div><div class="rang-name">Legende</div><div class="rang-pts">≥ 8.000 pts</div></div>
+          <div class="rang-card"><div class="rang-dot" style="background:#A8A8A8"></div><div class="rang-name">Veteraan</div><div class="rang-pts">≥ 4.000 pts</div></div>
+          <div class="rang-card"><div class="rang-dot" style="background:#6858CC"></div><div class="rang-name">Toegewijde</div><div class="rang-pts">≥ 1.500 pts</div></div>
+          <div class="rang-card"><div class="rang-dot" style="background:var(--streak)"></div><div class="rang-name">Vaste kijker</div><div class="rang-pts">≥ 500 pts</div></div>
+          <div class="rang-card"><div class="rang-dot" style="background:var(--dim)"></div><div class="rang-name">Beginner</div><div class="rang-pts">0+ pts</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- CHALLENGES -->
+<div id="view-challenges" class="view">
+<div class="section">
+  <div class="eyebrow fade-up">Streamer challenges</div>
+  <h2 class="section-title fade-up">Challenges &amp;<br>Speedrun records</h2>
+  <p class="section-desc fade-up">Morrog daagt streamers uit tot speedruns en challenges. Hier staan alle duels, tijden en records bijgehouden.</p>
+  <div class="challenges-grid">
+    <div class="challenge-card fade-up">
+      <div class="challenge-head">
+        <div class="challenge-game-badge">⛏</div>
+        <div class="challenge-meta">
+          <div class="challenge-type">Speedrun · 1v1</div>
+          <div class="challenge-title">Minecraft 1.16.1<br>Any% Speedrun</div>
+          <span class="challenge-status status-done">Afgerond</span>
+        </div>
+      </div>
+      <div class="sr-row record">
+        <div class="sr-pos p1">1</div>
+        <div class="sr-avatar">🦁</div>
+        <div class="sr-info"><div class="sr-name">Linktijger <span class="record-crown">👑</span></div><div class="sr-sub">NL streamer · Huidig record</div></div>
+        <div><div class="sr-time record-time">24:52</div><div class="sr-date">Record houder</div></div>
+      </div>
+      <div class="sr-row">
+        <div class="sr-pos p2">2</div>
+        <div class="sr-avatar">🟣</div>
+        <div class="sr-info"><div class="sr-name">Morrog</div><div class="sr-sub">Persoonlijk record</div></div>
+        <div><div class="sr-time">28:26</div><div class="sr-date">Persoonlijk record</div></div>
+      </div>
+      <div class="card-footer">
+        <div class="card-footer-txt">Morrog verloor met 3:34 — rematch gepland?</div>
+        <a href="https://twitch.tv/morrog" class="card-footer-link" target="_blank">Bekijk VOD →</a>
+      </div>
+    </div>
+    <div class="challenge-card fade-up">
+      <div class="challenge-head">
+        <div class="challenge-game-badge">⚔</div>
+        <div class="challenge-meta">
+          <div class="challenge-type">Challenge · Solo</div>
+          <div class="challenge-title">WoW Hardcore<br>Level 60 Race</div>
+          <span class="challenge-status status-active">Bezig</span>
+        </div>
+      </div>
+      <div class="sr-row record">
+        <div class="sr-pos p1">1</div>
+        <div class="sr-avatar">🟣</div>
+        <div class="sr-info"><div class="sr-name">Morrog <span class="record-crown">👑</span></div><div class="sr-sub">Level 47 · Nog bezig</div></div>
+        <div><div class="sr-time record-time" style="font-size:14px;color:var(--streak)">Bezig</div><div class="sr-date">Gestart 28 mrt</div></div>
+      </div>
+      <div class="sr-row">
+        <div class="sr-pos p2">2</div>
+        <div class="sr-avatar">💀</div>
+        <div class="sr-info"><div class="sr-name">Morrog (poging 1)</div><div class="sr-sub">Gestorven op level 34</div></div>
+        <div><div class="sr-time" style="font-size:14px;color:var(--here)">Dead</div><div class="sr-date">Level 34</div></div>
+      </div>
+      <div class="card-footer">
+        <div class="card-footer-txt">🔴 Live te volgen op Twitch</div>
+        <a href="https://twitch.tv/morrog" class="card-footer-link" target="_blank">Kijk mee →</a>
+      </div>
+    </div>
+    <div class="challenge-card fade-up">
+      <div class="challenge-head">
+        <div class="challenge-game-badge">🏎</div>
+        <div class="challenge-meta">
+          <div class="challenge-type">Speedrun · 1v1</div>
+          <div class="challenge-title">Mario Kart 8 DX<br>200cc All Cups</div>
+          <span class="challenge-status status-done">Afgerond</span>
+        </div>
+      </div>
+      <div class="sr-row record">
+        <div class="sr-pos p1">1</div>
+        <div class="sr-avatar">🟣</div>
+        <div class="sr-info"><div class="sr-name">Morrog <span class="record-crown">👑</span></div><div class="sr-sub">Huidig record</div></div>
+        <div><div class="sr-time record-time">1:12:44</div><div class="sr-date">Record houder</div></div>
+      </div>
+      <div class="sr-row">
+        <div class="sr-pos p2">2</div>
+        <div class="sr-avatar">🎮</div>
+        <div class="sr-info"><div class="sr-name">Challenger NL</div><div class="sr-sub">NL streamer</div></div>
+        <div><div class="sr-time">1:18:21</div><div class="sr-date">Tweede plaats</div></div>
+      </div>
+      <div class="card-footer">
+        <div class="card-footer-txt">Morrog wint dit duel met 5:37</div>
+        <a href="https://twitch.tv/morrog" class="card-footer-link" target="_blank">Bekijk VOD →</a>
+      </div>
+    </div>
+    <!-- TRACKMANIA LIVE CARD -->
+    <div class="challenge-card fade-up" id="tm-card">
+      <div class="challenge-head">
+        <div class="challenge-game-badge">🏎</div>
+        <div class="challenge-meta">
+          <div class="challenge-type">Trackmania · 1v1 duel</div>
+          <div class="challenge-title">Winter 2026 - 07<br>Tijden duel</div>
+          <span class="challenge-status status-active" id="tm-status">Live tijden</span>
+        </div>
+      </div>
+      <div id="tm-rows">
+        <div class="sr-row record">
+          <div class="sr-pos" style="color:#D4AF37">1</div>
+          <div class="sr-avatar">🟣</div>
+          <div class="sr-info">
+            <div class="sr-name">Morrog <span class="record-crown">👑</span></div>
+            <div class="sr-sub">Winter 2026 - 07 · Huidig record</div>
+          </div>
+          <div>
+            <div class="sr-time record-time">00:28.836</div>
+            <div class="sr-date">Record houder</div>
+          </div>
+        </div>
+        <div class="sr-row">
+          <div class="sr-pos" style="color:#A8A8A8">2</div>
+          <div class="sr-avatar">🎮</div>
+          <div class="sr-info">
+            <div class="sr-name">Sejecem</div>
+            <div class="sr-sub">Winter 2026 - 07 · Persoonlijk record</div>
+          </div>
+          <div>
+            <div class="sr-time">00:28.938</div>
+            <div class="sr-date">+0:00.102 achter</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-footer-txt" id="tm-update-tijd">Bijgewerkt: live via backend · elke 5 min</div>
+        <a href="https://trackmania.io/#/leaderboard/dccdf820-6a24-4ab1-9078-58fea41282db/T1ESUOSoqqV7cy_zJ7OqK73Vosd" class="card-footer-link" target="_blank">Bekijk leaderboard →</a>
+      </div>
+    </div>
+
+    <div class="challenge-card fade-up" style="border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;min-height:200px;">
+      <div style="font-size:32px;margin-bottom:12px">⚡</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--white3);margin-bottom:6px">Nieuwe challenge</div>
+      <div style="font-size:13px;color:var(--dim);line-height:1.6">Morrog kondigt binnenkort<br>een nieuw duel aan</div>
+    </div>
+  </div>
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:28px 32px" class="fade-up">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--white3);margin-bottom:10px">Hoe werkt het?</div>
+    <p style="font-size:14px;color:var(--white3);line-height:1.75;max-width:680px">Morrog daagt andere Nederlandse streamers uit tot speedruns of challenges in games. Tijden worden live op stream gezet en hier bijgehouden. Aanwezig zijn bij een nieuw record? Dan krijg je automatisch een <strong style="color:var(--white2)">Ik Was Hier</strong> moment en +100 loyaliteitspunten.</p>
+  </div>
+</div>
+</div>
+
+<!-- AGENDA -->
+<div id="view-agenda" class="view">
+<div class="section">
+  <div class="eyebrow fade-up">Aankomende events</div>
+  <h2 class="section-title fade-up">Wat staat er<br>op de agenda?</h2>
+  <p class="section-desc fade-up">Marathons, charity streams en challenges die eraan komen. Aanwezig zijn loont — elk groot event is een potentieel Ik Was Hier moment.</p>
+  <div class="agenda-grid">
+    <div class="agenda-card fade-up">
+      <div class="agenda-card-top">
+        <div class="agenda-category">Game marathon</div>
+        <span class="agenda-icon">🏰</span>
+        <div class="agenda-title">Elden Ring Marathon</div>
+        <div class="agenda-desc">Van begin tot einde, non-stop. Morrog speelt Elden Ring door tot de credits rollen — alle graces, alle bosses, geen shortcuts. De chat bepaalt welke build hij speelt.</div>
+      </div>
+      <div class="agenda-card-bottom">
+        <div class="agenda-when">Zomer 2025</div>
+        <span class="agenda-status binnenkort">Binnenkort</span>
+      </div>
+    </div>
+    <div class="agenda-card fade-up">
+      <div class="agenda-card-top">
+        <div class="agenda-category">Launch stream</div>
+        <span class="agenda-icon">🌴</span>
+        <div class="agenda-title">GTA 6 Marathon</div>
+        <div class="agenda-desc">Zodra GTA 6 uitkomt gaat Morrog live. Launch day marathon — van de eerste minuut tot diep in de nacht. Dit wordt een van de grootste streams van het jaar.</div>
+      </div>
+      <div class="agenda-card-bottom">
+        <div class="agenda-when">Launch day 2025</div>
+        <span class="agenda-status gepland">Gepland</span>
+      </div>
+    </div>
+    <div class="agenda-card charity fade-up">
+      <div class="agenda-card-top">
+        <div class="agenda-category">Charity stream</div>
+        <span class="agenda-icon">💚</span>
+        <div class="agenda-title">Charity Stream voor Kinderen</div>
+        <div class="agenda-desc">Morrog zamelt samen met zijn community geld in voor een goed doel voor kinderen. Elk jaar groeit het bedrag — vorig jaar werd er een aanzienlijk bedrag opgehaald voor de Nierstichting.</div>
+        <div class="charity-goal">
+          <div class="charity-goal-label">Vorig jaar opgehaald</div>
+          <div class="charity-bar-track"><div class="charity-bar-fill" id="charity-bar"></div></div>
+          <div class="charity-goal-meta"><span style="color:var(--streak);font-weight:500">€ 12.480</span><span>Doel 2025: € 20.000</span></div>
+        </div>
+      </div>
+      <div class="agenda-card-bottom">
+        <div class="agenda-when">Q4 2025</div>
+        <span class="agenda-status binnenkort">Datum volgt</span>
+      </div>
+    </div>
+    <div class="agenda-card fade-up">
+      <div class="agenda-card-top">
+        <div class="agenda-category">Rematch · Speedrun</div>
+        <span class="agenda-icon">⛏</span>
+        <div class="agenda-title">Minecraft Rematch vs Linktijger</div>
+        <div class="agenda-desc">Morrog verloor de eerste Minecraft speedrun met 3 minuten en 34 seconden. De rematch wordt aangekondigd zodra de datum vast staat. Wie pakt het record?</div>
+      </div>
+      <div class="agenda-card-bottom">
+        <div class="agenda-when">Datum TBA</div>
+        <span class="agenda-status gepland">In de planning</span>
+      </div>
+    </div>
+    <div class="agenda-card fade-up">
+      <div class="agenda-card-top">
+        <div class="agenda-category">Seizoensstart</div>
+        <span class="agenda-icon">⚔</span>
+        <div class="agenda-title">WoW The War Within — Season 2</div>
+        <div class="agenda-desc">Morrog speelt dag één van het nieuwe WoW seizoen live. Mythic+ race, eerste raid night en ranking push. De ultieme start van het seizoen voor de NL WoW community.</div>
+      </div>
+      <div class="agenda-card-bottom">
+        <div class="agenda-when">Season 2 launch</div>
+        <span class="agenda-status bezig">Binnenkort live</span>
+      </div>
+    </div>
+    <div class="agenda-card fade-up" style="border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;">
+      <div style="font-size:28px;margin-bottom:10px">📅</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--white3);margin-bottom:4px">Meer volgt</div>
+      <div style="font-size:12px;color:var(--dim)">Volg Morrog op Twitch<br>voor aankondigingen</div>
+    </div>
+  </div>
+  <div style="margin-top:48px;display:flex;align-items:center;gap:20px;padding:20px 24px;background:var(--bg2);border:1px solid var(--border);border-left:2px solid var(--white);border-radius:0 6px 6px 0" class="fade-up">
+    <div style="font-size:24px">🏛</div>
+    <div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--white);margin-bottom:3px">Aanwezig zijn loont</div>
+      <div style="font-size:13px;color:var(--white3);line-height:1.6">Elk groot event is een potentieel <strong style="color:var(--white2)">Ik Was Hier</strong> moment. Morrog activeert dit live via <code style="font-family:'Barlow Condensed',sans-serif;color:var(--white2)">!ikwashier</code> in de chat — dan krijg jij automatisch +100 loyaliteitspunten en sta je voor altijd in de archieven.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<footer>
+  <img class="footer-logo" src="https://shop.morrog.nl/cdn/shop/files/Morrog-Logo_90x.png?v=1701878792"
+    alt="Morrog" onerror="this.style.display='none';document.getElementById('footer-fb').style.display='block'">
+  <span id="footer-fb" class="footer-fb" style="display:none">MORROG</span>
+  <div class="footer-txt">© 2025 Morrog · Community Hub</div>
+  <div class="footer-links">
+    <a class="footer-link" href="https://twitch.tv/morrog" target="_blank">Twitch</a>
+    <a class="footer-link" href="https://shop.morrog.nl" target="_blank">Shop</a>
+  </div>
+</footer>
+
+<script>
+function switchView(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+  const activeView = document.getElementById('view-' + name);
+  activeView.classList.add('active');
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(() => {
+    activeView.querySelectorAll('.fade-up').forEach((el, i) => {
+      el.classList.remove('visible');
+      setTimeout(() => el.classList.add('visible'), i * 55);
+    });
+  }, 30);
+  if (name === 'agenda') {
+    setTimeout(() => {
+      const bar = document.getElementById('charity-bar');
+      if (bar) bar.style.width = '62%';
+    }, 500);
+  }
+}
+
+// Initial home animation
+setTimeout(() => {
+  document.querySelectorAll('#view-home .fade-up').forEach((el, i) => {
+    setTimeout(() => el.classList.add('visible'), i * 55);
+  });
+}, 100);
+
+// ── TRACKMANIA LIVE TIJDEN ──
+const TM_BACKEND = 'https://morrog-loyalty-backend-production.up.railway.app';
+
+async function laadTrackmanTijden() {
+  try {
+    const res  = await fetch(TM_BACKEND + '/api/trackmania/tijden');
+    const data = await res.json();
+    if (!data || data.length === 0) return;
+
+    const map    = data[0];
+    const tijden = map.tijden || [];
+    if (tijden.length === 0) return;
+
+    // Sorteer op tijd
+    tijden.sort((a, b) => a.tijd_ms - b.tijd_ms);
+
+    const posKlassen = ['gold', 'silver', 'bronze'];
+    const posKleuren = ['#D4AF37', '#A8A8A8', '#A06030'];
+
+    let html = '';
+    tijden.forEach((t, i) => {
+      const isRecord = i === 0;
+      const naam     = t.username === 'sejecem.' ? 'Sejecem' : 'Morrog';
+      const avatar   = t.username === 'sejecem.' ? 'https://unavatar.io/twitch/sejecem' : 'https://unavatar.io/twitch/morrog';
+      const kleur    = posKleuren[i] || 'var(--white3)';
+
+      html += `
+        <div class="sr-row ${isRecord ? 'record' : ''}">
+          <div class="sr-pos" style="color:${kleur}">${i + 1}</div>
+          <div class="sr-avatar">
+            <img src="${avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"
+              onerror="this.parentElement.innerHTML='🎮'">
+          </div>
+          <div class="sr-info">
+            <div class="sr-name">
+              ${naam}
+              ${isRecord ? '<span class="record-crown">👑</span>' : ''}
+            </div>
+            <div class="sr-sub">${map.map} · ${isRecord ? 'Huidig record' : 'Persoonlijk record'}</div>
+          </div>
+          <div>
+            <div class="sr-time ${isRecord ? 'record-time' : ''}">${t.tijd_format}</div>
+            <div class="sr-date">
+              ${tijden.length > 1 && i > 0 ? '+' + ((tijden[i].tijd_ms - tijden[0].tijd_ms) / 1000).toFixed(3).replace('.', ':') + ' achter' : ''}
+            </div>
+          </div>
+        </div>`;
+    });
+
+    document.getElementById('tm-rows').innerHTML = html;
+
+    // Update tijd
+    const opgehaald = new Date(tijden[0].opgehaald);
+    document.getElementById('tm-update-tijd').textContent =
+      'Bijgewerkt: ' + opgehaald.toLocaleTimeString('nl-NL', {hour: '2-digit', minute: '2-digit'});
+
+  } catch(e) {
+    console.log('TM tijden laden mislukt:', e.message);
+  }
+}
+
+// Laad direct bij challenges tab
+const origSwitchView = switchView;
+switchView = function(name, btn) {
+  origSwitchView(name, btn);
+  if (name === 'challenges') laadTrackmanTijden();
+};
+
+</script>
+</body>
+</html>
