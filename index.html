@@ -439,24 +439,15 @@ footer { border-top:1px solid var(--border); padding:32px 40px; display:flex; al
     <div>
       <div class="lb-card fade-up">
         <div class="lb-card-head">
+          <div class="lb-card fade-up">
+        <div class="lb-card-head">
           <div class="lb-card-title">Top kijkers</div>
-          <div style="font-size:11px;color:var(--white3)">9.993 geregistreerd</div>
+          <div style="font-size:11px;color:var(--white3)" id="lb-totaal">laden...</div>
         </div>
-        <div class="lb-rows">
-          <div class="lb-row"><div class="lb-pos gold">1</div><div class="lb-av">👤</div><div class="lb-name">warhead_l_m</div><span class="lb-badge legende">Legende</span><div class="lb-score">8.170</div></div>
-          <div class="lb-row"><div class="lb-pos silver">2</div><div class="lb-av">👤</div><div class="lb-name">oziie97</div><span class="lb-badge veteraan">Veteraan</span><div class="lb-score">7.137</div></div>
-          <div class="lb-row"><div class="lb-pos bronze">3</div><div class="lb-av">👤</div><div class="lb-name">janwillem00</div><span class="lb-badge veteraan">Veteraan</span><div class="lb-score">4.729</div></div>
-          <div class="lb-row"><div class="lb-pos">4</div><div class="lb-av">👤</div><div class="lb-name">dennisdehoon</div><span class="lb-badge veteraan">Veteraan</span><div class="lb-score">4.346</div></div>
-          <div class="lb-row"><div class="lb-pos">5</div><div class="lb-av">👤</div><div class="lb-name">unknown_</div><span class="lb-badge veteraan">Veteraan</span><div class="lb-score">4.079</div></div>
-          <div class="lb-row"><div class="lb-pos">6</div><div class="lb-av">👤</div><div class="lb-name">jitsiboy</div><span class="lb-badge veteraan">Veteraan</span><div class="lb-score">4.075</div></div>
-          <div class="lb-row"><div class="lb-pos">7</div><div class="lb-av">👤</div><div class="lb-name">kasifynl</div><span class="lb-badge veteraan">Veteraan</span><div class="lb-score">4.013</div></div>
-          <div class="lb-row"><div class="lb-pos">8</div><div class="lb-av">👤</div><div class="lb-name">yeejn</div><span class="lb-badge toegewijde">Toegewijde</span><div class="lb-score">3.844</div></div>
-          <div class="lb-row"><div class="lb-pos">9</div><div class="lb-av">👤</div><div class="lb-name">djustinkamp</div><span class="lb-badge toegewijde">Toegewijde</span><div class="lb-score">3.843</div></div>
-          <div class="lb-row"><div class="lb-pos">10</div><div class="lb-av">👤</div><div class="lb-name">jeffskye</div><span class="lb-badge toegewijde">Toegewijde</span><div class="lb-score">3.785</div></div>
-          <div class="lb-sep">· · ·</div>
-          <div class="lb-row me"><div class="lb-pos">?</div><div class="lb-av me">👤</div><div class="lb-name me">Jij</div><span class="lb-badge toegewijde">Toegewijde</span><div class="lb-score">—</div></div>
+        <div class="lb-rows" id="lb-rows">
+          <div style="padding:20px;text-align:center;font-size:12px;color:var(--white3)">Leaderboard laden...</div>
         </div>
-      </div>
+      </div></div>
       <div style="margin-top:16px" class="fade-up">
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--white3);margin-bottom:10px">Rangen</div>
         <div class="rang-cards">
@@ -741,6 +732,44 @@ setTimeout(() => {
 }, 100);
 
 
+
+// ── LEADERBOARD LIVE ──
+async function laadLeaderboard() {
+  try {
+    const res  = await fetch(TM_BACKEND + '/api/leaderboard?limit=10');
+    const data = await res.json();
+
+    const posKlassen = {1:'gold', 2:'silver', 3:'bronze'};
+    const rangKlassen = {
+      'Legende':      'legende',
+      'Veteraan':     'veteraan',
+      'Toegewijde':   'toegewijde',
+      'Vaste kijker': 'vaste',
+      'Beginner':     'beginner',
+    };
+
+    let html = '';
+    data.leaderboard.forEach((k, i) => {
+      const pos      = i + 1;
+      const posClass = posKlassen[pos] || '';
+      const rangClass= rangKlassen[k.rang] || 'beginner';
+      html += `
+        <div class="lb-row">
+          <div class="lb-pos ${posClass}">${pos}</div>
+          <div class="lb-av">👤</div>
+          <div class="lb-name">${k.username}</div>
+          <span class="lb-badge ${rangClass}">${k.rang}</span>
+          <div class="lb-score">${(k.score||0).toLocaleString('nl-NL')}</div>
+        </div>`;
+    });
+
+    document.getElementById('lb-rows').innerHTML   = html;
+    document.getElementById('lb-totaal').textContent = data.totaal.toLocaleString('nl-NL') + ' geregistreerd';
+  } catch(e) {
+    console.log('Leaderboard laden mislukt:', e.message);
+  }
+}
+
 // ── KIJKER ZOEKEN ──
 async function zoekKijker() {
   const username = document.getElementById('zoek-input').value.trim().toLowerCase();
@@ -854,6 +883,7 @@ const origSwitchView = switchView;
 switchView = function(name, btn) {
   origSwitchView(name, btn);
   if (name === 'challenges') laadTrackmanTijden();
+  if (name === 'loyalty') laadLeaderboard();
 };
 
 </script>
