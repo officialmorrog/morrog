@@ -391,6 +391,20 @@ footer { border-top:1px solid var(--border); padding:32px 40px; display:flex; al
   <div class="eyebrow fade-up">Loyaliteitssysteem</div>
   <h2 class="section-title fade-up">Jouw rang in de<br>Morrog community</h2>
   <p class="section-desc fade-up">Hoe langer en actiever je kijkt, hoe hoger je rang. Follow age weegt het zwaarst — wie er al jaren bij is hoeft niet harder zijn best te doen.</p>
+  <!-- ZOEKBALK -->
+  <div style="margin-bottom:40px" class="fade-up">
+    <div style="display:flex;gap:10px;max-width:460px">
+      <input id="zoek-input" type="text" placeholder="Jouw Twitch gebruikersnaam..."
+        style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:11px 16px;font-family:'Barlow',sans-serif;font-size:14px;color:var(--white);outline:none"
+        onkeydown="if(event.key==='Enter')zoekKijker()">
+      <button onclick="zoekKijker()"
+        style="padding:11px 20px;background:var(--white);color:var(--bg);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer">
+        Zoek
+      </button>
+    </div>
+    <div id="zoek-resultaat" style="margin-top:12px"></div>
+  </div>
+
   <div class="loyalty-grid">
     <div>
       <div class="factors-table fade-up">
@@ -725,6 +739,54 @@ setTimeout(() => {
     setTimeout(() => el.classList.add('visible'), i * 55);
   });
 }, 100);
+
+
+// ── KIJKER ZOEKEN ──
+async function zoekKijker() {
+  const username = document.getElementById('zoek-input').value.trim().toLowerCase();
+  const el       = document.getElementById('zoek-resultaat');
+  if (!username) return;
+
+  el.innerHTML = '<div style="font-size:13px;color:var(--white3)">Zoeken...</div>';
+
+  try {
+    const res  = await fetch(TM_BACKEND + '/api/kijker/' + encodeURIComponent(username));
+    if (res.status === 404) {
+      el.innerHTML = '<div style="font-size:13px;color:var(--here)">Kijker niet gevonden. Zorg dat je gebruikersnaam exact klopt.</div>';
+      return;
+    }
+    const k = await res.json();
+
+    const rangKleur = {
+      'Legende':      '#D4AF37',
+      'Veteraan':     '#A8A8A8',
+      'Toegewijde':   '#9080EE',
+      'Vaste kijker': '#3DAB6A',
+      'Beginner':     '#444',
+    }[k.rang] || '#444';
+
+    el.innerHTML = `
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:16px;max-width:460px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white3);margin-bottom:2px">Rang</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:${rangKleur};text-transform:uppercase">${k.rang}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;color:var(--white);line-height:1">${(k.score_totaal||0).toLocaleString('nl-NL')}</div>
+            <div style="font-size:11px;color:var(--white3)">punten</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--white3);padding-top:10px;border-top:1px solid var(--border)">
+          <span>Positie: <strong style="color:var(--white)">#${k.rank || '?'}</strong></span>
+          <span>Follow: <strong style="color:var(--white)">${k.follow_months || 0} mnd</strong></span>
+          <span>Streak: <strong style="color:var(--white)">${k.streak_current || 0}×</strong></span>
+        </div>
+      </div>`;
+  } catch(e) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--here)">Er ging iets mis. Probeer opnieuw.</div>';
+  }
+}
 
 // ── TRACKMANIA LIVE TIJDEN ──
 const TM_BACKEND = 'https://morrog-loyalty-backend-production.up.railway.app';
