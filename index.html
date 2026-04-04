@@ -697,6 +697,14 @@ function switchView(name, btn) {
   const activeView = document.getElementById('view-' + name);
   activeView.classList.add('active');
   if (btn) btn.classList.add('active');
+  else {
+    // Activeer de juiste nav knop op basis van naam
+    const navLinks = document.querySelectorAll('.nav-link');
+    const volgorde = ['home','loyalty','challenges','agenda'];
+    const idx = volgorde.indexOf(name);
+    if (idx >= 0 && navLinks[idx]) navLinks[idx].classList.add('active');
+  }
+  window.location.hash = name === 'home' ? '' : name;
   window.scrollTo({ top: 0, behavior: 'smooth' });
   setTimeout(() => {
     activeView.querySelectorAll('.fade-up').forEach((el, i) => {
@@ -927,11 +935,11 @@ async function init() {
     }
   }
 
-  // Laad standaard data
-  setTimeout(() => {
-    document.querySelectorAll('#view-home .fade-up').forEach((el,i) => setTimeout(() => el.classList.add('visible'), i*55));
-    laadLeaderboard();
-  }, 100);
+  // Herstel actieve view vanuit URL hash
+  const hash = window.location.hash.replace('#','');
+  const geldigeViews = ['home','loyalty','challenges','agenda'];
+  const startView = geldigeViews.includes(hash) ? hash : 'home';
+  setTimeout(() => { switchView(startView); }, 150);
 }
 
 init();
