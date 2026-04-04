@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morrog — Battle Pass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#090909;--bg2:#111111;--bg3:#181818;--bg4:#202020;--bg5:#282828;
+  --white:#FFFFFF;--white2:#CECECE;--white3:#888888;--dim:#333333;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --gold:#C8A84A;--streak:#3DAB6A;--here:#C85050;--sub:#6858CC;
+  --twitch:#9147FF;
+  --bp:#7C4DFF;--bp2:#5C35CC;--bp-glow:rgba(124,77,255,.18);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--white2);font-family:'Barlow',sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);z-index:100;display:flex;align-items:center;padding:0 40px;}
+.nav-logo{height:24px;margin-right:48px;opacity:.92;flex-shrink:0;}
+.nav-logo-fb{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;color:var(--white);margin-right:48px;text-transform:uppercase;}
+.nav-links{display:flex;gap:2px;flex:1;}
+.nav-link{padding:0 16px;height:58px;display:flex;align-items:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white3);border:none;background:none;border-bottom:2px solid transparent;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;text-decoration:none;}
+.nav-link:hover{color:var(--white2);}
+.nav-link.active{color:var(--white);border-bottom-color:var(--white);}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.nav-live{display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--streak);padding:6px 14px;border:1px solid rgba(61,171,106,.3);border-radius:3px;background:rgba(61,171,106,.06);text-decoration:none;transition:background .15s;}
+.nav-live:hover{background:rgba(61,171,106,.12);}
+.nav-live-dot{width:6px;height:6px;border-radius:50%;background:var(--streak);animation:pulse 1.5s ease-in-out infinite;}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 40px 60px;position:relative;overflow:hidden;text-align:center;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 30%, var(--bp-glow) 0%, transparent 70%);pointer-events:none;}
+.hero-bg2{position:absolute;inset:0;background:radial-gradient(ellipse 50% 35% at 50% 85%, rgba(200,168,74,.05) 0%, transparent 60%);pointer-events:none;}
+.hero-grid-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(124,77,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(124,77,255,.04) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;}
+.hero-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--bp);display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px;}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';display:block;width:32px;height:1px;background:var(--bp);opacity:.5;}
+.hero-season{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--white3);margin-bottom:12px;}
+.hero-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(72px,13vw,160px);font-weight:900;text-transform:uppercase;letter-spacing:-3px;line-height:.88;color:var(--white);margin-bottom:4px;position:relative;}
+.hero-title .bp{color:var(--bp);}
+.hero-title-glow{position:absolute;inset:-60px;background:radial-gradient(ellipse at 50% 50%, var(--bp-glow) 0%, transparent 70%);pointer-events:none;z-index:-1;}
+.hero-subtitle{font-family:'Barlow Condensed',sans-serif;font-size:clamp(16px,2.5vw,24px);font-weight:400;color:var(--white3);letter-spacing:2px;text-transform:uppercase;margin-bottom:32px;}
+.hero-desc{font-size:15px;color:var(--white3);font-weight:300;max-width:520px;margin:0 auto 40px;line-height:1.8;}
+
+/* USER PROGRESS CARD */
+.progress-card{background:var(--bg2);border:1px solid rgba(124,77,255,.3);border-radius:12px;padding:28px 32px;max-width:640px;margin:0 auto;width:100%;box-shadow:0 0 60px rgba(124,77,255,.1);}
+.progress-card.hidden{display:none;}
+.progress-top{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+.progress-avatar{width:52px;height:52px;border-radius:50%;border:2px solid rgba(124,77,255,.4);object-fit:cover;flex-shrink:0;}
+.progress-info{flex:1;text-align:left;}
+.progress-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--white);line-height:1;}
+.progress-sub{font-size:12px;color:var(--white3);margin-top:3px;}
+.progress-tier-badge{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:6px 14px;border-radius:4px;background:var(--bp-glow);border:1px solid rgba(124,77,255,.4);color:var(--bp);flex-shrink:0;}
+.progress-bar-wrap{margin-bottom:12px;}
+.progress-bar-label{display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--white3);margin-bottom:8px;}
+.progress-bar-track{height:8px;background:var(--bg4);border-radius:4px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg, var(--bp2), var(--bp));border-radius:4px;transition:width 1.2s cubic-bezier(.22,1,.36,1);}
+.progress-next{font-size:12px;color:var(--white3);text-align:center;}
+.progress-next strong{color:var(--white2);}
+.login-prompt{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:28px 32px;max-width:640px;margin:0 auto;width:100%;text-align:center;}
+.login-prompt p{font-size:14px;color:var(--white3);margin-bottom:16px;}
+.btn-twitch{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;background:rgba(145,71,255,.15);border:1px solid rgba(145,71,255,.4);border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--white);cursor:pointer;transition:background .15s;text-decoration:none;}
+.btn-twitch:hover{background:rgba(145,71,255,.25);}
+.btn-twitch svg{width:14px;height:14px;fill:#9147FF;}
+.scroll-hint{margin-top:40px;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);animation:float 2.5s ease-in-out infinite;}
+.scroll-hint-arrow{width:1px;height:32px;background:linear-gradient(to bottom,transparent,var(--dim));}
+
+/* TIERS SECTION */
+.tiers-section{max-width:1140px;margin:0 auto;padding:0 32px 120px;}
+.tiers-header{text-align:center;margin-bottom:56px;}
+.tiers-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--bp);display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:14px;}
+.tiers-eyebrow::before,.tiers-eyebrow::after{content:'';display:block;width:24px;height:1px;background:var(--bp);opacity:.5;}
+.tiers-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,4vw,48px);font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--white);line-height:1;}
+.tiers-desc{font-size:14px;color:var(--white3);margin-top:12px;font-weight:300;}
+
+/* TIER GRID */
+.tier-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+
+/* TIER CARD */
+.tier-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;transition:transform .2s, border-color .2s, box-shadow .2s;cursor:default;}
+.tier-card.unlocked{border-color:rgba(124,77,255,.35);box-shadow:0 0 20px rgba(124,77,255,.08);}
+.tier-card.unlocked:hover{transform:translateY(-3px);border-color:rgba(124,77,255,.6);box-shadow:0 8px 32px rgba(124,77,255,.15);}
+.tier-card.current{border-color:var(--bp);box-shadow:0 0 30px rgba(124,77,255,.25),inset 0 0 30px rgba(124,77,255,.04);}
+.tier-card.current .tier-num{color:var(--bp);}
+.tier-card.locked{opacity:.45;filter:saturate(.3);}
+.tier-card.legendary{border-color:var(--gold)!important;box-shadow:0 0 50px rgba(200,168,74,.2), inset 0 0 50px rgba(200,168,74,.03)!important;}
+.tier-card.legendary:hover{transform:translateY(-4px);box-shadow:0 12px 48px rgba(200,168,74,.3), inset 0 0 50px rgba(200,168,74,.05)!important;}
+.tier-card.legendary.locked{opacity:.35;}
+
+.tier-top{padding:14px 14px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.tier-num{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--white3);}
+.tier-iwh{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--white3);display:flex;align-items:center;gap:4px;}
+.tier-iwh .dot{width:5px;height:5px;border-radius:50%;background:var(--white3);}
+.tier-card.unlocked .tier-iwh .dot,.tier-card.current .tier-iwh .dot{background:var(--bp);}
+.tier-card.unlocked .tier-iwh,.tier-card.current .tier-iwh{color:var(--bp);}
+.tier-card.legendary .tier-iwh,.tier-card.legendary.unlocked .tier-iwh{color:var(--gold);}
+.tier-card.legendary .tier-iwh .dot,.tier-card.legendary.unlocked .tier-iwh .dot{background:var(--gold);}
+
+.tier-body{padding:16px 14px 18px;text-align:center;}
+.tier-icon{font-size:36px;margin-bottom:10px;display:block;line-height:1;}
+.tier-card.legendary .tier-icon{font-size:44px;animation:legendary-pulse 3s ease-in-out infinite;}
+.tier-name{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:var(--white);line-height:1.1;margin-bottom:5px;}
+.tier-card.legendary .tier-name{color:var(--gold);font-size:16px;}
+.tier-desc{font-size:11px;color:var(--white3);line-height:1.4;}
+
+/* LOCK OVERLAY */
+.tier-lock{position:absolute;top:8px;right:8px;width:18px;height:18px;opacity:.4;}
+.tier-lock svg{width:100%;height:100%;fill:var(--white3);}
+.tier-card.unlocked .tier-lock,.tier-card.current .tier-lock{display:none;}
+
+/* CHECK OVERLAY */
+.tier-check{position:absolute;top:8px;right:8px;width:18px;height:18px;background:var(--bp);border-radius:50%;display:none;align-items:center;justify-content:center;}
+.tier-check svg{width:10px;height:10px;fill:white;}
+.tier-card.unlocked .tier-check{display:flex;}
+.tier-card.current .tier-check{background:var(--streak);}
+
+/* CURRENT PULSE */
+.tier-current-badge{position:absolute;top:8px;left:8px;font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;border-radius:2px;background:var(--bp);color:white;display:none;}
+.tier-card.current .tier-current-badge{display:block;}
+
+/* LEGENDARY GLOW */
+.legendary-crown{position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:16px;line-height:1;}
+
+/* INFO SECTION */
+.info-section{max-width:900px;margin:0 auto;padding:0 32px 120px;}
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.info-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:24px;text-align:center;}
+.info-icon{font-size:32px;margin-bottom:12px;display:block;}
+.info-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--white);margin-bottom:6px;}
+.info-desc{font-size:13px;color:var(--white3);line-height:1.6;}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;max-width:1140px;margin:0 auto;}
+.footer-fb{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;letter-spacing:2px;color:var(--dim);text-transform:uppercase;}
+.footer-txt{font-size:12px;color:var(--dim);}
+.footer-links{display:flex;gap:20px;}
+.footer-link{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color .15s;}
+.footer-link:hover{color:var(--white3);}
+
+/* ANIMATIONS */
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+@keyframes legendary-pulse{0%,100%{transform:scale(1) rotate(0deg)}50%{transform:scale(1.08) rotate(2deg)}}
+.fade-up{opacity:0;transform:translateY(20px);transition:opacity .55s ease,transform .55s ease;}
+.fade-up.visible{opacity:1;transform:translateY(0);}
+
+@media(max-width:1000px){.tier-grid{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:760px){
+  nav{padding:0 20px;}
+  .nav-links{gap:0;}
+  .nav-link{padding:0 9px;font-size:10px;}
+  .hero{padding:100px 20px 60px;}
+  .tier-grid{grid-template-columns:repeat(2,1fr);}
+  .tiers-section,.info-section{padding:0 20px 80px;}
+  .info-grid{grid-template-columns:1fr;}
+  footer{flex-direction:column;gap:12px;text-align:center;padding:24px 20px;}
+  .progress-card,.login-prompt{padding:20px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <img class="nav-logo" src="https://shop.morrog.nl/cdn/shop/files/Morrog-Logo_90x.png?v=1701878792" alt="Morrog"
+    onerror="this.style.display='none';document.getElementById('nav-logo-fb').style.display='block'">
+  <span id="nav-logo-fb" class="nav-logo-fb" style="display:none">MORROG</span>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html">Home</a>
+    <a class="nav-link" href="index.html#loyalty">Loyaliteit</a>
+    <a class="nav-link" href="index.html#challenges">Challenges</a>
+    <a class="nav-link" href="index.html#agenda">Agenda</a>
+    <a class="nav-link" href="charity.html">Charity</a>
+    <a class="nav-link active" href="battlepass.html">Battle Pass</a>
+  </div>
+  <div class="nav-right">
+    <a class="nav-live" href="https://twitch.tv/morrog" target="_blank">
+      <span class="nav-live-dot"></span>Kijk live
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-bg2"></div>
+  <div class="hero-grid-lines"></div>
+
+  <div class="hero-eyebrow">Morrog Community</div>
+  <div class="hero-season">Seizoen I — Ik Was Hier</div>
+
+  <div class="hero-title">
+    BATTLE
+    <div class="hero-title-glow"></div>
+    <br><span class="bp">PASS</span>
+  </div>
+  <div class="hero-subtitle">25 tiers · exclusieve beloningen · jij was erbij</div>
+
+  <p class="hero-desc">
+    Elke keer dat je aanwezig bent bij een bijzonder kanaalmoment verdien je een
+    <strong style="color:var(--white2)">Ik Was Hier</strong> stempel. Verzamel genoeg stempels
+    en unlock gaming gear, merch en unieke beloningen.
+  </p>
+
+  <!-- INGELOGD: PROGRESS -->
+  <div class="progress-card hidden fade-up" id="progress-card">
+    <div class="progress-top">
+      <img class="progress-avatar" id="bp-avatar" src="" alt="">
+      <div class="progress-info">
+        <div class="progress-name" id="bp-name">—</div>
+        <div class="progress-sub" id="bp-sub">Laden...</div>
+      </div>
+      <div class="progress-tier-badge" id="bp-tier-badge">Tier ?</div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-label">
+        <span id="bp-bar-left">0 IWH</span>
+        <span id="bp-bar-right">Volgende tier</span>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="bp-bar-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="progress-next" id="bp-next-text"></div>
+  </div>
+
+  <!-- NIET INGELOGD -->
+  <div class="login-prompt fade-up" id="login-prompt">
+    <p>Log in om je eigen voortgang te zien in de Battle Pass.</p>
+    <a class="btn-twitch" href="index.html" onclick="localStorage.setItem('bp_return','1')">
+      <svg viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+      Inloggen via Twitch
+    </a>
+  </div>
+
+  <div class="scroll-hint">
+    Scroll voor alle tiers
+    <div class="scroll-hint-arrow"></div>
+  </div>
+</div>
+
+<!-- TIERS -->
+<div class="tiers-section">
+  <div class="tiers-header fade-up">
+    <div class="tiers-eyebrow">Alle beloningen</div>
+    <div class="tiers-title">25 tiers · 1 doel</div>
+    <div class="tiers-desc">Van je eerste IWH stempel tot de ultieme gaming setup — elke aanwezigheid telt.</div>
+  </div>
+
+  <div class="tier-grid fade-up" id="tier-grid">
+    <!-- gegenereerd door JS -->
+  </div>
+</div>
+
+<!-- INFO -->
+<div class="info-section">
+  <div class="info-grid fade-up">
+    <div class="info-card">
+      <span class="info-icon">🏴</span>
+      <div class="info-title">Hoe verdien je IWH?</div>
+      <div class="info-desc">Morrog activeert een "Ik Was Hier" moment tijdens bijzondere streams. Ben jij aanwezig? Dan krijg je automatisch een stempel.</div>
+    </div>
+    <div class="info-card">
+      <span class="info-icon">🎁</span>
+      <div class="info-title">Hoe claim je een reward?</div>
+      <div class="info-desc">Zodra je een tier unlockt stuur je een bericht in de Discord. Morrog neemt persoonlijk contact op voor de overdracht van de beloning.</div>
+    </div>
+    <div class="info-card">
+      <span class="info-icon">♾️</span>
+      <div class="info-title">Stempels vervallen niet</div>
+      <div class="info-desc">Je IWH stempels stapelen op door de tijd. Er is geen reset — wie trouw aanwezig blijft klimt uiteindelijk naar de top.</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div>
+    <div class="footer-fb">Morrog</div>
+    <div class="footer-txt">Battle Pass — Seizoen I</div>
+  </div>
+  <div class="footer-links">
+    <a class="footer-link" href="index.html">Community Hub</a>
+    <a class="footer-link" href="charity.html">Charity</a>
+    <a class="footer-link" href="https://twitch.tv/morrog" target="_blank">Twitch</a>
+  </div>
+</footer>
+
+<script>
+const BACKEND = 'https://morrog-loyalty-backend-production.up.railway.app';
+const TWITCH_CLIENT_ID = 'r6uuslartqla0c52af9wc4j7eobcnu';
+const REDIRECT_URI     = 'https://officialmorrog.github.io/morrog/battlepass.html';
+
+// ── TIERS DATA ──────────────────────────────────────────────
+const TIERS = [
+  { tier:1,  iwh:1,  icon:'🎨', name:'Sticker Pack',         desc:'Digitale Morrog stickerset — exclusief voor trouwe kijkers' },
+  { tier:2,  iwh:2,  icon:'💬', name:'Community Rol',        desc:'Exclusieve Discord rol: "Aanwezige" met toegang tot verborgen kanalen' },
+  { tier:3,  iwh:3,  icon:'🖼️', name:'Wallpaper Collectie', desc:'5 exclusieve Morrog wallpapers in 4K resolutie' },
+  { tier:4,  iwh:5,  icon:'📢', name:'Persoonlijke Shoutout',desc:'Live shoutout op stream met jouw naam en een boodschap naar keuze' },
+  { tier:5,  iwh:7,  icon:'🎮', name:'Steam Game (€10)',     desc:'Een Steam game naar keuze tot €10 — jij kiest, Morrog betaalt' },
+  { tier:6,  iwh:10, icon:'👕', name:'Morrog T-shirt',       desc:'Officieel Morrog shirt — limited edition, inclusief verzending' },
+  { tier:7,  iwh:12, icon:'⭐', name:'Chat Badge',           desc:'Exclusieve "IWH Veteraan" badge zichtbaar in de Morrog chat' },
+  { tier:8,  iwh:15, icon:'🖱️', name:'Gaming Muismat XL',   desc:'Extra grote muismat (900×400mm) met custom Morrog artwork' },
+  { tier:9,  iwh:18, icon:'🎮', name:'Steam Game (€20)',     desc:'Steam game naar keuze tot €20 — voor de echte gamer' },
+  { tier:10, iwh:22, icon:'🧥', name:'Morrog Hoodie',        desc:'Limited edition heavyweight hoodie — comfortabel en exclusief' },
+  { tier:11, iwh:25, icon:'⌨️', name:'Keycap Set',          desc:'Custom gaming keycaps in Morrog kleuren voor elk toetsenbord' },
+  { tier:12, iwh:28, icon:'🎮', name:'AAA Game (€40)',       desc:'Een grote AAA game of meerdere games tot €40 totaalwaarde' },
+  { tier:13, iwh:32, icon:'🎧', name:'HyperX Cloud Headset', desc:'Professionele HyperX Cloud gaming headset — studio-geluidskwaliteit' },
+  { tier:14, iwh:35, icon:'✍️', name:'Gesigneerd Pakket',    desc:'Gesigneerde Morrog merch collectie + gepersonaliseerde handgeschreven brief' },
+  { tier:15, iwh:38, icon:'🖱️', name:'Logitech G502 X',     desc:'High-end gaming muis met HERO 25K sensor — precisie op elk oppervlak' },
+  { tier:16, iwh:42, icon:'💜', name:'Sub Pakket 3 mnd',     desc:'3 maanden Twitch sub op Morrog + permanente VIP Discord toegang' },
+  { tier:17, iwh:46, icon:'⌨️', name:'Corsair K70 RGB',     desc:'Mechanisch RGB gaming toetsenbord — Cherry MX switches' },
+  { tier:18, iwh:50, icon:'📦', name:'Game Bundle',          desc:'Volledige AAA game bundle: 5 games naar keuze tot €60 totaal' },
+  { tier:19, iwh:54, icon:'🎬', name:'Cameo van Morrog',     desc:'Persoonlijke video van Morrog speciaal voor jou — voor elk moment' },
+  { tier:20, iwh:58, icon:'🖥️', name:'Gaming Monitor 27"',  desc:'27 inch 165Hz IPS gaming monitor — vloeiend beeld, scherpe kleuren' },
+  { tier:21, iwh:63, icon:'🤝', name:'IRL Meet & Greet',     desc:'Exclusief ticket voor een Morrog IRL meetup event — een dag met de community' },
+  { tier:22, iwh:68, icon:'💾', name:'PC Upgrade (€200)',    desc:'Gaming PC upgrade onderdeel naar keuze tot €200 — RAM, SSD, koeling of meer' },
+  { tier:23, iwh:73, icon:'🔥', name:'RTX 4060 Ti',          desc:'High-end NVIDIA RTX 4060 Ti GPU — voor de ultieme gaming prestaties' },
+  { tier:24, iwh:78, icon:'🏆', name:'Setup Upgrade Pack',   desc:'Volledige perifere upgrade: monitor + keyboard + muis + headset naar keuze' },
+  { tier:25, iwh:85, icon:'👑', name:'LEGENDARY SETUP',      desc:'De ultieme beloning: een complete custom gaming setup samengesteld door Morrog — voor de allertrouwste kijker' },
+];
+
+// ── AUTH ────────────────────────────────────────────────────
+let gebruikerIwhCount = 0;
+
+function verwerkCallback() {
+  const hash = window.location.hash.substring(1);
+  if (!hash.includes('access_token=')) return;
+  const params = new URLSearchParams(hash);
+  const token  = params.get('access_token');
+  if (token) {
+    localStorage.setItem('twitch_token', token);
+    window.location.hash = '';
+  }
+}
+
+async function laadGebruiker() {
+  const token = localStorage.getItem('twitch_token');
+  if (!token) {
+    document.getElementById('login-prompt').classList.remove('hidden');
+    return;
+  }
+
+  try {
+    const res  = await fetch(BACKEND + '/api/auth/verify', {
+      method: 'POST',
+      headers: { 'x-twitch-token': token, 'Content-Type': 'application/json' },
+      body: '{}',
+    });
+    const data = await res.json();
+    if (!data.user) { document.getElementById('login-prompt').classList.remove('hidden'); return; }
+
+    const user  = data.user;
+    const score = data.score;
+    gebruikerIwhCount = score ? Math.round((score.score_iwh || 0) / 100) : 0;
+
+    // Toon progress card
+    document.getElementById('login-prompt').classList.add('hidden');
+    document.getElementById('progress-card').classList.remove('hidden');
+    document.getElementById('bp-avatar').src  = user.profile_image_url || '';
+    document.getElementById('bp-name').textContent = user.display_name || user.login;
+
+    // Bereken huidige tier
+    const huidigeIndex = [...TIERS].reverse().findIndex(t => gebruikerIwhCount >= t.iwh);
+    const huidigeTier  = huidigeIndex >= 0 ? TIERS[TIERS.length - 1 - huidigeIndex] : null;
+    const volgendeTier = TIERS.find(t => gebruikerIwhCount < t.iwh) || null;
+
+    document.getElementById('bp-sub').textContent = `${gebruikerIwhCount} IWH stempel${gebruikerIwhCount !== 1 ? 's' : ''} verzameld`;
+    document.getElementById('bp-tier-badge').textContent = huidigeTier ? `Tier ${huidigeTier.tier}` : 'Tier 0';
+
+    if (volgendeTier) {
+      const prevIwh  = huidigeTier ? huidigeTier.iwh : 0;
+      const nodig    = volgendeTier.iwh - prevIwh;
+      const heb      = gebruikerIwhCount - prevIwh;
+      const pct      = Math.max(0, Math.min(100, Math.round(heb / nodig * 100)));
+      document.getElementById('bp-bar-left').textContent  = `${gebruikerIwhCount} IWH`;
+      document.getElementById('bp-bar-right').textContent = `Tier ${volgendeTier.tier}: ${volgendeTier.iwh} IWH`;
+      document.getElementById('bp-next-text').innerHTML   = `Nog <strong>${volgendeTier.iwh - gebruikerIwhCount} IWH</strong> tot <strong>${volgendeTier.name}</strong>`;
+      setTimeout(() => { document.getElementById('bp-bar-fill').style.width = pct + '%'; }, 600);
+    } else {
+      document.getElementById('bp-bar-left').textContent  = `${gebruikerIwhCount} IWH`;
+      document.getElementById('bp-bar-right').textContent = 'Alle tiers unlocked!';
+      document.getElementById('bp-next-text').innerHTML   = '<strong style="color:var(--gold)">👑 Je hebt alle 25 tiers unlocked!</strong>';
+      setTimeout(() => { document.getElementById('bp-bar-fill').style.width = '100%'; }, 600);
+    }
+
+    // Herrender grid met unlock state
+    renderTiers();
+  } catch {
+    document.getElementById('login-prompt').classList.remove('hidden');
+  }
+}
+
+// ── TIER GRID ───────────────────────────────────────────────
+function renderTiers() {
+  const grid = document.getElementById('tier-grid');
+  grid.innerHTML = '';
+
+  TIERS.forEach(t => {
+    const unlocked = gebruikerIwhCount >= t.iwh;
+    const isCurrent = !unlocked && (TIERS.findIndex(x => gebruikerIwhCount < x.iwh) === TIERS.indexOf(t));
+    const isLegendary = t.tier === 25;
+
+    const card = document.createElement('div');
+    card.className = `tier-card${unlocked ? ' unlocked' : ' locked'}${isCurrent ? ' current' : ''}${isLegendary ? ' legendary' : ''}`;
+
+    card.innerHTML = `
+      ${isLegendary ? '<div class="legendary-crown">👑</div>' : ''}
+      <div class="tier-current-badge">Nu</div>
+      <div class="tier-lock">
+        <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+      </div>
+      <div class="tier-check">
+        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+      </div>
+      <div class="tier-top">
+        <div class="tier-num">TIER ${t.tier}</div>
+        <div class="tier-iwh"><div class="dot"></div>${t.iwh} IWH</div>
+      </div>
+      <div class="tier-body">
+        <span class="tier-icon">${t.icon}</span>
+        <div class="tier-name">${t.name}</div>
+        <div class="tier-desc">${t.desc}</div>
+      </div>`;
+
+    grid.appendChild(card);
+  });
+}
+
+// ── FADE UP OBSERVER ─────────────────────────────────────────
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }});
+}, { threshold: 0.08 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// ── INIT ─────────────────────────────────────────────────────
+verwerkCallback();
+renderTiers(); // eerst zonder login state
+laadGebruiker();
+</script>
+</body>
+</html>
