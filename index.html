@@ -817,35 +817,56 @@ function switchView(name, btn) {
 }
 
 // ── LEADERBOARDS ──
-const posClass = { 1:'gold', 2:'silver', 3:'bronze' };
+const posClass  = { 1:'gold', 2:'silver', 3:'bronze' };
+const rangClass = { 'Legende':'legende','Veteraan':'veteraan','Toegewijde':'toegewijde','Vaste kijker':'vaste','Beginner':'beginner' };
 
 function bouwLb3Rijen(rows, eigenRij, containerId) {
   const inlogUsername = window._ingelogdUser?.login?.toLowerCase();
   const inTop = rows.some(r => r.username === inlogUsername);
   let html = '';
 
-  rows.forEach((k, i) => {
-    const pos = parseInt(k.rank) || (i + 1);
+  const bouwRij = (k, pos, isEigen) => {
     const isJij = k.username === inlogUsername;
-    html += `<div class="lb3-row${isJij?' eigen':''}" onclick="toonLb3Detail('${k.username}')">
-      <div class="lb3-pos ${posClass[pos]||''}${isJij?' eigen-pos':''}">${pos}</div>
-      <div class="lb3-name${isJij?' jij':''}">${k.display_name || k.username}${isJij?' <span style="color:var(--gold);font-size:10px">◀ jij</span>':''}</div>
-      <div class="lb3-score">${(parseInt(k.score)||0).toLocaleString('nl-NL')}</div>
-    </div>`;
-  });
+    const uid   = containerId + '-' + k.username;
+    return `
+      <div class="lb3-row${isJij?' eigen':''}${isEigen?' eigen':''}" onclick="toggleLb3Detail('${uid}','${k.username}',this)">
+        <div class="lb3-pos ${posClass[pos]||''}${isJij?' eigen-pos':''}">${pos}</div>
+        <div class="lb3-name${isJij?' jij':''}">${k.display_name || k.username}</div>
+        <span class="lb-badge ${rangClass[k.rang]||'beginner'}">${k.rang||''}</span>
+        <div class="lb3-score">${(parseInt(k.score)||0).toLocaleString('nl-NL')}</div>
+      </div>
+      <div class="kijker-detail" id="detail-${uid}"></div>`;
+  };
 
-  // Eigen positie als niet in top 10
+  rows.forEach((k, i) => { html += bouwRij(k, parseInt(k.rank)||(i+1), false); });
+
   if (eigenRij && inlogUsername && !inTop) {
     html += `<div class="lb3-row sep"><div class="lb3-sep-line">· · ·</div></div>`;
-    const epos = parseInt(eigenRij.rank) || '?';
-    html += `<div class="lb3-row eigen" onclick="toonLb3Detail('${eigenRij.username}')">
-      <div class="lb3-pos eigen-pos">${epos}</div>
-      <div class="lb3-name jij">${eigenRij.display_name || eigenRij.username} <span style="color:var(--gold);font-size:10px">◀ jij</span></div>
-      <div class="lb3-score">${(parseInt(eigenRij.score)||0).toLocaleString('nl-NL')}</div>
-    </div>`;
+    html += bouwRij({ ...eigenRij, rang: eigenRij.rang||'' }, parseInt(eigenRij.rank)||'?', true);
   }
 
   document.getElementById(containerId).innerHTML = html || '<div class="lb3-empty">Nog geen data</div>';
+}
+
+async function toggleLb3Detail(uid, username, rij) {
+  const detail = document.getElementById('detail-' + uid);
+  if (detail.classList.contains('open')) {
+    detail.classList.remove('open');
+    rij.classList.remove('selected');
+    return;
+  }
+  // Sluit alle andere details in dit scoreboard
+  const container = detail.closest('.lb3-rows');
+  container.querySelectorAll('.kijker-detail.open').forEach(d => d.classList.remove('open'));
+  container.querySelectorAll('.lb3-row.selected').forEach(r => r.classList.remove('selected'));
+  rij.classList.add('selected');
+  detail.innerHTML = '<div style="font-size:12px;color:var(--white3);padding:4px 0">Laden...</div>';
+  detail.classList.add('open');
+  try {
+    const res = await fetch(BACKEND + '/api/kijker/' + encodeURIComponent(username));
+    const k   = await res.json();
+    detail.innerHTML = bouwKijkerDetail(k);
+  } catch { detail.innerHTML = '<div style="font-size:12px;color:var(--here)">Fout bij laden.</div>'; }
 }
 
 async function laadLeaderboard() {
@@ -856,20 +877,14 @@ async function laadLeaderboard() {
     const res  = await fetch(BACKEND + '/api/leaderboard?limit=10');
     const data = await res.json();
     document.getElementById('lb-totaal').textContent = data.totaal.toLocaleString('nl-NL') + ' geregistreerd';
-
-    // Eigen positie in all-time
     let eigen = null;
-    if (inlogUsername) {
-      const inTop = data.leaderboard.some(k => k.username === inlogUsername);
-      if (!inTop) {
-        const r = await fetch(BACKEND + '/api/kijker/' + encodeURIComponent(inlogUsername));
-        if (r.ok) { const k = await r.json(); eigen = { username: k.username, display_name: k.display_name, score: k.score_totaal, rank: k.rank }; }
-      }
+    if (inlogUsername && !data.leaderboard.some(k => k.username === inlogUsername)) {
+      const r = await fetch(BACKEND + '/api/kijker/' + encodeURIComponent(inlogUsername));
+      if (r.ok) { const k = await r.json(); eigen = { username: k.username, display_name: k.display_name, score: k.score_totaal, rank: k.rank, rang: k.rang }; }
     }
-    // Zet rank op rijen
     data.leaderboard.forEach((k, i) => { k.rank = i + 1; });
     bouwLb3Rijen(data.leaderboard, eigen, 'lb-alltime');
-  } catch(e) { document.getElementById('lb-alltime').innerHTML = '<div class="lb3-empty">Fout bij laden</div>'; }
+  } catch { document.getElementById('lb-alltime').innerHTML = '<div class="lb3-empty">Fout bij laden</div>'; }
 
   // Week
   try {
@@ -884,15 +899,6 @@ async function laadLeaderboard() {
     const data = await res.json();
     bouwLb3Rijen(data.leaderboard, data.eigen, 'lb-maand');
   } catch { document.getElementById('lb-maand').innerHTML = '<div class="lb3-empty">Fout bij laden</div>'; }
-}
-
-async function toonLb3Detail(username) {
-  const res = await fetch(BACKEND + '/api/kijker/' + encodeURIComponent(username));
-  if (!res.ok) return;
-  const k = await res.json();
-  document.getElementById('zoek-input').value = username;
-  document.getElementById('zoek-resultaat').innerHTML = `<div class="kijker-detail open" style="max-width:500px">${bouwKijkerDetail(k)}</div>`;
-  document.getElementById('zoek-resultaat').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 function toggleScoreUitleg() {
