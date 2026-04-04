@@ -489,6 +489,13 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.96);b
         </div>
         <div class="feedback" id="systeem-follow-feedback"></div>
       </div>
+
+      <div class="card">
+        <div class="card-title">StreamElements watch time</div>
+        <p style="font-size:13px;color:var(--white3);margin-bottom:16px;line-height:1.6">Sync watch uren van alle kijkers vanuit StreamElements. Loopt automatisch elke nacht om 02:00. Handmatig triggeren duurt enkele minuten.</p>
+        <button class="btn btn-ghost" onclick="syncSeWatchTime()">↻ Sync SE watch time nu</button>
+        <div class="feedback" id="systeem-se-feedback"></div>
+      </div>
     </div>
 
   </div><!-- .content -->
@@ -1023,6 +1030,13 @@ async function refreshAlleFollowAges() {
   try {
     await adminFetch('/api/followage/refresh/all', { method: 'POST', body: '{}' });
   } catch(e) { toonFeedback('systeem-follow-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+async function syncSeWatchTime() {
+  toonFeedback('systeem-se-feedback', 'SE watch time sync gestart op de achtergrond...', 'ok');
+  try {
+    await adminFetch('/api/se/sync', { method: 'POST', body: '{}' });
+  } catch(e) { toonFeedback('systeem-se-feedback', 'Fout: ' + e.message, 'fout'); }
 }
 
 // ── START ────────────────────────────────────────────────
