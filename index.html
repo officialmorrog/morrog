@@ -250,6 +250,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
     <button class="nav-link" onclick="switchView('loyalty',this)">Loyaliteit</button>
     <button class="nav-link" onclick="switchView('challenges',this)">Challenges &amp; Speedruns</button>
     <button class="nav-link" onclick="switchView('agenda',this)">Agenda</button>
+    <a class="nav-link" href="charity.html" style="text-decoration:none">Charity</a>
   </div>
   <div class="nav-right">
     <!-- Niet ingelogd -->
@@ -597,11 +598,10 @@ const MORROG_ID        = '65660593';
 
 // ── TWITCH AUTH ──────────────────────────────────────────
 function twitchLogin() {
-  const scope = '';
   window.location.href =
     `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}` +
     `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-    `&response_type=token&scope=${scope}`;
+    `&response_type=token&scope=user%3Aread%3Afollows+moderator%3Aread%3Afollowers`;
 }
 
 function uitloggen() {

@@ -496,6 +496,20 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.96);b
         <button class="btn btn-ghost" onclick="syncSeWatchTime()">↻ Sync SE watch time nu</button>
         <div class="feedback" id="systeem-se-feedback"></div>
       </div>
+
+      <div class="card">
+        <div class="card-title">StreamElements sub maanden</div>
+        <p style="font-size:13px;color:var(--white3);margin-bottom:16px;line-height:1.6">Sync historische cumulatieve sub maanden voor alle kijkers vanuit SE activiteiten. Doorzoekt de volledige activiteitenhistorie. Dit kan 5–15 minuten duren.</p>
+        <button class="btn btn-ghost" onclick="syncSeSubMonths()">↻ Sync sub maanden nu</button>
+        <div class="feedback" id="systeem-se-sub-feedback"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Chat berichten reset</div>
+        <p style="font-size:13px;color:var(--white3);margin-bottom:16px;line-height:1.6">Reset alle chat berichtaantallen naar 0. Chat wordt vanaf nu live bijgehouden via Twitch EventSub — eerlijk voor alle kijkers.</p>
+        <button class="btn btn-danger" onclick="resetChatMessages()">✕ Reset chat naar 0</button>
+        <div class="feedback" id="systeem-chat-reset-feedback"></div>
+      </div>
     </div>
 
   </div><!-- .content -->
@@ -525,7 +539,7 @@ function twitchLogin() {
   window.location.href =
     `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}` +
     `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-    `&response_type=token&scope=`;
+    `&response_type=token&scope=user%3Aread%3Afollows+moderator%3Aread%3Afollowers`;
 }
 
 function uitloggen() {
@@ -1037,6 +1051,23 @@ async function syncSeWatchTime() {
   try {
     await adminFetch('/api/se/sync', { method: 'POST', body: '{}' });
   } catch(e) { toonFeedback('systeem-se-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+async function resetChatMessages() {
+  if (!confirm('Reset alle chat berichten naar 0? Dit kan niet ongedaan worden gemaakt.')) return;
+  toonFeedback('systeem-chat-reset-feedback', 'Resetten...', 'ok');
+  try {
+    const r = await adminFetch('/api/chat/reset', { method: 'POST', body: '{}' });
+    toonFeedback('systeem-chat-reset-feedback', r.bericht, 'ok');
+  } catch(e) { toonFeedback('systeem-chat-reset-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+async function syncSeSubMonths() {
+  toonFeedback('systeem-se-sub-feedback', 'Sub maanden sync gestart — doorzoekt alle SE activiteiten, dit duurt 5–15 min...', 'ok');
+  try {
+    await adminFetch('/api/se/sync-subs', { method: 'POST', body: '{}' });
+    toonFeedback('systeem-se-sub-feedback', 'Sync gestart op de achtergrond. Scores worden automatisch herberekend als het klaar is.', 'ok');
+  } catch(e) { toonFeedback('systeem-se-sub-feedback', 'Fout: ' + e.message, 'fout'); }
 }
 
 // ── START ────────────────────────────────────────────────
