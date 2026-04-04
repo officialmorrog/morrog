@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morrog — Streamer Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#090909;--bg2:#111111;--bg3:#181818;--bg4:#202020;--bg5:#282828;
+  --white:#FFFFFF;--white2:#CECECE;--white3:#888888;--dim:#333333;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --gold:#C8A84A;--streak:#3DAB6A;--here:#C85050;--sub:#6858CC;
+  --twitch:#9147FF;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--white2);font-family:'Barlow',sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);z-index:100;display:flex;align-items:center;padding:0 40px;gap:20px;}
+.nav-logo{height:22px;opacity:.9;flex-shrink:0;}
+.nav-logo-fb{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;letter-spacing:3px;color:var(--white);text-transform:uppercase;}
+.nav-badge{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);background:rgba(200,168,74,.1);border:1px solid rgba(200,168,74,.25);padding:3px 10px;border-radius:2px;}
+.nav-spacer{flex:1;}
+.nav-user-info{display:flex;align-items:center;gap:10px;}
+.nav-avatar{width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);object-fit:cover;}
+.nav-username{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--white2);}
+.btn-hub{display:flex;align-items:center;gap:6px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white3);padding:5px 12px;border:1px solid var(--border2);border-radius:3px;background:transparent;text-decoration:none;transition:color .15s;}
+.btn-hub:hover{color:var(--white);}
+.btn-logout{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--here);padding:5px 12px;border:1px solid rgba(200,80,80,.3);border-radius:3px;background:transparent;cursor:pointer;transition:background .15s;}
+.btn-logout:hover{background:rgba(200,80,80,.08);}
+
+/* LAYOUT */
+.dashboard{display:grid;grid-template-columns:220px 1fr;min-height:100vh;padding-top:58px;}
+
+/* SIDEBAR */
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:32px 0;position:sticky;top:58px;height:calc(100vh - 58px);overflow-y:auto;}
+.sidebar-section{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--white3);padding:0 20px;margin-bottom:6px;margin-top:24px;}
+.sidebar-section:first-child{margin-top:0;}
+.sidebar-btn{display:flex;align-items:center;gap:12px;width:100%;padding:11px 20px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--white3);background:none;border:none;cursor:pointer;transition:color .12s,background .12s;text-align:left;}
+.sidebar-btn:hover{background:var(--bg3);color:var(--white2);}
+.sidebar-btn.active{background:var(--bg3);color:var(--white);border-right:2px solid var(--white);}
+.sidebar-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+.sidebar-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--streak);animation:pulse 1.5s ease-in-out infinite;display:none;}
+.sidebar-dot.actief{display:block;}
+
+/* CONTENT */
+.content{padding:40px 48px;max-width:900px;}
+.panel{display:none;}
+.panel.active{display:block;}
+.panel-title{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--white);margin-bottom:6px;}
+.panel-desc{font-size:13px;color:var(--white3);margin-bottom:32px;line-height:1.6;}
+
+/* KAARTEN */
+.card{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:24px;margin-bottom:16px;}
+.card-title{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--white3);margin-bottom:16px;}
+
+/* FORMS */
+.form-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.form-group{display:flex;flex-direction:column;gap:6px;flex:1;min-width:160px;}
+.form-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--white3);}
+.form-input{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:10px 14px;font-family:'Barlow',sans-serif;font-size:14px;color:var(--white);outline:none;transition:border-color .15s;width:100%;}
+.form-input:focus{border-color:rgba(255,255,255,.3);}
+.form-select{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:10px 14px;font-family:'Barlow',sans-serif;font-size:14px;color:var(--white);outline:none;width:100%;cursor:pointer;}
+
+/* KNOPPEN */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border-radius:3px;border:none;cursor:pointer;transition:opacity .15s,transform .1s;}
+.btn:hover{opacity:.85;}.btn:active{transform:scale(.98);}
+.btn-primary{background:var(--white);color:var(--bg);}
+.btn-danger{background:var(--here);color:var(--white);}
+.btn-success{background:var(--streak);color:var(--white);}
+.btn-gold{background:var(--gold);color:var(--bg);}
+.btn-ghost{background:transparent;color:var(--white2);border:1px solid var(--border2);}
+.btn-sm{padding:7px 14px;font-size:11px;}
+
+/* STATUS BADGES */
+.status-badge{display:inline-flex;align-items:center;gap:6px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:2px;}
+.badge-actief{background:rgba(61,171,106,.1);color:var(--streak);border:1px solid rgba(61,171,106,.25);}
+.badge-inactief{background:var(--bg4);color:var(--white3);border:1px solid var(--border);}
+.badge-dot{width:6px;height:6px;border-radius:50%;animation:pulse 1.5s ease-in-out infinite;}
+
+/* GIVEAWAY WINNAAR ANIMATIE */
+.winnaar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;align-items:center;justify-content:center;flex-direction:column;}
+.winnaar-overlay.active{display:flex;}
+.winnaar-drum{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--white3);margin-bottom:20px;}
+.winnaar-naam{font-family:'Barlow Condensed',sans-serif;font-size:64px;font-weight:900;text-transform:uppercase;color:var(--gold);letter-spacing:2px;text-align:center;line-height:1.1;opacity:0;transform:scale(.5);transition:opacity .5s,transform .5s;}
+.winnaar-naam.toon{opacity:1;transform:scale(1);}
+.winnaar-prijs{font-size:16px;color:var(--white3);margin-top:12px;opacity:0;transition:opacity .5s .3s;}
+.winnaar-prijs.toon{opacity:1;}
+.winnaar-sluit{margin-top:32px;opacity:0;transition:opacity .5s .6s;}
+.winnaar-sluit.toon{opacity:1;}
+.winnaar-rol-namen{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;color:var(--white2);margin-bottom:8px;min-height:40px;transition:opacity .1s;}
+
+/* FEEDBACK */
+.feedback{padding:10px 14px;border-radius:4px;font-size:13px;margin-top:10px;display:none;}
+.feedback.ok{background:rgba(61,171,106,.1);color:var(--streak);border:1px solid rgba(61,171,106,.25);display:block;}
+.feedback.fout{background:rgba(200,80,80,.1);color:var(--here);border:1px solid rgba(200,80,80,.25);display:block;}
+
+/* LIJST RIJEN */
+.lijst-rij{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;}
+.lijst-rij-naam{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--white);}
+.lijst-rij-sub{font-size:12px;color:var(--white3);}
+.lijst-lege{padding:24px;text-align:center;font-size:13px;color:var(--white3);}
+
+/* SCORE AANPAS GRID */
+.score-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:12px;}
+.score-veld{display:flex;flex-direction:column;gap:5px;}
+.score-veld-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white3);}
+.score-veld-huidig{font-size:11px;color:var(--dim);margin-top:2px;}
+
+/* KIJKER INFO */
+.kijker-info-box{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:20px;margin-bottom:16px;display:none;}
+.kijker-info-naam{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;color:var(--white);margin-bottom:4px;}
+.kijker-info-stats{display:flex;gap:20px;flex-wrap:wrap;font-size:12px;color:var(--white3);}
+.kijker-info-stats strong{color:var(--white);}
+
+/* SEPARATOR */
+.sep{border:none;border-top:1px solid var(--border);margin:20px 0;}
+
+/* WINNAARS LIJST */
+.winnaars-lijst{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+.winnaar-rij{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;}
+.winnaar-rij-naam{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gold);}
+.winnaar-rij-prijs{font-size:12px;color:var(--white3);}
+.winnaar-rij-datum{font-size:11px;color:var(--dim);}
+
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* AUTH SCHERM */
+.auth-scherm{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;text-align:center;padding:40px;}
+.auth-logo{font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:900;letter-spacing:3px;text-transform:uppercase;color:var(--white);margin-bottom:8px;}
+.auth-desc{font-size:14px;color:var(--white3);max-width:360px;line-height:1.7;margin-bottom:8px;}
+.btn-twitch{display:inline-flex;align-items:center;gap:10px;padding:14px 28px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:var(--twitch);color:var(--white);border:none;border-radius:4px;cursor:pointer;text-decoration:none;transition:opacity .15s;}
+.btn-twitch:hover{opacity:.85;}
+.btn-twitch svg{width:18px;height:18px;fill:white;}
+
+@media(max-width:900px){
+  .dashboard{grid-template-columns:1fr;}
+  .sidebar{position:static;height:auto;display:flex;overflow-x:auto;padding:8px 0;border-right:none;border-bottom:1px solid var(--border);}
+  .sidebar-section{display:none;}
+  .sidebar-btn{padding:8px 14px;font-size:11px;white-space:nowrap;}
+  .content{padding:24px 20px;}
+  nav{padding:0 20px;}
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH SCHERM (zichtbaar als niet ingelogd) -->
+<div id="auth-scherm" class="auth-scherm">
+  <div class="auth-logo">MORROG<span style="color:var(--gold)">.</span></div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--white3)">Streamer Dashboard</div>
+  <div class="auth-desc">Dit dashboard is alleen toegankelijk voor het Twitch account <strong style="color:var(--white)">@morrog</strong>. Log in om verder te gaan.</div>
+  <button class="btn-twitch" onclick="twitchLogin()">
+    <svg viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+    Inloggen met Twitch
+  </button>
+</div>
+
+<!-- DASHBOARD (verborgen tot auth) -->
+<div id="dashboard-main" style="display:none">
+
+<nav>
+  <img class="nav-logo" src="https://shop.morrog.nl/cdn/shop/files/Morrog-Logo_90x.png?v=1701878792" alt="Morrog"
+    onerror="this.style.display='none'">
+  <span class="nav-badge">Streamer Dashboard</span>
+  <div class="nav-spacer"></div>
+  <div class="nav-user-info">
+    <img class="nav-avatar" id="nav-avatar" src="" alt="">
+    <span class="nav-username" id="nav-username"></span>
+  </div>
+  <a class="btn-hub" href="index.html">← Hub</a>
+  <button class="btn-logout" onclick="uitloggen()">Uitloggen</button>
+</nav>
+
+<div class="dashboard">
+  <div class="sidebar">
+    <div class="sidebar-section">Beheer</div>
+    <button class="sidebar-btn active" onclick="toonPanel('giveaway', this)">
+      <span class="sidebar-icon">🎁</span> Giveaway
+      <span class="sidebar-dot" id="dot-giveaway"></span>
+    </button>
+    <button class="sidebar-btn" onclick="toonPanel('iwh', this)">
+      <span class="sidebar-icon">📍</span> Ik Was Hier
+      <span class="sidebar-dot" id="dot-iwh"></span>
+    </button>
+    <div class="sidebar-section">Content</div>
+    <button class="sidebar-btn" onclick="toonPanel('agenda', this)">
+      <span class="sidebar-icon">📅</span> Agenda
+    </button>
+    <div class="sidebar-section">Data</div>
+    <button class="sidebar-btn" onclick="toonPanel('leaderboard', this)">
+      <span class="sidebar-icon">🏆</span> Leaderboard
+    </button>
+    <button class="sidebar-btn" onclick="toonPanel('trackmania', this)">
+      <span class="sidebar-icon">🏎</span> Trackmania
+    </button>
+    <div class="sidebar-section">Systeem</div>
+    <button class="sidebar-btn" onclick="toonPanel('systeem', this)">
+      <span class="sidebar-icon">⚙</span> Systeem
+    </button>
+  </div>
+
+  <div class="content">
+
+    <!-- ── GIVEAWAY ─────────────────────────────────── -->
+    <div class="panel active" id="panel-giveaway">
+      <div class="panel-title">Giveaway</div>
+      <div class="panel-desc">Start een giveaway, stel de criteria in en rol een winnaar. Alle kijkers met genoeg punten en follow-tijd komen in aanmerking.</div>
+
+      <!-- Status -->
+      <div class="card" id="giveaway-status-card">
+        <div class="card-title">Huidige status</div>
+        <div id="giveaway-status-inhoud" style="font-size:13px;color:var(--white3)">Laden...</div>
+      </div>
+
+      <!-- Nieuwe giveaway starten -->
+      <div class="card" id="giveaway-start-card">
+        <div class="card-title">Nieuwe giveaway starten</div>
+        <div class="form-row">
+          <div class="form-group" style="flex:2">
+            <label class="form-label">Prijs</label>
+            <input class="form-input" id="gw-prijs" type="text" placeholder="bijv. Sub giften, merchandise...">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Min. punten</label>
+            <input class="form-input" id="gw-punten" type="number" value="500" min="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Min. follow (dagen)</label>
+            <input class="form-input" id="gw-follow" type="number" value="30" min="0">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="startGiveaway()">🎁 Start giveaway</button>
+        <div class="feedback" id="gw-start-feedback"></div>
+      </div>
+
+      <!-- Winnaar beheer -->
+      <div class="card" id="giveaway-beheer-card" style="display:none">
+        <div class="card-title">Giveaway beheren</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-gold" onclick="rolWinnaar()">🎰 Rol winnaar</button>
+          <button class="btn btn-danger btn-sm" onclick="stopGiveaway()">Stop giveaway</button>
+        </div>
+        <div class="feedback" id="gw-beheer-feedback"></div>
+      </div>
+
+      <!-- Winnaarsgeschiedenis -->
+      <div class="card">
+        <div class="card-title">Winnaarsgeschiedenis</div>
+        <div class="winnaars-lijst" id="winnaars-lijst">
+          <div class="lijst-lege">Laden...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── IK WAS HIER ────────────────────────────── -->
+    <div class="panel" id="panel-iwh">
+      <div class="panel-title">Ik Was Hier</div>
+      <div class="panel-desc">Activeer een bijzonder kanaalmoment. Kijkers die nu in de chat zijn krijgen automatisch +100 bonuspunten bijgeschreven.</div>
+
+      <!-- Status actief moment -->
+      <div class="card" id="iwh-status-card">
+        <div class="card-title">Actief moment</div>
+        <div id="iwh-actief-inhoud" style="font-size:13px;color:var(--white3)">Laden...</div>
+      </div>
+
+      <!-- Nieuw moment -->
+      <div class="card">
+        <div class="card-title">Nieuw moment activeren</div>
+        <div class="form-row">
+          <div class="form-group" style="flex:2">
+            <label class="form-label">Naam van het moment</label>
+            <input class="form-input" id="iwh-naam" type="text" placeholder="bijv. 200K volgers milestone">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Beschrijving (optioneel)</label>
+            <input class="form-input" id="iwh-beschrijving" type="text" placeholder="Korte omschrijving">
+          </div>
+        </div>
+        <button class="btn btn-success" onclick="startIwh()">📍 Activeer moment</button>
+        <div class="feedback" id="iwh-start-feedback"></div>
+      </div>
+
+      <!-- Momenten lijst -->
+      <div class="card">
+        <div class="card-title">Alle momenten</div>
+        <div id="iwh-lijst">
+          <div class="lijst-lege">Laden...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AGENDA ─────────────────────────────────── -->
+    <div class="panel" id="panel-agenda">
+      <div class="panel-title">Agenda</div>
+      <div class="panel-desc">Voeg aankomende events toe aan de hub pagina. Kijkers zien deze direct op de Agenda tab.</div>
+
+      <!-- Nieuw event -->
+      <div class="card">
+        <div class="card-title">Event toevoegen</div>
+        <div class="form-row">
+          <div class="form-group" style="flex:2">
+            <label class="form-label">Titel</label>
+            <input class="form-input" id="ag-titel" type="text" placeholder="bijv. GTA 6 Launch Stream">
+          </div>
+          <div class="form-group" style="min-width:80px;max-width:100px">
+            <label class="form-label">Icoon</label>
+            <input class="form-input" id="ag-icoon" type="text" placeholder="🎮" maxlength="4" value="📅">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Categorie</label>
+            <input class="form-input" id="ag-categorie" type="text" placeholder="bijv. Game marathon">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Wanneer</label>
+            <input class="form-input" id="ag-wanneer" type="text" placeholder="bijv. Zomer 2025">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="ag-status">
+              <option value="gepland">Gepland</option>
+              <option value="binnenkort">Binnenkort</option>
+              <option value="bezig">Bezig</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex:1">
+            <label class="form-label">Beschrijving</label>
+            <input class="form-input" id="ag-beschrijving" type="text" placeholder="Korte omschrijving voor kijkers">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="voegAgendaToe()">+ Voeg toe</button>
+        <div class="feedback" id="ag-feedback"></div>
+      </div>
+
+      <!-- Events lijst -->
+      <div class="card">
+        <div class="card-title">Huidige events</div>
+        <div id="agenda-lijst">
+          <div class="lijst-lege">Laden...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LEADERBOARD ────────────────────────────── -->
+    <div class="panel" id="panel-leaderboard">
+      <div class="panel-title">Leaderboard</div>
+      <div class="panel-desc">Zoek een kijker op en pas hun statistieken handmatig aan. De score wordt direct herberekend.</div>
+
+      <!-- Zoeken -->
+      <div class="card">
+        <div class="card-title">Kijker opzoeken</div>
+        <div class="form-row">
+          <div class="form-group" style="flex:2">
+            <label class="form-label">Twitch gebruikersnaam</label>
+            <input class="form-input" id="lb-zoek-input" type="text" placeholder="gebruikersnaam"
+              onkeydown="if(event.key==='Enter')zoekKijkerAdmin()">
+          </div>
+          <div class="form-group" style="max-width:120px;justify-content:flex-end;padding-top:22px">
+            <button class="btn btn-primary" onclick="zoekKijkerAdmin()">Zoek</button>
+          </div>
+        </div>
+        <div class="feedback" id="lb-zoek-feedback"></div>
+
+        <!-- Kijker info -->
+        <div class="kijker-info-box" id="kijker-info-box">
+          <div class="kijker-info-naam" id="ki-naam"></div>
+          <div class="kijker-info-stats" id="ki-stats"></div>
+          <hr class="sep">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--white3);margin-bottom:14px">Statistieken aanpassen</div>
+          <div class="score-grid">
+            <div class="score-veld">
+              <label class="score-veld-label">Watch uren</label>
+              <input class="form-input" id="adj-watch" type="number" min="0" step="0.5">
+              <div class="score-veld-huidig" id="cur-watch"></div>
+            </div>
+            <div class="score-veld">
+              <label class="score-veld-label">Streams</label>
+              <input class="form-input" id="adj-streams" type="number" min="0">
+              <div class="score-veld-huidig" id="cur-streams"></div>
+            </div>
+            <div class="score-veld">
+              <label class="score-veld-label">Chat berichten</label>
+              <input class="form-input" id="adj-chat" type="number" min="0">
+              <div class="score-veld-huidig" id="cur-chat"></div>
+            </div>
+            <div class="score-veld">
+              <label class="score-veld-label">Sub maanden</label>
+              <input class="form-input" id="adj-sub" type="number" min="0">
+              <div class="score-veld-huidig" id="cur-sub"></div>
+            </div>
+            <div class="score-veld">
+              <label class="score-veld-label">Clips gemaakt</label>
+              <input class="form-input" id="adj-clips" type="number" min="0">
+              <div class="score-veld-huidig" id="cur-clips"></div>
+            </div>
+            <div class="score-veld">
+              <label class="score-veld-label">Raids</label>
+              <input class="form-input" id="adj-raids" type="number" min="0">
+              <div class="score-veld-huidig" id="cur-raids"></div>
+            </div>
+            <div class="score-veld">
+              <label class="score-veld-label">SE punten</label>
+              <input class="form-input" id="adj-se" type="number" min="0">
+              <div class="score-veld-huidig" id="cur-se"></div>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="slaStatsOp()">💾 Opslaan &amp; herbereken</button>
+          <div class="feedback" id="lb-save-feedback"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TRACKMANIA ─────────────────────────────── -->
+    <div class="panel" id="panel-trackmania">
+      <div class="panel-title">Trackmania</div>
+      <div class="panel-desc">Voeg nieuwe maps toe en werk tijden handmatig bij. Tijden worden automatisch elke 5 minuten opgehaald.</div>
+
+      <!-- Map toevoegen -->
+      <div class="card">
+        <div class="card-title">Map toevoegen</div>
+        <div class="form-row">
+          <div class="form-group" style="flex:2">
+            <label class="form-label">Map naam</label>
+            <input class="form-input" id="tm-naam" type="text" placeholder="bijv. Winter 2026 - 07">
+          </div>
+          <div class="form-group" style="min-width:80px;max-width:100px">
+            <label class="form-label">Track nr</label>
+            <input class="form-input" id="tm-track-nr" type="number" placeholder="7" min="1">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex:2">
+            <label class="form-label">Map UID</label>
+            <input class="form-input" id="tm-uid" type="text" placeholder="T1ESUOSoqqV7cy_zJ7OqK73Vosd">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Campaign (optioneel)</label>
+            <input class="form-input" id="tm-campaign" type="text" placeholder="Winter 2026">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="voegMapToe()">+ Voeg map toe</button>
+        <div class="feedback" id="tm-feedback"></div>
+      </div>
+
+      <!-- Huidige tijden -->
+      <div class="card">
+        <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+          Huidige tijden
+          <button class="btn btn-ghost btn-sm" onclick="updateTmTijden()">↻ Nu updaten</button>
+        </div>
+        <div id="tm-tijden-lijst">
+          <div class="lijst-lege">Laden...</div>
+        </div>
+        <div class="feedback" id="tm-update-feedback"></div>
+      </div>
+    </div>
+
+    <!-- ── SYSTEEM ─────────────────────────────────── -->
+    <div class="panel" id="panel-systeem">
+      <div class="panel-title">Systeem</div>
+      <div class="panel-desc">Beheertools voor het loyaliteitssysteem. Gebruik deze voorzichtig.</div>
+
+      <div class="card">
+        <div class="card-title">Scores</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-ghost" onclick="herberekenScores()">↻ Herbereken alle scores</button>
+        </div>
+        <div class="feedback" id="systeem-score-feedback"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Follow ages</div>
+        <p style="font-size:13px;color:var(--white3);margin-bottom:16px;line-height:1.6">Refresh de follow datum van alle kijkers via de Twitch API. Dit duurt enkele minuten en loopt op de achtergrond.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-ghost" onclick="refreshFollowAges()">↻ Dagelijkse refresh (nieuw/verlopen)</button>
+          <button class="btn btn-ghost" onclick="refreshAlleFollowAges()">↻ Refresh ALLE kijkers</button>
+        </div>
+        <div class="feedback" id="systeem-follow-feedback"></div>
+      </div>
+    </div>
+
+  </div><!-- .content -->
+</div><!-- .dashboard -->
+</div><!-- #dashboard-main -->
+
+<!-- WINNAAR OVERLAY -->
+<div class="winnaar-overlay" id="winnaar-overlay">
+  <div class="winnaar-drum" id="winnaar-drum">Bezig met rollen...</div>
+  <div class="winnaar-rol-namen" id="winnaar-rol-namen"></div>
+  <div class="winnaar-naam" id="winnaar-naam"></div>
+  <div class="winnaar-prijs" id="winnaar-prijs"></div>
+  <button class="btn btn-ghost winnaar-sluit" id="winnaar-sluit" onclick="sluitOverlay()">Sluiten</button>
+</div>
+
+<script>
+const BACKEND          = 'https://morrog-loyalty-backend-production.up.railway.app';
+const TWITCH_CLIENT_ID = 'r6uuslartqla0c52af9wc4j7eobcnu';
+const REDIRECT_URI     = 'https://officialmorrog.github.io/morrog/dashboard.html';
+const MORROG_ID        = '65660593';
+
+let twitchToken = null;
+let huidigKijker = null;
+
+// ── AUTH ─────────────────────────────────────────────────
+function twitchLogin() {
+  window.location.href =
+    `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}` +
+    `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+    `&response_type=token&scope=`;
+}
+
+function uitloggen() {
+  localStorage.removeItem('dashboard_token');
+  twitchToken = null;
+  document.getElementById('auth-scherm').style.display    = 'flex';
+  document.getElementById('dashboard-main').style.display = 'none';
+}
+
+async function init() {
+  // OAuth callback
+  const hash   = window.location.hash;
+  const params = new URLSearchParams(hash.replace('#', '?'));
+  const token  = params.get('access_token');
+
+  if (token) {
+    history.replaceState(null, '', window.location.pathname);
+    localStorage.setItem('dashboard_token', token);
+    twitchToken = token;
+  } else {
+    twitchToken = localStorage.getItem('dashboard_token');
+  }
+
+  if (!twitchToken) {
+    document.getElementById('auth-scherm').style.display = 'flex';
+    return;
+  }
+
+  // Verificeer token en check of het morrog is
+  try {
+    const res = await fetch(BACKEND + '/api/auth/verify', {
+      method: 'POST',
+      headers: { 'x-twitch-token': twitchToken }
+    });
+    const data = await res.json();
+
+    if (!data.isAdmin) {
+      localStorage.removeItem('dashboard_token');
+      document.getElementById('auth-scherm').style.display = 'flex';
+      document.getElementById('auth-scherm').innerHTML += '<p style="color:var(--here);margin-top:8px;font-size:13px">Dit dashboard is alleen voor @morrog.</p>';
+      return;
+    }
+
+    // Toon dashboard
+    document.getElementById('auth-scherm').style.display    = 'none';
+    document.getElementById('dashboard-main').style.display = 'block';
+    document.getElementById('nav-avatar').src               = data.user.profile_image_url || '';
+    document.getElementById('nav-username').textContent      = data.user.display_name;
+
+    // Laad initieel data
+    laadGiveawayStatus();
+    laadWinnaars();
+    laadIwhStatus();
+    laadIwhLijst();
+    laadAgendaLijst();
+    laadTmTijden();
+
+  } catch {
+    document.getElementById('auth-scherm').style.display = 'flex';
+  }
+}
+
+// Helper: admin API call
+async function adminFetch(endpoint, options = {}) {
+  return fetch(BACKEND + endpoint, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-twitch-token': twitchToken,
+      ...(options.headers || {}),
+    },
+  });
+}
+
+// ── PANELS ──────────────────────────────────────────────
+function toonPanel(naam, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + naam).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+function toonFeedback(id, bericht, type = 'ok') {
+  const el = document.getElementById(id);
+  el.className = 'feedback ' + type;
+  el.textContent = bericht;
+  setTimeout(() => { el.style.display = 'none'; el.className = 'feedback'; }, 5000);
+}
+
+// ── GIVEAWAY ────────────────────────────────────────────
+async function laadGiveawayStatus() {
+  try {
+    const res  = await fetch(BACKEND + '/api/giveaway/actief');
+    const data = await res.json();
+    const el   = document.getElementById('giveaway-status-inhoud');
+    const beheer = document.getElementById('giveaway-beheer-card');
+    const start  = document.getElementById('giveaway-start-card');
+    const dot    = document.getElementById('dot-giveaway');
+
+    if (data) {
+      el.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <span class="status-badge badge-actief"><span class="badge-dot" style="background:var(--streak)"></span> Actief</span>
+        </div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;color:var(--white);margin-bottom:6px">${data.prijs}</div>
+        <div style="font-size:12px;color:var(--white3)">Min. punten: <strong style="color:var(--white)">${data.min_punten}</strong> &nbsp;·&nbsp; Min. follow: <strong style="color:var(--white)">${data.min_follow_dagen} dagen</strong></div>
+        ${data.winnaar_naam ? `<div style="margin-top:10px;font-size:13px;color:var(--gold)">Winnaar: <strong>${data.winnaar_naam}</strong></div>` : ''}
+      `;
+      beheer.style.display = 'block';
+      start.style.display  = 'none';
+      dot.classList.add('actief');
+    } else {
+      el.innerHTML = '<span class="status-badge badge-inactief">Geen actieve giveaway</span>';
+      beheer.style.display = 'none';
+      start.style.display  = 'block';
+      dot.classList.remove('actief');
+    }
+  } catch(e) { console.log('Giveaway status fout:', e.message); }
+}
+
+async function startGiveaway() {
+  const prijs  = document.getElementById('gw-prijs').value.trim();
+  const punten = parseInt(document.getElementById('gw-punten').value) || 500;
+  const follow = parseInt(document.getElementById('gw-follow').value) || 30;
+  if (!prijs) { toonFeedback('gw-start-feedback', 'Vul een prijs in.', 'fout'); return; }
+
+  try {
+    const res = await adminFetch('/api/giveaway/start', {
+      method: 'POST',
+      body: JSON.stringify({ prijs, min_punten: punten, min_follow_dagen: follow }),
+    });
+    const data = await res.json();
+    if (!res.ok) { toonFeedback('gw-start-feedback', data.error, 'fout'); return; }
+    toonFeedback('gw-start-feedback', `Giveaway gestart: ${data.prijs}`, 'ok');
+    document.getElementById('gw-prijs').value = '';
+    laadGiveawayStatus();
+  } catch(e) { toonFeedback('gw-start-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+async function stopGiveaway() {
+  if (!confirm('Weet je zeker dat je de giveaway wil stoppen?')) return;
+  try {
+    await adminFetch('/api/giveaway/stop', { method: 'POST', body: '{}' });
+    toonFeedback('gw-beheer-feedback', 'Giveaway gestopt.', 'ok');
+    laadGiveawayStatus();
+  } catch(e) { toonFeedback('gw-beheer-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+async function rolWinnaar() {
+  const overlay = document.getElementById('winnaar-overlay');
+  const drumEl  = document.getElementById('winnaar-drum');
+  const rolEl   = document.getElementById('winnaar-rol-namen');
+  const naamEl  = document.getElementById('winnaar-naam');
+  const prijsEl = document.getElementById('winnaar-prijs');
+  const sluitEl = document.getElementById('winnaar-sluit');
+
+  // Reset overlay
+  overlay.classList.add('active');
+  drumEl.textContent  = 'Bezig met rollen...';
+  rolEl.textContent   = '';
+  naamEl.textContent  = '';
+  naamEl.className    = 'winnaar-naam';
+  prijsEl.textContent = '';
+  prijsEl.className   = 'winnaar-prijs';
+  sluitEl.className   = 'btn btn-ghost winnaar-sluit';
+
+  // Trommel animatie
+  const namen = ['???', '...', '???', '...'];
+  let idx = 0;
+  const interval = setInterval(() => {
+    rolEl.textContent = namen[idx % namen.length];
+    rolEl.style.opacity = idx % 2 === 0 ? '1' : '0.3';
+    idx++;
+  }, 150);
+
+  try {
+    const res  = await adminFetch('/api/giveaway/rol', { method: 'POST', body: '{}' });
+    const data = await res.json();
+    clearInterval(interval);
+
+    if (!res.ok) {
+      overlay.classList.remove('active');
+      toonFeedback('gw-beheer-feedback', data.error || 'Geen eligible kijkers.', 'fout');
+      return;
+    }
+
+    // Toon winnaar
+    setTimeout(() => {
+      rolEl.textContent   = '';
+      drumEl.textContent  = '🎉 De winnaar is...';
+      naamEl.textContent  = data.displayName || data.winnaar;
+      naamEl.classList.add('toon');
+      prijsEl.textContent = data.prijs;
+      prijsEl.classList.add('toon');
+      sluitEl.classList.add('toon');
+      laadWinnaars();
+      laadGiveawayStatus();
+    }, 500);
+
+  } catch(e) {
+    clearInterval(interval);
+    overlay.classList.remove('active');
+    toonFeedback('gw-beheer-feedback', 'Fout: ' + e.message, 'fout');
+  }
+}
+
+function sluitOverlay() {
+  document.getElementById('winnaar-overlay').classList.remove('active');
+}
+
+async function laadWinnaars() {
+  try {
+    const res  = await fetch(BACKEND + '/api/giveaway/winnaars');
+    const data = await res.json();
+    const el   = document.getElementById('winnaars-lijst');
+    if (!data || data.length === 0) { el.innerHTML = '<div class="lijst-lege">Nog geen winnaars.</div>'; return; }
+    el.innerHTML = data.map(w => `
+      <div class="winnaar-rij">
+        <div class="winnaar-rij-naam">🏆 ${w.winnaar}</div>
+        <div class="winnaar-rij-prijs">${w.prijs}</div>
+        <div class="winnaar-rij-datum">${new Date(w.gerold_op).toLocaleDateString('nl-NL')}</div>
+      </div>
+    `).join('');
+  } catch(e) { console.log('Winnaars fout:', e.message); }
+}
+
+// ── IK WAS HIER ─────────────────────────────────────────
+async function laadIwhStatus() {
+  try {
+    const res  = await fetch(BACKEND + '/api/iwh/momenten');
+    const data = await res.json();
+    const actief = data.find(m => m.actief);
+    const el     = document.getElementById('iwh-actief-inhoud');
+    const dot    = document.getElementById('dot-iwh');
+
+    if (actief) {
+      el.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <span class="status-badge badge-actief"><span class="badge-dot" style="background:var(--streak)"></span> Live</span>
+        </div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;color:var(--white);margin-bottom:6px">${actief.naam}</div>
+        <div style="font-size:12px;color:var(--white3);margin-bottom:14px">${actief.aanwezigen || 0} aanwezigen · Gestart ${new Date(actief.aangemaakt).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})}</div>
+        <button class="btn btn-danger btn-sm" onclick="stopIwh(${actief.id})">Stop moment</button>
+      `;
+      dot.classList.add('actief');
+    } else {
+      el.innerHTML = '<span class="status-badge badge-inactief">Geen actief moment</span>';
+      dot.classList.remove('actief');
+    }
+  } catch(e) { console.log('IWH status fout:', e.message); }
+}
+
+async function startIwh() {
+  const naam = document.getElementById('iwh-naam').value.trim();
+  const beschrijving = document.getElementById('iwh-beschrijving').value.trim();
+  if (!naam) { toonFeedback('iwh-start-feedback', 'Vul een naam in.', 'fout'); return; }
+
+  try {
+    const res = await adminFetch('/api/iwh/start', {
+      method: 'POST',
+      body: JSON.stringify({ naam, beschrijving }),
+    });
+    const data = await res.json();
+    if (!res.ok) { toonFeedback('iwh-start-feedback', data.error, 'fout'); return; }
+    toonFeedback('iwh-start-feedback', `Moment geactiveerd: ${naam}`, 'ok');
+    document.getElementById('iwh-naam').value        = '';
+    document.getElementById('iwh-beschrijving').value = '';
+    laadIwhStatus();
+    laadIwhLijst();
+  } catch(e) { toonFeedback('iwh-start-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+async function stopIwh(id) {
+  try {
+    await adminFetch(`/api/iwh/stop/${id}`, { method: 'POST', body: '{}' });
+    toonFeedback('iwh-start-feedback', 'Moment gestopt.', 'ok');
+    laadIwhStatus();
+    laadIwhLijst();
+  } catch(e) { toonFeedback('iwh-start-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+async function laadIwhLijst() {
+  try {
+    const res  = await fetch(BACKEND + '/api/iwh/momenten');
+    const data = await res.json();
+    const el   = document.getElementById('iwh-lijst');
+    if (!data || data.length === 0) { el.innerHTML = '<div class="lijst-lege">Nog geen momenten.</div>'; return; }
+    el.innerHTML = data.map(m => `
+      <div class="lijst-rij">
+        <div style="flex:1">
+          <div class="lijst-rij-naam">${m.actief ? '🔴 ' : ''}${m.naam}</div>
+          <div class="lijst-rij-sub">${m.aanwezigen || 0} aanwezigen · ${new Date(m.aangemaakt).toLocaleDateString('nl-NL')}</div>
+        </div>
+        ${m.actief ? `<button class="btn btn-danger btn-sm" onclick="stopIwh(${m.id})">Stop</button>` : ''}
+      </div>
+    `).join('');
+  } catch(e) { console.log('IWH lijst fout:', e.message); }
+}
+
+// ── AGENDA ──────────────────────────────────────────────
+async function voegAgendaToe() {
+  const titel = document.getElementById('ag-titel').value.trim();
+  if (!titel) { toonFeedback('ag-feedback', 'Vul een titel in.', 'fout'); return; }
+
+  try {
+    const res = await adminFetch('/api/agenda', {
+      method: 'POST',
+      body: JSON.stringify({
+        titel,
+        beschrijving: document.getElementById('ag-beschrijving').value.trim(),
+        categorie:    document.getElementById('ag-categorie').value.trim(),
+        wanneer:      document.getElementById('ag-wanneer').value.trim(),
+        icoon:        document.getElementById('ag-icoon').value.trim() || '📅',
+        status:       document.getElementById('ag-status').value,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) { toonFeedback('ag-feedback', data.error, 'fout'); return; }
+    toonFeedback('ag-feedback', 'Event toegevoegd!', 'ok');
+    ['ag-titel','ag-beschrijving','ag-categorie','ag-wanneer'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('ag-icoon').value = '📅';
+    laadAgendaLijst();
+  } catch(e) { toonFeedback('ag-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+async function laadAgendaLijst() {
+  try {
+    const res  = await fetch(BACKEND + '/api/agenda');
+    const data = await res.json();
+    const el   = document.getElementById('agenda-lijst');
+    if (!data || data.length === 0) { el.innerHTML = '<div class="lijst-lege">Geen events in de database. Voeg er een toe.</div>'; return; }
+    el.innerHTML = data.map(e => `
+      <div class="lijst-rij">
+        <div style="font-size:20px;flex-shrink:0">${e.icoon || '📅'}</div>
+        <div style="flex:1">
+          <div class="lijst-rij-naam">${e.titel}</div>
+          <div class="lijst-rij-sub">${e.categorie || ''} ${e.wanneer ? '· ' + e.wanneer : ''} · ${e.status || ''}</div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="verwijderAgenda(${e.id})">✕</button>
+      </div>
+    `).join('');
+  } catch(e) { console.log('Agenda lijst fout:', e.message); }
+}
+
+async function verwijderAgenda(id) {
+  if (!confirm('Event verwijderen?')) return;
+  try {
+    await adminFetch(`/api/agenda/${id}`, { method: 'DELETE' });
+    laadAgendaLijst();
+  } catch(e) { console.log('Agenda delete fout:', e.message); }
+}
+
+// ── LEADERBOARD / SCORE AANPASSEN ───────────────────────
+async function zoekKijkerAdmin() {
+  const username = document.getElementById('lb-zoek-input').value.trim().toLowerCase();
+  if (!username) return;
+
+  try {
+    const res = await fetch(BACKEND + '/api/kijker/' + encodeURIComponent(username));
+    if (res.status === 404) { toonFeedback('lb-zoek-feedback', 'Kijker niet gevonden.', 'fout'); return; }
+    const k = await res.json();
+    huidigKijker = k;
+
+    const box = document.getElementById('kijker-info-box');
+    box.style.display = 'block';
+    document.getElementById('ki-naam').textContent = k.display_name || k.username;
+    document.getElementById('ki-stats').innerHTML = `
+      <span>Score: <strong>${(k.score_totaal||0).toLocaleString('nl-NL')} pts</strong></span>
+      <span>Rang: <strong>${k.rang||'?'}</strong></span>
+      <span>Positie: <strong>#${k.rank_positie||'?'}</strong></span>
+      <span>Follow: <strong>${k.follow_months||0} mnd</strong></span>
+    `;
+
+    // Vul huidige waarden in
+    const velden = [
+      ['adj-watch', 'cur-watch', 'watch_hours', 'Watch uren'],
+      ['adj-streams', 'cur-streams', 'streams_present', 'Streams'],
+      ['adj-chat', 'cur-chat', 'chat_messages', 'Berichten'],
+      ['adj-sub', 'cur-sub', 'sub_months', 'Sub mnd'],
+      ['adj-clips', 'cur-clips', 'clips_made', 'Clips'],
+      ['adj-raids', 'cur-raids', 'raids_joined', 'Raids'],
+      ['adj-se', 'cur-se', 'se_points', 'SE punten'],
+    ];
+    velden.forEach(([inputId, curId, veld]) => {
+      document.getElementById(inputId).value  = k[veld] ?? 0;
+      document.getElementById(curId).textContent = 'Huidig: ' + (k[veld] ?? 0);
+    });
+
+    toonFeedback('lb-zoek-feedback', `Kijker geladen: ${k.display_name || k.username}`, 'ok');
+  } catch(e) { toonFeedback('lb-zoek-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+async function slaStatsOp() {
+  if (!huidigKijker) return;
+  const username = huidigKijker.username;
+
+  const body = {
+    watch_hours:     parseFloat(document.getElementById('adj-watch').value)   || 0,
+    streams_present: parseInt(document.getElementById('adj-streams').value)   || 0,
+    chat_messages:   parseInt(document.getElementById('adj-chat').value)      || 0,
+    sub_months:      parseInt(document.getElementById('adj-sub').value)       || 0,
+    clips_made:      parseInt(document.getElementById('adj-clips').value)     || 0,
+    raids_joined:    parseInt(document.getElementById('adj-raids').value)     || 0,
+    se_points:       parseInt(document.getElementById('adj-se').value)        || 0,
+  };
+
+  try {
+    const res  = await adminFetch(`/api/kijker/${username}/adjust`, { method: 'POST', body: JSON.stringify(body) });
+    const data = await res.json();
+    if (!res.ok) { toonFeedback('lb-save-feedback', data.error, 'fout'); return; }
+    const score = data.kijker;
+    toonFeedback('lb-save-feedback', `Opgeslagen! Nieuwe score: ${(score.score_totaal||0).toLocaleString('nl-NL')} pts (${score.rang})`, 'ok');
+    huidigKijker = { ...huidigKijker, ...body, score_totaal: score.score_totaal, rang: score.rang, rank_positie: score.rank_positie };
+    document.getElementById('ki-stats').innerHTML = `
+      <span>Score: <strong>${(score.score_totaal||0).toLocaleString('nl-NL')} pts</strong></span>
+      <span>Rang: <strong>${score.rang||'?'}</strong></span>
+      <span>Positie: <strong>#${score.rank_positie||'?'}</strong></span>
+      <span>Follow: <strong>${huidigKijker.follow_months||0} mnd</strong></span>
+    `;
+  } catch(e) { toonFeedback('lb-save-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+// ── TRACKMANIA ──────────────────────────────────────────
+async function voegMapToe() {
+  const naam    = document.getElementById('tm-naam').value.trim();
+  const uid     = document.getElementById('tm-uid').value.trim();
+  const trackNr = parseInt(document.getElementById('tm-track-nr').value) || null;
+  const campaign= document.getElementById('tm-campaign').value.trim();
+  if (!naam || !uid) { toonFeedback('tm-feedback', 'Naam en Map UID zijn verplicht.', 'fout'); return; }
+
+  try {
+    const res  = await adminFetch('/api/trackmania/map', { method: 'POST', body: JSON.stringify({ naam, map_uid: uid, campaign, track_nr: trackNr }) });
+    const data = await res.json();
+    if (!res.ok) { toonFeedback('tm-feedback', data.error, 'fout'); return; }
+    toonFeedback('tm-feedback', 'Map toegevoegd!', 'ok');
+    ['tm-naam','tm-uid','tm-campaign','tm-track-nr'].forEach(id => document.getElementById(id).value = '');
+    laadTmTijden();
+  } catch(e) { toonFeedback('tm-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+async function updateTmTijden() {
+  toonFeedback('tm-update-feedback', 'Tijden ophalen...', 'ok');
+  try {
+    const res  = await adminFetch('/api/trackmania/update', { method: 'POST', body: '{}' });
+    const data = await res.json();
+    if (!res.ok) { toonFeedback('tm-update-feedback', data.error, 'fout'); return; }
+    toonFeedback('tm-update-feedback', 'Tijden bijgewerkt!', 'ok');
+    laadTmTijden();
+  } catch(e) { toonFeedback('tm-update-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+async function laadTmTijden() {
+  try {
+    const res  = await fetch(BACKEND + '/api/trackmania/tijden');
+    const data = await res.json();
+    const el   = document.getElementById('tm-tijden-lijst');
+    if (!data || data.length === 0) { el.innerHTML = '<div class="lijst-lege">Geen tijden gevonden.</div>'; return; }
+
+    let html = '';
+    data.forEach(map => {
+      html += `<div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--white3);margin-bottom:6px;margin-top:12px">${map.map}</div>`;
+      if (!map.tijden || map.tijden.length === 0) {
+        html += '<div style="font-size:12px;color:var(--dim);margin-bottom:8px">Geen tijden beschikbaar</div>';
+      } else {
+        map.tijden.forEach((t, i) => {
+          html += `<div class="lijst-rij" style="margin-bottom:6px">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:${i===0?'var(--gold)':'#A8A8A8'};width:24px;text-align:center">${i+1}</div>
+            <div style="flex:1">
+              <div class="lijst-rij-naam">${t.username}</div>
+              <div class="lijst-rij-sub">Bijgewerkt: ${new Date(t.opgehaald).toLocaleString('nl-NL')}</div>
+            </div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:${i===0?'var(--gold)':'var(--white)'}">${t.tijd_format}</div>
+          </div>`;
+        });
+      }
+    });
+    el.innerHTML = html;
+  } catch(e) { console.log('TM tijden fout:', e.message); }
+}
+
+// ── SYSTEEM ─────────────────────────────────────────────
+async function herberekenScores() {
+  toonFeedback('systeem-score-feedback', 'Bezig...', 'ok');
+  try {
+    const res = await adminFetch('/api/scores/herbereken', { method: 'POST', body: '{}' });
+    const data = await res.json();
+    if (!res.ok) { toonFeedback('systeem-score-feedback', data.error, 'fout'); return; }
+    toonFeedback('systeem-score-feedback', 'Alle scores herberekend!', 'ok');
+  } catch(e) { toonFeedback('systeem-score-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+async function refreshFollowAges() {
+  toonFeedback('systeem-follow-feedback', 'Follow age refresh gestart op de achtergrond...', 'ok');
+  try {
+    await adminFetch('/api/followage/refresh', { method: 'POST', body: '{}' });
+  } catch(e) { toonFeedback('systeem-follow-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+async function refreshAlleFollowAges() {
+  if (!confirm('Dit refresht ALLE kijkers en duurt meerdere minuten. Doorgaan?')) return;
+  toonFeedback('systeem-follow-feedback', 'Volledige follow age refresh gestart op de achtergrond...', 'ok');
+  try {
+    await adminFetch('/api/followage/refresh/all', { method: 'POST', body: '{}' });
+  } catch(e) { toonFeedback('systeem-follow-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+// ── START ────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

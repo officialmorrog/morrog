@@ -13,6 +13,7 @@
   --white:#FFFFFF;--white2:#CECECE;--white3:#888888;--dim:#333333;
   --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
   --gold:#C8A84A;--streak:#3DAB6A;--here:#C85050;--sub:#6858CC;
+  --twitch:#9147FF;
 }
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--white2);font-family:'Barlow',sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden;}
@@ -26,9 +27,39 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
 .nav-link{padding:0 16px;height:58px;display:flex;align-items:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white3);border:none;background:none;border-bottom:2px solid transparent;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;}
 .nav-link:hover{color:var(--white2);}
 .nav-link.active{color:var(--white);border-bottom-color:var(--white);}
-.nav-live{margin-left:auto;display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--streak);padding:6px 14px;border:1px solid rgba(61,171,106,.3);border-radius:3px;background:rgba(61,171,106,.06);text-decoration:none;transition:background .15s;}
+.nav-live{display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--streak);padding:6px 14px;border:1px solid rgba(61,171,106,.3);border-radius:3px;background:rgba(61,171,106,.06);text-decoration:none;transition:background .15s;}
 .nav-live:hover{background:rgba(61,171,106,.12);}
 .nav-live-dot{width:6px;height:6px;border-radius:50%;background:var(--streak);animation:pulse 1.5s ease-in-out infinite;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+
+/* LOGIN KNOP */
+.btn-twitch-login{display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white);padding:6px 14px;border:1px solid rgba(145,71,255,.4);border-radius:3px;background:rgba(145,71,255,.12);cursor:pointer;transition:background .15s;}
+.btn-twitch-login:hover{background:rgba(145,71,255,.22);}
+.btn-twitch-login svg{width:14px;height:14px;fill:var(--twitch);flex-shrink:0;}
+
+/* USER BADGE IN NAV */
+.nav-user{display:flex;align-items:center;gap:8px;cursor:pointer;position:relative;}
+.nav-user-avatar{width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);object-fit:cover;}
+.nav-user-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--white2);}
+.nav-user-rang{font-size:10px;color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.nav-user-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;min-width:200px;padding:8px 0;display:none;z-index:200;}
+.nav-user:hover .nav-user-dropdown{display:block;}
+.nav-user-dropdown-item{padding:10px 16px;font-size:13px;color:var(--white3);cursor:pointer;transition:background .12s;display:block;text-decoration:none;white-space:nowrap;}
+.nav-user-dropdown-item:hover{background:var(--bg3);color:var(--white);}
+.nav-user-dropdown-sep{border-top:1px solid var(--border);margin:4px 0;}
+
+/* MIJN RANG BANNER (in loyalty view) */
+.mijn-rang-banner{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:20px 24px;margin-bottom:32px;display:flex;align-items:center;justify-content:space-between;gap:20px;}
+.mijn-rang-banner.hidden{display:none;}
+.mijn-rang-info{display:flex;align-items:center;gap:16px;}
+.mijn-rang-avatar{width:44px;height:44px;border-radius:50%;border:2px solid var(--border2);object-fit:cover;flex-shrink:0;}
+.mijn-rang-labels{flex:1;}
+.mijn-rang-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--white);margin-bottom:2px;}
+.mijn-rang-sub{font-size:12px;color:var(--white3);}
+.mijn-rang-score{text-align:right;}
+.mijn-rang-pts{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:var(--white);line-height:1;}
+.mijn-rang-rang{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;text-transform:uppercase;margin-top:2px;}
+
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
@@ -193,6 +224,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
   .loyalty-grid{grid-template-columns:1fr;}
   .challenges-grid{grid-template-columns:1fr;}
   footer{flex-direction:column;gap:16px;text-align:center;padding:24px 20px;}
+  .mijn-rang-banner{flex-direction:column;align-items:flex-start;gap:12px;}
 }
 </style>
 </head>
@@ -208,9 +240,33 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
     <button class="nav-link" onclick="switchView('challenges',this)">Challenges &amp; Speedruns</button>
     <button class="nav-link" onclick="switchView('agenda',this)">Agenda</button>
   </div>
-  <a class="nav-live" href="https://twitch.tv/morrog" target="_blank">
-    <span class="nav-live-dot"></span>Kijk live
-  </a>
+  <div class="nav-right">
+    <!-- Niet ingelogd -->
+    <button class="btn-twitch-login" id="btn-login" onclick="twitchLogin()" style="display:none">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+      Inloggen
+    </button>
+    <!-- Ingelogd -->
+    <div class="nav-user" id="nav-user" style="display:none">
+      <img class="nav-user-avatar" id="nav-avatar" src="" alt="">
+      <div>
+        <div class="nav-user-name" id="nav-username"></div>
+        <div class="nav-user-rang" id="nav-rang"></div>
+      </div>
+      <div class="nav-user-dropdown">
+        <a class="nav-user-dropdown-item" onclick="switchView('loyalty',document.querySelectorAll('.nav-link')[1])" style="cursor:pointer">Mijn loyaliteit</a>
+        <div id="nav-dashboard-link" style="display:none">
+          <div class="nav-user-dropdown-sep"></div>
+          <a class="nav-user-dropdown-item" href="dashboard.html">⚙ Streamer dashboard</a>
+        </div>
+        <div class="nav-user-dropdown-sep"></div>
+        <a class="nav-user-dropdown-item" onclick="uitloggen()" style="cursor:pointer;color:var(--here)">Uitloggen</a>
+      </div>
+    </div>
+    <a class="nav-live" href="https://twitch.tv/morrog" target="_blank">
+      <span class="nav-live-dot"></span>Kijk live
+    </a>
+  </div>
 </nav>
 
 <!-- HOME -->
@@ -262,6 +318,21 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
   <h2 class="section-title fade-up">Jouw rang in de<br>Morrog community</h2>
   <p class="section-desc fade-up">Hoe langer en actiever je kijkt, hoe hoger je rang. Follow age weegt het zwaarst — wie er al jaren bij is hoeft niet harder zijn best te doen.</p>
 
+  <!-- MIJN RANG BANNER (zichtbaar na login) -->
+  <div class="mijn-rang-banner hidden fade-up" id="mijn-rang-banner">
+    <div class="mijn-rang-info">
+      <img class="mijn-rang-avatar" id="mijn-rang-avatar" src="" alt="">
+      <div class="mijn-rang-labels">
+        <div class="mijn-rang-name" id="mijn-rang-name"></div>
+        <div class="mijn-rang-sub" id="mijn-rang-sub"></div>
+      </div>
+    </div>
+    <div class="mijn-rang-score">
+      <div class="mijn-rang-pts" id="mijn-rang-pts"></div>
+      <div class="mijn-rang-rang" id="mijn-rang-rang"></div>
+    </div>
+  </div>
+
   <!-- ZOEKBALK -->
   <div style="margin-bottom:40px" class="fade-up">
     <div style="display:flex;gap:10px;max-width:460px">
@@ -299,7 +370,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
         <div class="eyebrow">Ik Was Hier momenten</div>
         <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;text-transform:uppercase;color:var(--white);margin-bottom:8px">Historische kanaalmomenten</h3>
         <p style="font-size:13px;color:var(--white3);margin-bottom:0">Aanwezig bij een bijzonder moment? +100 bonuspunten en voor altijd in de archieven.</p>
-        <div class="iwh-events">
+        <div class="iwh-events" id="iwh-lijst">
           <div class="iwh-event earned"><div class="iwh-icon">🏆</div><div class="iwh-info"><div class="iwh-name">Rank 1 Wereldkampioen WoW</div><div class="iwh-date">14 maart 2024</div></div><div class="iwh-pts">+100 pts</div></div>
           <div class="iwh-event missed"><div class="iwh-icon">—</div><div class="iwh-info"><div class="iwh-name">200.000 volgers milestone</div><div class="iwh-date">2 februari 2025</div></div><div class="iwh-pts dim">+100 pts</div></div>
           <div class="iwh-event missed"><div class="iwh-icon">—</div><div class="iwh-info"><div class="iwh-name">10-jarig jubileum stream</div><div class="iwh-date">5 juli 2024</div></div><div class="iwh-pts dim">+100 pts</div></div>
@@ -428,7 +499,8 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
   <div class="eyebrow fade-up">Aankomende events</div>
   <h2 class="section-title fade-up">Wat staat er<br>op de agenda?</h2>
   <p class="section-desc fade-up">Marathons, charity streams en challenges die eraan komen. Aanwezig zijn loont — elk groot event is een potentieel Ik Was Hier moment.</p>
-  <div class="agenda-grid">
+  <div class="agenda-grid" id="agenda-grid">
+    <!-- Statische fallback cards -->
     <div class="agenda-card fade-up">
       <div class="agenda-card-top">
         <div class="agenda-category">Game marathon</div>
@@ -507,7 +579,105 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
 </footer>
 
 <script>
-const BACKEND = 'https://morrog-loyalty-backend-production.up.railway.app';
+const BACKEND     = 'https://morrog-loyalty-backend-production.up.railway.app';
+const TWITCH_CLIENT_ID = 'r6uuslartqla0c52af9wc4j7eobcnu';
+const REDIRECT_URI     = 'https://officialmorrog.github.io/morrog';
+const MORROG_ID        = '65660593';
+
+// ── TWITCH AUTH ──────────────────────────────────────────
+function twitchLogin() {
+  const scope = '';
+  window.location.href =
+    `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}` +
+    `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+    `&response_type=token&scope=${scope}`;
+}
+
+function uitloggen() {
+  localStorage.removeItem('twitch_token');
+  localStorage.removeItem('twitch_user');
+  localStorage.removeItem('loyalty_score');
+  toonIngelogdUI(false);
+}
+
+async function verwerkTwitchCallback() {
+  const hash   = window.location.hash;
+  const params = new URLSearchParams(hash.replace('#', '?'));
+  const token  = params.get('access_token');
+  if (!token) return false;
+
+  // Verwijder hash uit URL
+  history.replaceState(null, '', window.location.pathname);
+
+  localStorage.setItem('twitch_token', token);
+  await laadGebruikersData(token);
+  return true;
+}
+
+async function laadGebruikersData(token) {
+  try {
+    const res  = await fetch(BACKEND + '/api/auth/verify', {
+      method: 'POST',
+      headers: { 'x-twitch-token': token }
+    });
+    if (!res.ok) { uitloggen(); return; }
+    const data = await res.json();
+    localStorage.setItem('twitch_user', JSON.stringify(data.user));
+    if (data.score) localStorage.setItem('loyalty_score', JSON.stringify(data.score));
+    toonIngelogdUI(true, data.user, data.score, data.isAdmin);
+  } catch {
+    // stille fout — token blijft geldig
+    const cachedUser  = JSON.parse(localStorage.getItem('twitch_user') || 'null');
+    const cachedScore = JSON.parse(localStorage.getItem('loyalty_score') || 'null');
+    if (cachedUser) toonIngelogdUI(true, cachedUser, cachedScore, cachedUser.id === MORROG_ID);
+  }
+}
+
+function toonIngelogdUI(ingelogd, user = null, score = null, isAdmin = false) {
+  document.getElementById('btn-login').style.display    = ingelogd ? 'none' : 'flex';
+  document.getElementById('nav-user').style.display     = ingelogd ? 'flex' : 'none';
+
+  if (ingelogd && user) {
+    document.getElementById('nav-avatar').src           = user.profile_image_url || '';
+    document.getElementById('nav-username').textContent = user.display_name || user.login;
+    document.getElementById('nav-rang').textContent     = score?.rang || '';
+    document.getElementById('nav-dashboard-link').style.display = isAdmin ? 'block' : 'none';
+
+    // Mijn rang banner in loyalty view
+    const banner = document.getElementById('mijn-rang-banner');
+    if (score) {
+      banner.classList.remove('hidden');
+      document.getElementById('mijn-rang-avatar').src         = user.profile_image_url || '';
+      document.getElementById('mijn-rang-name').textContent   = user.display_name || user.login;
+      const positie = score.rank_positie ? `#${score.rank_positie} · ` : '';
+      const follow  = score.follow_months ? `${score.follow_months} mnd gevolgd` : '';
+      const streak  = score.streak_current ? ` · ${score.streak_current}× streak` : '';
+      document.getElementById('mijn-rang-sub').textContent    = positie + follow + streak;
+      document.getElementById('mijn-rang-pts').textContent    = (score.score_totaal || 0).toLocaleString('nl-NL');
+
+      const rangKleuren = {'Legende':'#C8A84A','Veteraan':'#A8A8A8','Toegewijde':'#9080EE','Vaste kijker':'#3DAB6A','Beginner':'#555'};
+      const kleur = rangKleuren[score.rang] || '#555';
+      const rangEl = document.getElementById('mijn-rang-rang');
+      rangEl.textContent  = score.rang || '';
+      rangEl.style.color  = kleur;
+    } else {
+      // Wel ingelogd maar niet in systeem
+      banner.classList.remove('hidden');
+      document.getElementById('mijn-rang-avatar').src         = user.profile_image_url || '';
+      document.getElementById('mijn-rang-name').textContent   = user.display_name || user.login;
+      document.getElementById('mijn-rang-sub').textContent    = 'Nog niet geregistreerd — kijk een stream!';
+      document.getElementById('mijn-rang-pts').textContent    = '0';
+      document.getElementById('mijn-rang-rang').textContent   = 'Beginner';
+      document.getElementById('mijn-rang-rang').style.color   = '#555';
+    }
+
+    // Vul zoekbalk voor met eigen naam
+    const zoekInput = document.getElementById('zoek-input');
+    if (zoekInput && !zoekInput.value) zoekInput.value = user.login;
+  } else {
+    document.getElementById('mijn-rang-banner').classList.add('hidden');
+  }
+}
 
 // ── VIEW SWITCHING ──
 function switchView(name, btn) {
@@ -523,8 +693,8 @@ function switchView(name, btn) {
       setTimeout(() => el.classList.add('visible'), i * 55);
     });
   }, 30);
-  if (name === 'agenda') setTimeout(() => { const b = document.getElementById('charity-bar'); if(b) b.style.width='62%'; }, 500);
-  if (name === 'loyalty') laadLeaderboard();
+  if (name === 'agenda')    { setTimeout(() => { const b = document.getElementById('charity-bar'); if(b) b.style.width='62%'; }, 500); laadAgenda(); }
+  if (name === 'loyalty')   { laadLeaderboard(); laadIwhMomenten(); }
   if (name === 'challenges') laadTrackmanTijden();
 }
 
@@ -582,6 +752,32 @@ async function zoekKijker() {
   } catch(e) { el.innerHTML = '<div style="font-size:13px;color:var(--here)">Er ging iets mis.</div>'; }
 }
 
+// ── IWH MOMENTEN ──
+async function laadIwhMomenten() {
+  try {
+    const res  = await fetch(BACKEND + '/api/iwh/momenten');
+    const data = await res.json();
+    if (!data || data.length === 0) return;
+    const el = document.getElementById('iwh-lijst');
+    if (!el) return;
+    let html = '';
+    data.forEach(m => {
+      const klasse = m.actief ? 'upcoming' : 'missed';
+      const icoon  = m.actief ? '🔴' : '—';
+      const datum  = m.actief ? 'Live nu!' : new Date(m.aangemaakt).toLocaleDateString('nl-NL', {day:'numeric',month:'long',year:'numeric'});
+      html += `<div class="iwh-event ${klasse}">
+        <div class="iwh-icon">${icoon}</div>
+        <div class="iwh-info">
+          <div class="iwh-name">${m.naam}</div>
+          <div class="iwh-date">${datum}${m.aanwezigen ? ' · ' + m.aanwezigen + ' aanwezigen' : ''}</div>
+        </div>
+        <div class="iwh-pts${m.actief?'':' dim'}">+100 pts</div>
+      </div>`;
+    });
+    el.innerHTML = html;
+  } catch(e) { console.log('IWH fout:', e.message); }
+}
+
 // ── TRACKMANIA ──
 async function laadTrackmanTijden() {
   try {
@@ -591,7 +787,6 @@ async function laadTrackmanTijden() {
     const map    = data[0];
     const tijden = (map.tijden || []).sort((a,b) => a.tijd_ms - b.tijd_ms);
     if (tijden.length === 0) return;
-    const posKleuren = ['#D4AF37','#A8A8A8','#A06030'];
     let html = '';
     tijden.forEach((t, i) => {
       const isRecord = i === 0;
@@ -605,7 +800,7 @@ async function laadTrackmanTijden() {
         </div>
         <div>
           <div class="sr-time ${isRecord?'record-time':''}">${t.tijd_format}</div>
-          <div class="sr-date">${i>0?'+'+((tijden[i].tijd_ms-tijden[0].tijd_ms)/1000).toFixed(3).replace('.',':').replace(/(\d+):(\d+)\.(\d+)/,'$1:$2.$3')+' achter':''}</div>
+          <div class="sr-date">${i>0?'+'+((tijden[i].tijd_ms-tijden[0].tijd_ms)/1000).toFixed(3)+' achter':''}</div>
         </div>
       </div>`;
     });
@@ -615,11 +810,71 @@ async function laadTrackmanTijden() {
   } catch(e) { console.log('TM fout:', e.message); }
 }
 
+// ── AGENDA ──
+async function laadAgenda() {
+  try {
+    const res  = await fetch(BACKEND + '/api/agenda');
+    const data = await res.json();
+    if (!data || data.length === 0) return; // Houd statische cards
+    const statusKlasse = { gepland:'gepland', binnenkort:'binnenkort', bezig:'bezig', 'in de planning':'gepland' };
+    let html = '';
+    data.forEach(e => {
+      const klasse = statusKlasse[e.status?.toLowerCase()] || 'gepland';
+      html += `<div class="agenda-card fade-up">
+        <div class="agenda-card-top">
+          <div class="agenda-category">${e.categorie || ''}</div>
+          <span class="agenda-icon">${e.icoon || '📅'}</span>
+          <div class="agenda-title">${e.titel}</div>
+          <div class="agenda-desc">${e.beschrijving || ''}</div>
+        </div>
+        <div class="agenda-card-bottom">
+          <div class="agenda-when">${e.wanneer || ''}</div>
+          <span class="agenda-status ${klasse}">${e.status || 'Gepland'}</span>
+        </div>
+      </div>`;
+    });
+    // Voeg "meer volgt" kaartje toe
+    html += `<div class="agenda-card fade-up" style="border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;">
+      <div style="font-size:28px;margin-bottom:10px">📅</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--white3);margin-bottom:4px">Meer volgt</div>
+      <div style="font-size:12px;color:var(--dim)">Volg Morrog op Twitch<br>voor aankondigingen</div>
+    </div>`;
+    document.getElementById('agenda-grid').innerHTML = html;
+    // Animeer nieuwe kaarten
+    setTimeout(() => {
+      document.querySelectorAll('#view-agenda .fade-up').forEach((el,i) => setTimeout(() => el.classList.add('visible'), i*55));
+    }, 30);
+  } catch(e) { console.log('Agenda fout:', e.message); }
+}
+
 // ── INIT ──
-setTimeout(() => {
-  document.querySelectorAll('#view-home .fade-up').forEach((el,i) => setTimeout(() => el.classList.add('visible'), i*55));
-  laadLeaderboard();
-}, 100);
+async function init() {
+  // Verwerk OAuth callback (als er een token in de hash zit)
+  const vanCallback = await verwerkTwitchCallback();
+
+  if (!vanCallback) {
+    // Herstel sessie uit localStorage
+    const opgeslagenToken = localStorage.getItem('twitch_token');
+    const opgeslagenUser  = JSON.parse(localStorage.getItem('twitch_user') || 'null');
+    const opgeslagenScore = JSON.parse(localStorage.getItem('loyalty_score') || 'null');
+
+    if (opgeslagenToken && opgeslagenUser) {
+      toonIngelogdUI(true, opgeslagenUser, opgeslagenScore, opgeslagenUser.id === MORROG_ID);
+      // Refresh op de achtergrond
+      laadGebruikersData(opgeslagenToken);
+    } else {
+      document.getElementById('btn-login').style.display = 'flex';
+    }
+  }
+
+  // Laad standaard data
+  setTimeout(() => {
+    document.querySelectorAll('#view-home .fade-up').forEach((el,i) => setTimeout(() => el.classList.add('visible'), i*55));
+    laadLeaderboard();
+  }, 100);
+}
+
+init();
 </script>
 </body>
 </html>
