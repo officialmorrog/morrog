@@ -195,6 +195,12 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.96);b
     <button class="sidebar-btn" onclick="toonPanel('agenda', this)">
       <span class="sidebar-icon">📅</span> Agenda
     </button>
+    <button class="sidebar-btn" onclick="toonPanel('hof', this)">
+      <span class="sidebar-icon">🏆</span> Hall of Fame
+    </button>
+    <button class="sidebar-btn" onclick="toonPanel('battlepass', this)">
+      <span class="sidebar-icon">👑</span> Battlepass
+    </button>
     <div class="sidebar-section">Data</div>
     <button class="sidebar-btn" onclick="toonPanel('leaderboard', this)">
       <span class="sidebar-icon">🏆</span> Leaderboard
@@ -354,6 +360,51 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.96);b
         <div id="agenda-lijst">
           <div class="lijst-lege">Laden...</div>
         </div>
+      </div>
+
+      <!-- Bewerk card (hidden by default) -->
+      <div class="card" id="agenda-bewerk-card" style="display:none">
+        <div class="card-title">Event bewerken</div>
+        <input type="hidden" id="ag-bewerk-id">
+        <div class="form-row">
+          <div class="form-group" style="flex:2">
+            <label class="form-label">Titel</label>
+            <input class="form-input" id="ag-bewerk-titel" type="text">
+          </div>
+          <div class="form-group" style="min-width:80px;max-width:100px">
+            <label class="form-label">Icoon</label>
+            <input class="form-input" id="ag-bewerk-icoon" type="text" maxlength="4">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Categorie</label>
+            <input class="form-input" id="ag-bewerk-categorie" type="text">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Wanneer</label>
+            <input class="form-input" id="ag-bewerk-wanneer" type="text">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="ag-bewerk-status">
+              <option value="gepland">Gepland</option>
+              <option value="binnenkort">Binnenkort</option>
+              <option value="bezig">Bezig</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex:1">
+            <label class="form-label">Beschrijving</label>
+            <input class="form-input" id="ag-bewerk-beschrijving" type="text">
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-primary" onclick="slaAgendaBewerk()">💾 Opslaan</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('agenda-bewerk-card').style.display='none'">Annuleren</button>
+        </div>
+        <div class="feedback" id="ag-bewerk-feedback"></div>
       </div>
     </div>
 
@@ -524,6 +575,220 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.96);b
         <div id="kluis-hint-knoppen" style="display:flex;flex-direction:column;gap:8px;"></div>
         <div class="feedback" id="kluis-hint-feedback"></div>
       </div>
+
+      <!-- Alle kluizen -->
+      <div class="card">
+        <div class="card-title">Alle kluizen</div>
+        <div id="kluis-alle-lijst"><div class="lijst-lege">Laden...</div></div>
+        <div class="feedback" id="kluis-alle-feedback"></div>
+      </div>
+
+      <!-- Kluis bewerk (hidden) -->
+      <div class="card" id="kluis-bewerk-card" style="display:none">
+        <div class="card-title">Kluis bewerken</div>
+        <input type="hidden" id="kluis-bewerk-id">
+        <div class="form-row">
+          <div class="form-group" style="flex:2">
+            <label class="form-label">Naam</label>
+            <input class="form-input" id="kluis-bewerk-naam" type="text">
+          </div>
+          <div class="form-group" style="flex:1">
+            <label class="form-label">Code (6 cijfers)</label>
+            <input class="form-input" id="kluis-bewerk-code" type="text" maxlength="6">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex:2">
+            <label class="form-label">Beloning</label>
+            <input class="form-input" id="kluis-bewerk-beloning" type="text">
+          </div>
+          <div class="form-group" style="flex:1">
+            <label class="form-label">Max pogingen/dag</label>
+            <input class="form-input" id="kluis-bewerk-pogingen" type="number" min="1" max="20">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="kluis-bewerk-actief">
+              <option value="true">Actief</option>
+              <option value="false">Inactief</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-primary" onclick="slaKluisBewerk()">💾 Opslaan</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('kluis-bewerk-card').style.display='none'">Annuleren</button>
+        </div>
+        <div class="feedback" id="kluis-bewerk-feedback"></div>
+      </div>
+    </div>
+
+    <!-- ── HALL OF FAME ──────────────────────────── -->
+    <div class="panel" id="panel-hof">
+      <div class="panel-title">Hall of Fame</div>
+      <div class="panel-desc">Beheer de Hall of Fame — challenges, speedruns, records en andere prestaties.</div>
+
+      <!-- Toevoegen -->
+      <div class="card">
+        <div class="card-title">Nieuwe entry toevoegen</div>
+        <div class="form-row">
+          <div class="form-group" style="flex:2">
+            <label class="form-label">Naam / Titel</label>
+            <input class="form-input" id="hof-naam" type="text" placeholder="bijv. Trackmania World Record">
+          </div>
+          <div class="form-group" style="min-width:80px;max-width:100px">
+            <label class="form-label">Icoon</label>
+            <input class="form-input" id="hof-icoon" type="text" value="🏆" maxlength="4">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Game</label>
+            <input class="form-input" id="hof-game" type="text" placeholder="bijv. Trackmania">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <input class="form-input" id="hof-type" type="text" placeholder="bijv. Speedrun, Challenge">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Resultaat</label>
+            <input class="form-input" id="hof-resultaat" type="text" placeholder="bijv. 1:23.456">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Tegenstander / Context</label>
+            <input class="form-input" id="hof-tegenstander" type="text" placeholder="bijv. vs. community, solo">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Datum</label>
+            <input class="form-input" id="hof-datum" type="date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="hof-status">
+              <option value="afgerond">Afgerond</option>
+              <option value="bezig">Bezig</option>
+              <option value="record">Record</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex:1">
+            <label class="form-label">Beschrijving</label>
+            <input class="form-input" id="hof-beschrijving" type="text" placeholder="Korte omschrijving">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="voegHofToe()">+ Voeg toe</button>
+        <div class="feedback" id="hof-add-feedback"></div>
+      </div>
+
+      <!-- Lijst -->
+      <div class="card">
+        <div class="card-title">Alle entries</div>
+        <div id="hof-lijst"><div class="lijst-lege">Laden...</div></div>
+      </div>
+
+      <!-- Bewerk (hidden) -->
+      <div class="card" id="hof-bewerk-card" style="display:none">
+        <div class="card-title">Entry bewerken</div>
+        <input type="hidden" id="hof-bewerk-id">
+        <div class="form-row">
+          <div class="form-group" style="flex:2">
+            <label class="form-label">Naam / Titel</label>
+            <input class="form-input" id="hof-bewerk-naam" type="text">
+          </div>
+          <div class="form-group" style="min-width:80px;max-width:100px">
+            <label class="form-label">Icoon</label>
+            <input class="form-input" id="hof-bewerk-icoon" type="text" maxlength="4">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Game</label>
+            <input class="form-input" id="hof-bewerk-game" type="text">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <input class="form-input" id="hof-bewerk-type" type="text">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Resultaat</label>
+            <input class="form-input" id="hof-bewerk-resultaat" type="text">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Tegenstander / Context</label>
+            <input class="form-input" id="hof-bewerk-tegenstander" type="text">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Datum</label>
+            <input class="form-input" id="hof-bewerk-datum" type="date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="hof-bewerk-status">
+              <option value="afgerond">Afgerond</option>
+              <option value="bezig">Bezig</option>
+              <option value="record">Record</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex:1">
+            <label class="form-label">Beschrijving</label>
+            <input class="form-input" id="hof-bewerk-beschrijving" type="text">
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-primary" onclick="slaHofBewerk()">💾 Opslaan</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('hof-bewerk-card').style.display='none'">Annuleren</button>
+        </div>
+        <div class="feedback" id="hof-bewerk-feedback"></div>
+      </div>
+    </div>
+
+    <!-- ── BATTLEPASS ──────────────────────────── -->
+    <div class="panel" id="panel-battlepass">
+      <div class="panel-title">Battlepass</div>
+      <div class="panel-desc">Bewerk de 25 battlepass tiers — naam, icoon, beschrijving en het vereiste aantal IWH stempels.</div>
+
+      <div class="card" id="bp-bewerk-card" style="display:none">
+        <div class="card-title">Tier bewerken</div>
+        <input type="hidden" id="bp-bewerk-id">
+        <div class="form-row">
+          <div class="form-group" style="flex:2">
+            <label class="form-label">Naam</label>
+            <input class="form-input" id="bp-bewerk-naam" type="text">
+          </div>
+          <div class="form-group" style="min-width:80px;max-width:100px">
+            <label class="form-label">Icoon</label>
+            <input class="form-input" id="bp-bewerk-icoon" type="text" maxlength="4">
+          </div>
+          <div class="form-group" style="max-width:120px">
+            <label class="form-label">Vereiste IWH</label>
+            <input class="form-input" id="bp-bewerk-iwh" type="number" min="1">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex:1">
+            <label class="form-label">Beschrijving</label>
+            <input class="form-input" id="bp-bewerk-beschrijving" type="text">
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-primary" onclick="slaBpBewerk()">💾 Opslaan</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('bp-bewerk-card').style.display='none'">Annuleren</button>
+        </div>
+        <div class="feedback" id="bp-bewerk-feedback"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Alle tiers</div>
+        <div id="bp-tiers-lijst"><div class="lijst-lege">Laden...</div></div>
+      </div>
     </div>
 
     <!-- ── SYSTEEM ─────────────────────────────────── -->
@@ -655,6 +920,8 @@ async function init() {
     laadIwhLijst();
     laadAgendaLijst();
     laadTmTijden();
+    laadHofLijst();
+    laadBattlepassTiers();
 
   } catch {
     document.getElementById('auth-scherm').style.display = 'flex';
@@ -679,7 +946,9 @@ function toonPanel(naam, btn) {
   document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('panel-' + naam).classList.add('active');
   if (btn) btn.classList.add('active');
-  if (naam === 'kluis') laadKluisStatus();
+  if (naam === 'kluis') { laadKluisStatus(); laadAlleKluizen(); }
+  if (naam === 'hof') laadHofLijst();
+  if (naam === 'battlepass') laadBattlepassTiers();
 }
 
 function toonFeedback(id, bericht, type = 'ok') {
@@ -821,9 +1090,18 @@ async function laadWinnaars() {
         <div class="winnaar-rij-naam">🏆 ${w.winnaar}</div>
         <div class="winnaar-rij-prijs">${w.prijs}</div>
         <div class="winnaar-rij-datum">${new Date(w.gerold_op).toLocaleDateString('nl-NL')}</div>
+        <button class="btn btn-danger btn-sm" onclick="verwijderWinnaar(${w.id})">✕</button>
       </div>
     `).join('');
   } catch(e) { console.log('Winnaars fout:', e.message); }
+}
+
+async function verwijderWinnaar(id) {
+  if (!confirm('Winnaar verwijderen?')) return;
+  try {
+    await adminFetch(`/api/giveaway/winnaar/${id}`, { method: 'DELETE' });
+    laadWinnaars();
+  } catch(e) { console.log('Winnaar delete fout:', e.message); }
 }
 
 // ── IK WAS HIER ─────────────────────────────────────────
@@ -888,15 +1166,42 @@ async function laadIwhLijst() {
     const el   = document.getElementById('iwh-lijst');
     if (!data || data.length === 0) { el.innerHTML = '<div class="lijst-lege">Nog geen momenten.</div>'; return; }
     el.innerHTML = data.map(m => `
-      <div class="lijst-rij">
+      <div class="lijst-rij" id="iwh-rij-${m.id}">
         <div style="flex:1">
           <div class="lijst-rij-naam">${m.actief ? '🔴 ' : ''}${m.naam}</div>
           <div class="lijst-rij-sub">${m.aanwezigen || 0} aanwezigen · ${new Date(m.aangemaakt).toLocaleDateString('nl-NL')}</div>
         </div>
-        ${m.actief ? `<button class="btn btn-danger btn-sm" onclick="stopIwh(${m.id})">Stop</button>` : ''}
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          ${m.actief ? `<button class="btn btn-danger btn-sm" onclick="stopIwh(${m.id})">Stop</button>` : ''}
+          <button class="btn btn-ghost btn-sm" onclick="bewerkIwh(${m.id}, '${m.naam.replace(/'/g,"\\'")}', '${(m.beschrijving||'').replace(/'/g,"\\'")}')">✎</button>
+          <button class="btn btn-danger btn-sm" onclick="verwijderIwh(${m.id})">✕</button>
+        </div>
       </div>
     `).join('');
   } catch(e) { console.log('IWH lijst fout:', e.message); }
+}
+
+async function verwijderIwh(id) {
+  if (!confirm('Moment verwijderen? Alle aanwezigheiddata gaat ook verloren.')) return;
+  try {
+    await adminFetch(`/api/iwh/momenten/${id}`, { method: 'DELETE' });
+    laadIwhStatus();
+    laadIwhLijst();
+  } catch(e) { console.log('IWH delete fout:', e.message); }
+}
+
+async function bewerkIwh(id, huidigNaam, huidigBeschrijving) {
+  const naam = prompt('Naam:', huidigNaam);
+  if (naam === null) return;
+  const beschrijving = prompt('Beschrijving:', huidigBeschrijving);
+  if (beschrijving === null) return;
+  try {
+    await adminFetch(`/api/iwh/momenten/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ naam: naam.trim(), beschrijving: beschrijving.trim() }),
+    });
+    laadIwhLijst();
+  } catch(e) { console.log('IWH edit fout:', e.message); }
 }
 
 // ── AGENDA ──────────────────────────────────────────────
@@ -938,7 +1243,10 @@ async function laadAgendaLijst() {
           <div class="lijst-rij-naam">${e.titel}</div>
           <div class="lijst-rij-sub">${e.categorie || ''} ${e.wanneer ? '· ' + e.wanneer : ''} · ${e.status || ''}</div>
         </div>
-        <button class="btn btn-danger btn-sm" onclick="verwijderAgenda(${e.id})">✕</button>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn btn-ghost btn-sm" onclick="bewerkAgenda(${e.id})">✎ Bewerk</button>
+          <button class="btn btn-danger btn-sm" onclick="verwijderAgenda(${e.id})">✕</button>
+        </div>
       </div>
     `).join('');
   } catch(e) { console.log('Agenda lijst fout:', e.message); }
@@ -950,6 +1258,43 @@ async function verwijderAgenda(id) {
     await adminFetch(`/api/agenda/${id}`, { method: 'DELETE' });
     laadAgendaLijst();
   } catch(e) { console.log('Agenda delete fout:', e.message); }
+}
+
+let agendaBewerk = null;
+function bewerkAgenda(id) {
+  const res = fetch(BACKEND + '/api/agenda').then(r => r.json()).then(data => {
+    const item = data.find(e => e.id === id);
+    if (!item) return;
+    agendaBewerk = item;
+    document.getElementById('ag-bewerk-id').value        = item.id;
+    document.getElementById('ag-bewerk-titel').value     = item.titel || '';
+    document.getElementById('ag-bewerk-icoon').value     = item.icoon || '📅';
+    document.getElementById('ag-bewerk-categorie').value = item.categorie || '';
+    document.getElementById('ag-bewerk-wanneer').value   = item.wanneer || '';
+    document.getElementById('ag-bewerk-status').value    = item.status || 'gepland';
+    document.getElementById('ag-bewerk-beschrijving').value = item.beschrijving || '';
+    document.getElementById('agenda-bewerk-card').style.display = 'block';
+    document.getElementById('agenda-bewerk-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+}
+
+async function slaAgendaBewerk() {
+  const id = parseInt(document.getElementById('ag-bewerk-id').value);
+  const body = {
+    titel:       document.getElementById('ag-bewerk-titel').value.trim(),
+    icoon:       document.getElementById('ag-bewerk-icoon').value.trim() || '📅',
+    categorie:   document.getElementById('ag-bewerk-categorie').value.trim(),
+    wanneer:     document.getElementById('ag-bewerk-wanneer').value.trim(),
+    status:      document.getElementById('ag-bewerk-status').value,
+    beschrijving: document.getElementById('ag-bewerk-beschrijving').value.trim(),
+  };
+  try {
+    const res = await adminFetch(`/api/agenda/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+    if (!res.ok) { const d = await res.json(); toonFeedback('ag-bewerk-feedback', d.error, 'fout'); return; }
+    document.getElementById('agenda-bewerk-card').style.display = 'none';
+    laadAgendaLijst();
+    toonFeedback('ag-feedback', 'Event bijgewerkt!', 'ok');
+  } catch(e) { toonFeedback('ag-bewerk-feedback', 'Fout: ' + e.message, 'fout'); }
 }
 
 // ── LEADERBOARD / SCORE AANPASSEN ───────────────────────
@@ -1272,6 +1617,237 @@ async function laadKluisStatus() {
   } catch(e) {
     document.getElementById('kluis-status-inhoud').textContent = 'Fout bij laden: ' + e.message;
   }
+}
+
+// ── KLUIS: ALLE KLUIZEN ──────────────────────────────────
+async function laadAlleKluizen() {
+  try {
+    const res  = await adminFetch('/api/kluis/alle');
+    const data = await res.json();
+    const el   = document.getElementById('kluis-alle-lijst');
+    if (!data || data.length === 0) { el.innerHTML = '<div class="lijst-lege">Geen kluizen gevonden.</div>'; return; }
+    el.innerHTML = data.map(k => `
+      <div class="lijst-rij">
+        <div style="flex:1">
+          <div class="lijst-rij-naam">${k.actief ? '🔒 ' : '🔓 '}${k.naam}</div>
+          <div class="lijst-rij-sub">Max ${k.max_pogingen} pogingen/dag · ${k.beloning || 'Geen beloning'} · ${new Date(k.aangemaakt).toLocaleDateString('nl-NL')}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn btn-ghost btn-sm" onclick="bewerkKluis(${k.id})">✎ Bewerk</button>
+          <button class="btn btn-danger btn-sm" onclick="verwijderKluis(${k.id})">✕</button>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) { console.log('Alle kluizen fout:', e.message); }
+}
+
+async function verwijderKluis(id) {
+  if (!confirm('Kluis en alle data (pogingen, teams, krakers) verwijderen?')) return;
+  try {
+    await adminFetch(`/api/kluis/${id}`, { method: 'DELETE' });
+    laadAlleKluizen();
+    laadKluisStatus();
+    toonFeedback('kluis-alle-feedback', 'Kluis verwijderd.', 'ok');
+  } catch(e) { toonFeedback('kluis-alle-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+async function bewerkKluis(id) {
+  try {
+    const res  = await adminFetch('/api/kluis/alle');
+    const data = await res.json();
+    const k    = data.find(x => x.id === id);
+    if (!k) return;
+    document.getElementById('kluis-bewerk-id').value       = k.id;
+    document.getElementById('kluis-bewerk-naam').value     = k.naam;
+    document.getElementById('kluis-bewerk-code').value     = '';
+    document.getElementById('kluis-bewerk-beloning').value = k.beloning || '';
+    document.getElementById('kluis-bewerk-pogingen').value = k.max_pogingen;
+    document.getElementById('kluis-bewerk-actief').value   = k.actief ? 'true' : 'false';
+    const card = document.getElementById('kluis-bewerk-card');
+    card.style.display = 'block';
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch(e) { console.log('Kluis bewerk fout:', e.message); }
+}
+
+async function slaKluisBewerk() {
+  const id = parseInt(document.getElementById('kluis-bewerk-id').value);
+  const code = document.getElementById('kluis-bewerk-code').value.trim();
+  const body = {
+    naam:         document.getElementById('kluis-bewerk-naam').value.trim(),
+    beloning:     document.getElementById('kluis-bewerk-beloning').value.trim(),
+    max_pogingen: parseInt(document.getElementById('kluis-bewerk-pogingen').value) || 5,
+    actief:       document.getElementById('kluis-bewerk-actief').value === 'true',
+  };
+  if (code) {
+    if (!/^\d{6}$/.test(code)) { toonFeedback('kluis-bewerk-feedback', 'Code moet exact 6 cijfers zijn', 'fout'); return; }
+    body.code = code;
+  }
+  try {
+    const res = await adminFetch(`/api/kluis/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+    if (!res.ok) { const d = await res.json(); toonFeedback('kluis-bewerk-feedback', d.error, 'fout'); return; }
+    document.getElementById('kluis-bewerk-card').style.display = 'none';
+    laadAlleKluizen();
+    laadKluisStatus();
+    toonFeedback('kluis-alle-feedback', 'Kluis bijgewerkt!', 'ok');
+  } catch(e) { toonFeedback('kluis-bewerk-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+// ── HALL OF FAME ─────────────────────────────────────────
+async function laadHofLijst() {
+  try {
+    const res  = await fetch(BACKEND + '/api/hof');
+    const data = await res.json();
+    const el   = document.getElementById('hof-lijst');
+    if (!data || data.length === 0) { el.innerHTML = '<div class="lijst-lege">Nog geen entries. Voeg er een toe.</div>'; return; }
+    el.innerHTML = data.map(h => `
+      <div class="lijst-rij">
+        <div style="font-size:20px;flex-shrink:0">${h.icoon || '🏆'}</div>
+        <div style="flex:1">
+          <div class="lijst-rij-naam">${h.naam}</div>
+          <div class="lijst-rij-sub">${[h.game, h.type, h.resultaat].filter(Boolean).join(' · ')}${h.datum ? ' · ' + new Date(h.datum).toLocaleDateString('nl-NL') : ''}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn btn-ghost btn-sm" onclick="bewerkHof(${h.id})">✎</button>
+          <button class="btn btn-danger btn-sm" onclick="verwijderHof(${h.id})">✕</button>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) { console.log('HoF lijst fout:', e.message); }
+}
+
+async function voegHofToe() {
+  const naam = document.getElementById('hof-naam').value.trim();
+  if (!naam) { toonFeedback('hof-add-feedback', 'Naam is verplicht.', 'fout'); return; }
+  const body = {
+    naam,
+    icoon:        document.getElementById('hof-icoon').value.trim() || '🏆',
+    game:         document.getElementById('hof-game').value.trim(),
+    type:         document.getElementById('hof-type').value.trim(),
+    resultaat:    document.getElementById('hof-resultaat').value.trim(),
+    tegenstander: document.getElementById('hof-tegenstander').value.trim(),
+    datum:        document.getElementById('hof-datum').value || null,
+    status:       document.getElementById('hof-status').value,
+    beschrijving: document.getElementById('hof-beschrijving').value.trim(),
+  };
+  try {
+    const res = await adminFetch('/api/hof', { method: 'POST', body: JSON.stringify(body) });
+    if (!res.ok) { const d = await res.json(); toonFeedback('hof-add-feedback', d.error, 'fout'); return; }
+    toonFeedback('hof-add-feedback', 'Entry toegevoegd!', 'ok');
+    ['hof-naam','hof-icoon','hof-game','hof-type','hof-resultaat','hof-tegenstander','hof-beschrijving'].forEach(id => {
+      const el = document.getElementById(id);
+      el.value = id === 'hof-icoon' ? '🏆' : '';
+    });
+    document.getElementById('hof-datum').value = '';
+    laadHofLijst();
+  } catch(e) { toonFeedback('hof-add-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+let hofData = [];
+async function bewerkHof(id) {
+  if (!hofData.length) {
+    const res = await fetch(BACKEND + '/api/hof');
+    hofData = await res.json();
+  }
+  const h = hofData.find(x => x.id === id);
+  if (!h) return;
+  document.getElementById('hof-bewerk-id').value           = h.id;
+  document.getElementById('hof-bewerk-naam').value         = h.naam || '';
+  document.getElementById('hof-bewerk-icoon').value        = h.icoon || '🏆';
+  document.getElementById('hof-bewerk-game').value         = h.game || '';
+  document.getElementById('hof-bewerk-type').value         = h.type || '';
+  document.getElementById('hof-bewerk-resultaat').value    = h.resultaat || '';
+  document.getElementById('hof-bewerk-tegenstander').value = h.tegenstander || '';
+  document.getElementById('hof-bewerk-datum').value        = h.datum ? h.datum.slice(0,10) : '';
+  document.getElementById('hof-bewerk-status').value       = h.status || 'afgerond';
+  document.getElementById('hof-bewerk-beschrijving').value = h.beschrijving || '';
+  const card = document.getElementById('hof-bewerk-card');
+  card.style.display = 'block';
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+async function slaHofBewerk() {
+  const id = parseInt(document.getElementById('hof-bewerk-id').value);
+  const body = {
+    naam:         document.getElementById('hof-bewerk-naam').value.trim(),
+    icoon:        document.getElementById('hof-bewerk-icoon').value.trim() || '🏆',
+    game:         document.getElementById('hof-bewerk-game').value.trim(),
+    type:         document.getElementById('hof-bewerk-type').value.trim(),
+    resultaat:    document.getElementById('hof-bewerk-resultaat').value.trim(),
+    tegenstander: document.getElementById('hof-bewerk-tegenstander').value.trim(),
+    datum:        document.getElementById('hof-bewerk-datum').value || null,
+    status:       document.getElementById('hof-bewerk-status').value,
+    beschrijving: document.getElementById('hof-bewerk-beschrijving').value.trim(),
+  };
+  try {
+    const res = await adminFetch(`/api/hof/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+    if (!res.ok) { const d = await res.json(); toonFeedback('hof-bewerk-feedback', d.error, 'fout'); return; }
+    hofData = [];
+    document.getElementById('hof-bewerk-card').style.display = 'none';
+    laadHofLijst();
+    toonFeedback('hof-add-feedback', 'Entry bijgewerkt!', 'ok');
+  } catch(e) { toonFeedback('hof-bewerk-feedback', 'Fout: ' + e.message, 'fout'); }
+}
+
+async function verwijderHof(id) {
+  if (!confirm('Entry verwijderen uit Hall of Fame?')) return;
+  hofData = [];
+  try {
+    await adminFetch(`/api/hof/${id}`, { method: 'DELETE' });
+    laadHofLijst();
+  } catch(e) { console.log('HoF delete fout:', e.message); }
+}
+
+// ── BATTLEPASS ───────────────────────────────────────────
+let bpTiers = [];
+
+async function laadBattlepassTiers() {
+  try {
+    const res  = await fetch(BACKEND + '/api/battlepass/tiers');
+    bpTiers    = await res.json();
+    const el   = document.getElementById('bp-tiers-lijst');
+    if (!bpTiers || bpTiers.length === 0) { el.innerHTML = '<div class="lijst-lege">Geen tiers gevonden.</div>'; return; }
+    el.innerHTML = bpTiers.map(t => `
+      <div class="lijst-rij">
+        <div style="font-size:18px;flex-shrink:0;width:32px;text-align:center">${t.icoon || '🎁'}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--white3);width:32px;flex-shrink:0">T${t.tier_nummer}</div>
+        <div style="flex:1">
+          <div class="lijst-rij-naam" style="${t.is_legendary ? 'color:var(--gold)' : ''}">${t.naam}</div>
+          <div class="lijst-rij-sub">${t.vereiste_iwh} IWH stempels · ${t.beschrijving ? t.beschrijving.slice(0,60) + (t.beschrijving.length > 60 ? '…' : '') : ''}</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="bewerkBpTier(${t.id})">✎ Bewerk</button>
+      </div>
+    `).join('');
+  } catch(e) { console.log('Battlepass laden fout:', e.message); }
+}
+
+function bewerkBpTier(id) {
+  const t = bpTiers.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('bp-bewerk-id').value          = t.id;
+  document.getElementById('bp-bewerk-naam').value        = t.naam || '';
+  document.getElementById('bp-bewerk-icoon').value       = t.icoon || '🎁';
+  document.getElementById('bp-bewerk-iwh').value         = t.vereiste_iwh || 1;
+  document.getElementById('bp-bewerk-beschrijving').value = t.beschrijving || '';
+  const card = document.getElementById('bp-bewerk-card');
+  card.style.display = 'block';
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+async function slaBpBewerk() {
+  const id = parseInt(document.getElementById('bp-bewerk-id').value);
+  const body = {
+    naam:         document.getElementById('bp-bewerk-naam').value.trim(),
+    icoon:        document.getElementById('bp-bewerk-icoon').value.trim() || '🎁',
+    vereiste_iwh: parseInt(document.getElementById('bp-bewerk-iwh').value) || 1,
+    beschrijving: document.getElementById('bp-bewerk-beschrijving').value.trim(),
+  };
+  try {
+    const res = await adminFetch(`/api/battlepass/tiers/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+    if (!res.ok) { const d = await res.json(); toonFeedback('bp-bewerk-feedback', d.error, 'fout'); return; }
+    document.getElementById('bp-bewerk-card').style.display = 'none';
+    laadBattlepassTiers();
+    toonFeedback('bp-bewerk-feedback', 'Tier opgeslagen!', 'ok');
+  } catch(e) { toonFeedback('bp-bewerk-feedback', 'Fout: ' + e.message, 'fout'); }
 }
 
 // ── START ────────────────────────────────────────────────
