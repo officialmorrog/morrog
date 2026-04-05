@@ -260,7 +260,7 @@ function shuffleArray(arr) {
   }
 }
 
-function playClip(index) {
+function playClip(index, muted = false) {
   if (!clips.length) return;
   clearTimeout(autoTimer);
 
@@ -283,10 +283,12 @@ function playClip(index) {
   }
 
   iframe.onload = () => { loading.style.display = 'none'; };
-  iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${PARENT}&autoplay=${userHasInteracted}`;
+  // muted=true bij auto-doorgaan zodat Chrome autoplay nooit blokkeert
+  iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${PARENT}&autoplay=${userHasInteracted}&muted=${muted}`;
 
   // Timer volledig onafhankelijk van onload — start direct, vuurt op clip.duration
-  autoTimer = setTimeout(nextClip, (clip.duration || 30) * 1000);
+  // auto-doorgaan altijd muted zodat Chrome het toestaat
+  autoTimer = setTimeout(() => nextClip(true), (clip.duration || 30) * 1000);
 
   // Info updaten
   document.getElementById('clip-title').textContent = clip.title || 'Onbekende clip';
@@ -301,14 +303,14 @@ function playClip(index) {
   scrollQueueToActive();
 }
 
-function nextClip() {
+function nextClip(muted = false) {
   if (!clips.length) return;
-  playClip((currentIndex + 1) % clips.length);
+  playClip((currentIndex + 1) % clips.length, muted);
 }
 
 function prevClip() {
   if (!clips.length) return;
-  playClip((currentIndex - 1 + clips.length) % clips.length);
+  playClip((currentIndex - 1 + clips.length) % clips.length, false);
 }
 
 function shuffleQueue() {
