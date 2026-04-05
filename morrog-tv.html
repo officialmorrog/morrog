@@ -54,6 +54,10 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
 .player-embed{position:relative;padding-bottom:56.25%;height:0;background:#000;}
 .player-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
 .player-loading{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#000;color:var(--white3);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;z-index:2;}
+.player-start{position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.7);cursor:pointer;z-index:3;gap:14px;color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:background .15s;}
+.player-start:hover{background:rgba(0,0,0,.55);}
+.player-start svg{width:60px;height:60px;fill:currentColor;opacity:.9;}
+.player-start:hover svg{opacity:1;}
 
 /* CLIP INFO */
 .clip-info{padding:16px 20px;border-top:1px solid var(--border);}
@@ -128,6 +132,10 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
         <div class="player-wrap">
           <div class="player-embed" id="player-embed">
             <div class="player-loading" id="player-loading">Clips laden...</div>
+            <div class="player-start" id="player-start" onclick="startPlayer()">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Klik om te starten
+            </div>
           </div>
           <div class="clip-info">
             <div class="clip-title" id="clip-title">—</div>
@@ -185,6 +193,13 @@ let clips         = [];
 let currentIndex  = 0;
 let autoTimer     = null;
 let currentFilter = 'all_time';
+let userHasInteracted = false;
+
+function startPlayer() {
+  userHasInteracted = true;
+  document.getElementById('player-start').style.display = 'none';
+  playClip(0);
+}
 
 async function getToken() {
   const cached = sessionStorage.getItem('morrog_tv_token');
@@ -227,7 +242,12 @@ async function loadClips(filter) {
     if (filter === 'random') shuffleArray(clips);
     currentIndex = 0;
     renderQueue();
-    playClip(0);
+    if (userHasInteracted) {
+      playClip(0);
+    } else {
+      document.getElementById('player-loading').style.display = 'none';
+      document.getElementById('player-start').style.display = 'flex';
+    }
   } catch(e) {
     document.getElementById('player-loading').textContent = 'Fout bij laden.';
   }
@@ -263,7 +283,7 @@ function playClip(index) {
   }
 
   iframe.onload = () => { loading.style.display = 'none'; };
-  iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${PARENT}&autoplay=true`;
+  iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${PARENT}&autoplay=${userHasInteracted}`;
 
   // Timer volledig onafhankelijk van onload — start direct, vuurt op clip.duration
   autoTimer = setTimeout(nextClip, (clip.duration || 30) * 1000);
