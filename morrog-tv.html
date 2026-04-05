@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morrog TV — Clip Player</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#090909;--bg2:#111111;--bg3:#181818;--bg4:#202020;--bg5:#282828;
+  --white:#FFFFFF;--white2:#CECECE;--white3:#888888;--dim:#333333;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --gold:#b17438;--brand:#b17438;--brand-dark:#2e0f38;
+  --streak:#3DAB6A;--here:#C85050;--twitch:#9147FF;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--white2);font-family:'Barlow',sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);z-index:100;display:flex;align-items:center;padding:0 40px;}
+.nav-logo{height:24px;margin-right:48px;opacity:.92;flex-shrink:0;}
+.nav-logo-fb{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;color:var(--white);margin-right:48px;text-transform:uppercase;}
+.nav-links{display:flex;gap:2px;flex:1;}
+.nav-link{padding:0 16px;height:58px;display:flex;align-items:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white3);border:none;background:none;border-bottom:2px solid transparent;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;text-decoration:none;}
+.nav-link:hover{color:var(--white2);}
+.nav-link.active{color:var(--white);border-bottom-color:var(--brand);}
+.nav-right{margin-left:auto;}
+
+/* LAYOUT */
+.page{padding:80px 0 0;min-height:100vh;}
+.inner{max-width:1280px;margin:0 auto;padding:32px 32px 64px;}
+
+/* HEADER */
+.tv-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;gap:16px;flex-wrap:wrap;}
+.tv-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--brand);display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.tv-eyebrow::before{content:'';display:block;width:24px;height:1px;background:var(--brand);}
+.tv-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--white);line-height:1;}
+.tv-title span{color:var(--brand);}
+
+/* FILTERS */
+.tv-filters{display:flex;gap:6px;flex-wrap:wrap;}
+.filter-btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 16px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--white3);cursor:pointer;transition:all .15s;}
+.filter-btn:hover{color:var(--white2);border-color:rgba(177,116,56,.4);}
+.filter-btn.active{background:rgba(177,116,56,.15);border-color:var(--brand);color:var(--brand);}
+
+/* MAIN GRID */
+.tv-grid{display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start;}
+
+/* PLAYER */
+.player-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;overflow:hidden;}
+.player-embed{position:relative;padding-bottom:56.25%;height:0;background:#000;}
+.player-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+.player-loading{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#000;color:var(--white3);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;}
+
+/* VOORTGANGSBALK */
+.progress-bar-wrap{height:3px;background:var(--bg4);position:relative;cursor:pointer;}
+.progress-bar-fill{height:100%;background:var(--brand);width:0%;transition:width .5s linear;}
+
+/* CLIP INFO */
+.clip-info{padding:16px 20px;border-top:1px solid var(--border);}
+.clip-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:8px;line-height:1.2;}
+.clip-meta{display:flex;gap:20px;flex-wrap:wrap;}
+.clip-meta-item{font-size:12px;color:var(--white3);display:flex;align-items:center;gap:5px;}
+.clip-meta-item strong{color:var(--white2);}
+
+/* CONTROLS */
+.player-controls{padding:14px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.ctrl-btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:7px 16px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--white3);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;}
+.ctrl-btn:hover{color:var(--white);border-color:var(--border2);}
+.ctrl-btn.primary{background:rgba(177,116,56,.15);border-color:var(--brand);color:var(--brand);}
+.ctrl-btn.primary:hover{background:rgba(177,116,56,.25);}
+.ctrl-btn svg{width:12px;height:12px;fill:currentColor;flex-shrink:0;}
+.ctrl-spacer{flex:1;}
+.autoplay-status{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--white3);}
+.autoplay-status span{color:var(--brand);}
+
+/* WACHTRIJ */
+.queue-wrap{display:flex;flex-direction:column;gap:1px;background:var(--border);}
+.queue-head{background:var(--bg2);padding:14px 16px;border-bottom:1px solid var(--border);}
+.queue-head-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--white3);}
+.queue-list{background:var(--bg2);max-height:580px;overflow-y:auto;}
+.queue-list::-webkit-scrollbar{width:4px;}
+.queue-list::-webkit-scrollbar-track{background:var(--bg2);}
+.queue-list::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
+.queue-item{display:flex;gap:10px;padding:10px 12px;cursor:pointer;transition:background .12s;border-bottom:1px solid var(--border);}
+.queue-item:hover{background:var(--bg3);}
+.queue-item.active{background:rgba(177,116,56,.1);border-left:2px solid var(--brand);}
+.queue-thumb{width:72px;height:40px;border-radius:3px;object-fit:cover;flex-shrink:0;background:var(--bg4);}
+.queue-info{flex:1;min-width:0;}
+.queue-title{font-size:12px;font-weight:600;color:var(--white2);line-height:1.3;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.queue-sub{font-size:11px;color:var(--white3);display:flex;gap:8px;flex-wrap:wrap;}
+.queue-num{width:20px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--dim);flex-shrink:0;padding-top:2px;}
+.queue-num.current{color:var(--brand);}
+
+/* LEGE STAAT */
+.empty-state{padding:40px 20px;text-align:center;color:var(--white3);font-size:13px;}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .tv-grid{grid-template-columns:1fr;}
+  .queue-list{max-height:300px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <img class="nav-logo" src="https://shop.morrog.nl/cdn/shop/files/Morrog-Logo_90x.png?v=1701878792" alt="Morrog"
+    onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+  <span class="nav-logo-fb" style="display:none">MORROG</span>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html">Home</a>
+    <a class="nav-link" href="index.html#loyalty">Loyaliteit</a>
+    <a class="nav-link" href="index.html#challenges">Challenges &amp; Speedruns</a>
+    <a class="nav-link" href="index.html#agenda">Agenda</a>
+    <a class="nav-link active" href="morrog-tv.html">Morrog TV</a>
+  </div>
+  <div class="nav-right"></div>
+</nav>
+
+<div class="page">
+  <div class="inner">
+    <div class="tv-header">
+      <div>
+        <div class="tv-eyebrow">Live clip player</div>
+        <div class="tv-title">MORROG <span>TV</span></div>
+      </div>
+      <div class="tv-filters">
+        <button class="filter-btn active" data-filter="all_time" onclick="setFilter(this,'all_time')">Beste ooit</button>
+        <button class="filter-btn" data-filter="month" onclick="setFilter(this,'month')">Deze maand</button>
+        <button class="filter-btn" data-filter="week" onclick="setFilter(this,'week')">Deze week</button>
+        <button class="filter-btn" data-filter="random" onclick="setFilter(this,'random')">Willekeurig</button>
+      </div>
+    </div>
+
+    <div class="tv-grid">
+      <!-- PLAYER KOLOM -->
+      <div>
+        <div class="player-wrap">
+          <div class="player-embed" id="player-embed">
+            <div class="player-loading" id="player-loading">Clips laden...</div>
+          </div>
+          <div class="progress-bar-wrap" id="progress-wrap">
+            <div class="progress-bar-fill" id="progress-bar"></div>
+          </div>
+          <div class="clip-info">
+            <div class="clip-title" id="clip-title">—</div>
+            <div class="clip-meta">
+              <div class="clip-meta-item">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                <strong id="clip-views">—</strong> views
+              </div>
+              <div class="clip-meta-item">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <strong id="clip-creator">—</strong>
+              </div>
+              <div class="clip-meta-item">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+                <strong id="clip-date">—</strong>
+              </div>
+            </div>
+          </div>
+          <div class="player-controls">
+            <button class="ctrl-btn" onclick="prevClip()">
+              <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+              Vorige
+            </button>
+            <button class="ctrl-btn" onclick="nextClip()">
+              Volgende
+              <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zm2.5-6l5.5 3.87V8.13L8.5 12zM16 6h2v12h-2z"/></svg>
+            </button>
+            <button class="ctrl-btn" onclick="shuffleQueue()">
+              <svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+              Shuffle
+            </button>
+            <div class="ctrl-spacer"></div>
+            <div class="autoplay-status" id="autoplay-status">Volgende clip in <span id="countdown">55</span>s</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WACHTRIJ KOLOM -->
+      <div class="player-wrap" style="overflow:hidden;">
+        <div class="queue-head">
+          <div class="queue-head-title">Wachtrij — <span id="queue-count">0</span> clips</div>
+        </div>
+        <div class="queue-list" id="queue-list">
+          <div class="empty-state">Clips worden geladen...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CLIENT_ID = 'r6uuslartqla0c52af9wc4j7eobcnu';
+const BROADCASTER_ID = '65660593';
+const BACKEND = 'https://morrog-loyalty-backend-production.up.railway.app';
+const PARENT = 'officialmorrog.github.io';
+const AUTOPLAY_SEC = 55;
+
+let clips = [];
+let currentIndex = 0;
+let countdownVal = AUTOPLAY_SEC;
+let countdownTimer = null;
+let progressTimer = null;
+let currentFilter = 'all_time';
+let token = null;
+
+async function getToken() {
+  const cached = sessionStorage.getItem('morrog_tv_token');
+  if (cached) return cached;
+  try {
+    const r = await fetch(`${BACKEND}/api/twitch-token`);
+    const d = await r.json();
+    sessionStorage.setItem('morrog_tv_token', d.access_token);
+    return d.access_token;
+  } catch(e) {
+    console.error('Token ophalen mislukt', e);
+    return null;
+  }
+}
+
+function getDateRange(filter) {
+  if (filter === 'week') {
+    const d = new Date(); d.setDate(d.getDate() - 7);
+    return `&started_at=${d.toISOString()}`;
+  }
+  if (filter === 'month') {
+    const d = new Date(); d.setMonth(d.getMonth() - 1);
+    return `&started_at=${d.toISOString()}`;
+  }
+  return '';
+}
+
+async function loadClips(filter) {
+  document.getElementById('player-loading').style.display = 'flex';
+  document.getElementById('queue-list').innerHTML = '<div class="empty-state">Clips worden geladen...</div>';
+
+  token = await getToken();
+  if (!token) {
+    document.getElementById('player-loading').textContent = 'Kan clips niet laden.';
+    return;
+  }
+
+  const dateRange = getDateRange(filter);
+  const sort = (filter === 'random') ? 'views' : 'views';
+  const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${BROADCASTER_ID}&first=50${dateRange}`;
+
+  try {
+    const r = await fetch(url, {
+      headers: { 'Authorization': `Bearer ${token}`, 'Client-Id': CLIENT_ID }
+    });
+    const d = await r.json();
+    clips = d.data || [];
+
+    if (clips.length === 0) {
+      document.getElementById('player-loading').textContent = 'Geen clips gevonden.';
+      document.getElementById('queue-list').innerHTML = '<div class="empty-state">Geen clips gevonden voor dit filter.</div>';
+      return;
+    }
+
+    if (filter === 'random') shuffleArray(clips);
+
+    currentIndex = 0;
+    renderQueue();
+    playClip(currentIndex);
+  } catch(e) {
+    document.getElementById('player-loading').textContent = 'Fout bij laden.';
+    console.error(e);
+  }
+}
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function playClip(index) {
+  if (!clips.length) return;
+  currentIndex = index;
+  const clip = clips[index];
+
+  // Verwijder oude iframe
+  const embed = document.getElementById('player-embed');
+  const oldIframe = embed.querySelector('iframe');
+  if (oldIframe) oldIframe.remove();
+
+  // Loading tonen
+  document.getElementById('player-loading').style.display = 'flex';
+  document.getElementById('player-loading').textContent = 'Clip laden...';
+
+  // Nieuwe iframe
+  const iframe = document.createElement('iframe');
+  iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${PARENT}&autoplay=true`;
+  iframe.allowFullscreen = true;
+  iframe.allow = 'autoplay';
+  iframe.onload = () => { document.getElementById('player-loading').style.display = 'none'; };
+  embed.appendChild(iframe);
+
+  // Info updaten
+  document.getElementById('clip-title').textContent = clip.title || 'Onbekende clip';
+  document.getElementById('clip-views').textContent = (clip.view_count || 0).toLocaleString('nl-NL');
+  document.getElementById('clip-creator').textContent = clip.creator_name || '—';
+  const datum = clip.created_at ? new Date(clip.created_at).toLocaleDateString('nl-NL', {day:'numeric',month:'short',year:'numeric'}) : '—';
+  document.getElementById('clip-date').textContent = datum;
+
+  // Wachtrij updaten
+  renderQueue();
+  scrollQueueToActive();
+
+  // Countdown starten
+  startCountdown();
+}
+
+function startCountdown() {
+  clearInterval(countdownTimer);
+  clearInterval(progressTimer);
+  countdownVal = AUTOPLAY_SEC;
+
+  document.getElementById('countdown').textContent = countdownVal;
+  document.getElementById('progress-bar').style.transition = 'none';
+  document.getElementById('progress-bar').style.width = '0%';
+
+  // Force reflow
+  document.getElementById('progress-bar').offsetHeight;
+
+  document.getElementById('progress-bar').style.transition = `width ${AUTOPLAY_SEC}s linear`;
+  document.getElementById('progress-bar').style.width = '100%';
+
+  countdownTimer = setInterval(() => {
+    countdownVal--;
+    document.getElementById('countdown').textContent = countdownVal;
+    if (countdownVal <= 0) {
+      clearInterval(countdownTimer);
+      nextClip();
+    }
+  }, 1000);
+}
+
+function nextClip() {
+  if (!clips.length) return;
+  const next = (currentIndex + 1) % clips.length;
+  playClip(next);
+}
+
+function prevClip() {
+  if (!clips.length) return;
+  const prev = (currentIndex - 1 + clips.length) % clips.length;
+  playClip(prev);
+}
+
+function shuffleQueue() {
+  if (!clips.length) return;
+  shuffleArray(clips);
+  currentIndex = 0;
+  renderQueue();
+  playClip(0);
+}
+
+function setFilter(btn, filter) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = filter;
+  loadClips(filter);
+}
+
+function renderQueue() {
+  const list = document.getElementById('queue-list');
+  document.getElementById('queue-count').textContent = clips.length;
+
+  if (!clips.length) {
+    list.innerHTML = '<div class="empty-state">Geen clips.</div>';
+    return;
+  }
+
+  list.innerHTML = clips.map((c, i) => `
+    <div class="queue-item${i === currentIndex ? ' active' : ''}" onclick="playClip(${i})" id="qi-${i}">
+      <div class="queue-num${i === currentIndex ? ' current' : ''}">${i === currentIndex ? '▶' : i + 1}</div>
+      <img class="queue-thumb" src="${c.thumbnail_url || ''}" alt="" loading="lazy" onerror="this.style.opacity='.2'">
+      <div class="queue-info">
+        <div class="queue-title">${escHtml(c.title || 'Clip')}</div>
+        <div class="queue-sub">
+          <span>${(c.view_count || 0).toLocaleString('nl-NL')} views</span>
+          <span>${escHtml(c.creator_name || '—')}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function scrollQueueToActive() {
+  const el = document.getElementById(`qi-${currentIndex}`);
+  if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Start
+loadClips('all_time');
+</script>
+</body>
+</html>
