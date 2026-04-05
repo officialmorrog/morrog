@@ -32,11 +32,17 @@ body::after{
 
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);z-index:100;display:flex;align-items:center;padding:0 40px;}
-.nav-logo-fb{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;color:var(--white);margin-right:48px;text-transform:uppercase;text-decoration:none;}
+.nav-logo{height:24px;margin-right:48px;opacity:.92;flex-shrink:0;}
+.nav-logo-fb{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;color:var(--white);margin-right:48px;text-transform:uppercase;}
 .nav-links{display:flex;gap:2px;flex:1;}
 .nav-link{padding:0 16px;height:58px;display:flex;align-items:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white3);border:none;background:none;border-bottom:2px solid transparent;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;text-decoration:none;}
 .nav-link:hover{color:var(--white2);}
-.nav-link.active{color:var(--gold);border-bottom-color:var(--gold);}
+.nav-link.active{color:var(--white);border-bottom-color:var(--white);}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.nav-live{display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--streak);padding:6px 14px;border:1px solid rgba(61,171,106,.3);border-radius:3px;background:rgba(61,171,106,.06);text-decoration:none;transition:background .15s;}
+.nav-live:hover{background:rgba(61,171,106,.12);}
+.nav-live-dot{width:6px;height:6px;border-radius:50%;background:var(--streak);animation:pulse-nav 1.5s ease-in-out infinite;}
+@keyframes pulse-nav{0%,100%{opacity:1;}50%{opacity:0.4;}}
 
 /* PARTICLES CANVAS */
 #particles{position:fixed;inset:0;pointer-events:none;z-index:0;}
@@ -457,7 +463,9 @@ footer{
 <body>
 
 <nav>
-  <a class="nav-logo-fb" href="index.html">MORROG</a>
+  <img class="nav-logo" src="https://shop.morrog.nl/cdn/shop/files/Morrog-Logo_90x.png?v=1701878792" alt="Morrog"
+    onerror="this.style.display='none';document.getElementById('nav-logo-fb').style.display='block'">
+  <span id="nav-logo-fb" class="nav-logo-fb" style="display:none">MORROG</span>
   <div class="nav-links">
     <a class="nav-link" href="index.html">Home</a>
     <a class="nav-link" href="index.html#loyalty">Loyaliteit</a>
@@ -466,6 +474,11 @@ footer{
     <a class="nav-link" href="charity.html">Charity</a>
     <a class="nav-link" href="battlepass.html">Battle Pass</a>
     <a class="nav-link active" href="morrog-kluis.html">Kluis</a>
+  </div>
+  <div class="nav-right">
+    <a class="nav-live" href="https://twitch.tv/morrog" target="_blank">
+      <span class="nav-live-dot"></span>Kijk live
+    </a>
   </div>
 </nav>
 
