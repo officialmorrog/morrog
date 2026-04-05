@@ -54,10 +54,6 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
 .player-embed{position:relative;padding-bottom:56.25%;height:0;background:#000;}
 .player-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
 .player-loading{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#000;color:var(--white3);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;z-index:2;}
-.autoplay-unlock{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.7);z-index:3;cursor:pointer;gap:12px;}
-.autoplay-unlock-icon{width:56px;height:56px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;}
-.autoplay-unlock-icon svg{width:24px;height:24px;fill:#fff;margin-left:4px;}
-.autoplay-unlock-text{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--white2);}
 
 /* CLIP INFO */
 .clip-info{padding:16px 20px;border-top:1px solid var(--border);}
@@ -132,10 +128,6 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
         <div class="player-wrap">
           <div class="player-embed" id="player-embed">
             <div class="player-loading" id="player-loading">Clips laden...</div>
-            <div class="autoplay-unlock" id="autoplay-unlock" style="display:none" onclick="unlockAutoplay()">
-              <div class="autoplay-unlock-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-              <div class="autoplay-unlock-text">Klik om af te spelen</div>
-            </div>
           </div>
           <div class="clip-info">
             <div class="clip-title" id="clip-title">—</div>
@@ -193,7 +185,6 @@ let clips         = [];
 let currentIndex  = 0;
 let autoTimer     = null;
 let currentFilter = 'all_time';
-let autoplayUnlocked = false;
 
 async function getToken() {
   const cached = sessionStorage.getItem('morrog_tv_token');
@@ -271,18 +262,11 @@ function playClip(index) {
     embed.appendChild(iframe);
   }
 
-  iframe.onload = () => {
-    loading.style.display = 'none';
-    // Toon unlock-knop als autoplay geblokkeerd is (browser vereist klik)
-    if (!autoplayUnlocked) {
-      document.getElementById('autoplay-unlock').style.display = 'flex';
-    }
-  };
+  iframe.onload = () => { loading.style.display = 'none'; };
   iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${PARENT}&autoplay=true`;
 
-  // Timer op clip.duration: vuurt terwijl clip nog speelt, endcard verschijnt nooit
-  const duur = (clip.duration || 30) * 1000;
-  autoTimer = setTimeout(nextClip, duur);
+  // Timer volledig onafhankelijk van onload — start direct, vuurt op clip.duration
+  autoTimer = setTimeout(nextClip, (clip.duration || 30) * 1000);
 
   // Info updaten
   document.getElementById('clip-title').textContent = clip.title || 'Onbekende clip';
@@ -343,17 +327,6 @@ function renderQueue() {
 function scrollQueueToActive() {
   const el = document.getElementById(`qi-${currentIndex}`);
   if (el) el.scrollIntoView({ block:'nearest', behavior:'smooth' });
-}
-
-function unlockAutoplay() {
-  autoplayUnlocked = true;
-  document.getElementById('autoplay-unlock').style.display = 'none';
-  // Herlaad huidige clip zodat hij nu met toestemming autoplayt
-  const clip = clips[currentIndex];
-  const iframe = document.getElementById('player-embed').querySelector('iframe');
-  if (iframe && clip) {
-    iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${PARENT}&autoplay=true`;
-  }
 }
 
 function esc(s) {
