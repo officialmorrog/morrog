@@ -262,12 +262,18 @@ function playClip(index) {
     embed.appendChild(iframe);
   }
 
-  iframe.onload = () => { loading.style.display = 'none'; };
+  const clipUrl = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${PARENT}&autoplay=true`;
 
-  iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${PARENT}&autoplay=true`;
+  // Reset via about:blank zodat browser autoplay opnieuw toestaat, dan direct clip laden
+  iframe.onload = null;
+  iframe.src = 'about:blank';
+  requestAnimationFrame(() => {
+    iframe.onload = () => { loading.style.display = 'none'; };
+    iframe.src = clipUrl;
+  });
 
-  // Timer direct instellen: duur + 3s buffer voor laadtijd
-  const duur = (clip.duration || 30) * 1000 + 3000;
+  // Wissel 1 seconde voor het einde zodat de Twitch endcard nooit zichtbaar wordt
+  const duur = Math.max((clip.duration || 30) - 1, 1) * 1000;
   autoTimer = setTimeout(nextClip, duur);
 
   // Info updaten
