@@ -204,7 +204,9 @@ const video = document.getElementById('clip-video');
 video.addEventListener('ended', () => nextClip(true));
 
 // Als directe URL niet werkt (geoblocked, 404, etc.) — sla over
+// Negeer errors bij src='' (reset tijdens filter-wisseling)
 video.addEventListener('error', () => {
+  if (!video.src || !clips.length) return;
   const loading = document.getElementById('player-loading');
   loading.textContent = 'Clip niet beschikbaar, volgende laden...';
   loading.style.display = 'flex';
@@ -217,13 +219,13 @@ video.addEventListener('canplay', () => {
 });
 
 // Bij vooruitspoelen: reset veiligheids-timer op basis van resterende tijd
+// Sla over als duration nog niet bekend is (load-seek bij nieuwe src)
 video.addEventListener('seeked', () => {
+  if (!video.duration || isNaN(video.duration)) return;
   clearTimeout(autoTimer);
   const remaining = video.duration - video.currentTime;
-  if (!isNaN(remaining) && remaining > 0) {
+  if (remaining > 1) {
     autoTimer = setTimeout(() => nextClip(true), remaining * 1000 + 2000);
-  } else {
-    nextClip(true);
   }
 });
 
