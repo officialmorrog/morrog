@@ -136,6 +136,8 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
               <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
               Klik om te starten
             </div>
+            <video id="clip-video" playsinline controls
+              style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;display:none;"></video>
           </div>
           <div class="clip-info">
             <div class="clip-title" id="clip-title">—</div>
@@ -195,6 +197,36 @@ let autoTimer     = null;
 let currentFilter = 'all_time';
 let userHasInteracted = false;
 
+// ── Video element setup ──
+const video = document.getElementById('clip-video');
+
+// Volgende clip laden zodra huidige klaar is (exacte timing, geen timer)
+video.addEventListener('ended', () => nextClip(true));
+
+// Als directe URL niet werkt (geoblocked, 404, etc.) — sla over
+video.addEventListener('error', () => {
+  const loading = document.getElementById('player-loading');
+  loading.textContent = 'Clip niet beschikbaar, volgende laden...';
+  loading.style.display = 'flex';
+  setTimeout(() => nextClip(true), 1500);
+});
+
+// Laadscherm verbergen zodra video afspeelbaar is
+video.addEventListener('canplay', () => {
+  document.getElementById('player-loading').style.display = 'none';
+});
+
+// Bij vooruitspoelen: reset veiligheids-timer op basis van resterende tijd
+video.addEventListener('seeked', () => {
+  clearTimeout(autoTimer);
+  const remaining = video.duration - video.currentTime;
+  if (!isNaN(remaining) && remaining > 0) {
+    autoTimer = setTimeout(() => nextClip(true), remaining * 1000 + 2000);
+  } else {
+    nextClip(true);
+  }
+});
+
 function startPlayer() {
   userHasInteracted = true;
   document.getElementById('player-start').style.display = 'none';
@@ -220,6 +252,9 @@ function getDateRange(filter) {
 
 async function loadClips(filter) {
   clearTimeout(autoTimer);
+  video.pause();
+  video.src = '';
+  video.style.display = 'none';
   document.getElementById('player-loading').style.display = 'flex';
   document.getElementById('player-loading').textContent = 'Clips laden...';
   document.getElementById('queue-list').innerHTML = '<div class="empty-state">Clips worden geladen...</div>';
@@ -260,37 +295,43 @@ function shuffleArray(arr) {
   }
 }
 
-function playClip(index, muted = false) {
+function getVideoUrl(clip) {
+  // Twitch thumbnail: https://clips-media-assets2.twitch.tv/HASH-preview-480x272.jpg
+  // Directe MP4:      https://clips-media-assets2.twitch.tv/HASH.mp4
+  return clip.thumbnail_url.replace(/-preview-\d+x\d+\.jpg$/, '.mp4');
+}
+
+function playClip(index, autoAdvanced = false) {
   if (!clips.length) return;
   clearTimeout(autoTimer);
 
   currentIndex = index;
   const clip = clips[index];
 
-  // Laadscherm tonen
-  const embed = document.getElementById('player-embed');
   const loading = document.getElementById('player-loading');
   loading.textContent = 'Clip laden...';
   loading.style.display = 'flex';
+  document.getElementById('player-start').style.display = 'none';
+  video.style.display = 'block';
 
-  // Hergebruik iframe — browser behoudt zo de autoplay-toestemming
-  let iframe = embed.querySelector('iframe');
-  if (!iframe) {
-    iframe = document.createElement('iframe');
-    iframe.setAttribute('allow', 'autoplay; fullscreen; encrypted-media');
-    iframe.allowFullscreen = true;
-    embed.appendChild(iframe);
-  }
+  // Mute voor auto-advance — browser staat muted autoplay altijd toe
+  video.muted = autoAdvanced;
+  video.src = getVideoUrl(clip);
 
-  iframe.onload = () => { loading.style.display = 'none'; };
-  // muted=true bij auto-doorgaan zodat Chrome autoplay nooit blokkeert
-  iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${PARENT}&autoplay=${userHasInteracted}&muted=${muted}`;
+  video.play()
+    .then(() => {
+      // Na succesvolle start: geluid herstellen als dit auto-advance was
+      if (autoAdvanced) video.muted = false;
+    })
+    .catch(() => {
+      // Autoplay geblokkeerd (zou niet mogen bij muted, maar als fallback):
+      loading.style.display = 'none';
+      document.getElementById('player-start').style.display = 'flex';
+    });
 
-  // Timer volledig onafhankelijk van onload — start direct, vuurt op clip.duration
-  // auto-doorgaan altijd muted zodat Chrome het toestaat
-  autoTimer = setTimeout(() => nextClip(true), (clip.duration || 30) * 1000);
+  // Veiligheids-timer als 'ended' event uitblijft (bijv. door netwerkfout)
+  autoTimer = setTimeout(() => nextClip(true), (clip.duration || 30) * 1000 + 15000);
 
-  // Info updaten
   document.getElementById('clip-title').textContent = clip.title || 'Onbekende clip';
   document.getElementById('clip-views').textContent = (clip.view_count || 0).toLocaleString('nl-NL');
   document.getElementById('clip-creator').textContent = clip.creator_name || '—';
@@ -303,14 +344,14 @@ function playClip(index, muted = false) {
   scrollQueueToActive();
 }
 
-function nextClip(muted = false) {
+function nextClip(autoAdvanced = false) {
   if (!clips.length) return;
-  playClip((currentIndex + 1) % clips.length, muted);
+  playClip((currentIndex + 1) % clips.length, autoAdvanced);
 }
 
 function prevClip() {
   if (!clips.length) return;
-  playClip((currentIndex - 1 + clips.length) % clips.length, false);
+  playClip((currentIndex - 1 + clips.length) % clips.length);
 }
 
 function shuffleQueue() {
