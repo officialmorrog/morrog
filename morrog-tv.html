@@ -286,22 +286,22 @@ function playClip(index) {
   currentIndex = index;
   const clip = clips[index];
 
-  // Verwijder oude iframe
   const embed = document.getElementById('player-embed');
-  const oldIframe = embed.querySelector('iframe');
-  if (oldIframe) oldIframe.remove();
-
-  // Loading tonen
   document.getElementById('player-loading').style.display = 'flex';
   document.getElementById('player-loading').textContent = 'Clip laden...';
 
-  // Nieuwe iframe
-  const iframe = document.createElement('iframe');
+  // Hergebruik bestaande iframe zodat browser autoplay-toestemming behoudt
+  let iframe = embed.querySelector('iframe');
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.allowFullscreen = true;
+    iframe.setAttribute('allow', 'autoplay; fullscreen; encrypted-media');
+    iframe.onload = () => { document.getElementById('player-loading').style.display = 'none'; };
+    embed.appendChild(iframe);
+  } else {
+    iframe.onload = () => { document.getElementById('player-loading').style.display = 'none'; };
+  }
   iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${PARENT}&autoplay=true`;
-  iframe.allowFullscreen = true;
-  iframe.allow = 'autoplay';
-  iframe.onload = () => { document.getElementById('player-loading').style.display = 'none'; };
-  embed.appendChild(iframe);
 
   // Info updaten
   document.getElementById('clip-title').textContent = clip.title || 'Onbekende clip';
