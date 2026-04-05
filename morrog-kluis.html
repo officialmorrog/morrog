@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morrog Kluis — Community Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#090909;--bg2:#111111;--bg3:#181818;--bg4:#202020;--bg5:#282828;
+  --white:#FFFFFF;--white2:#CECECE;--white3:#888888;--dim:#333333;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --gold:#C8A84A;--gold2:#E8C56A;--streak:#3DAB6A;--here:#C85050;--sub:#6858CC;
+  --twitch:#9147FF;
+  --vault-glow:rgba(200,168,74,0.4);
+  --vault-border:rgba(200,168,74,0.25);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--white2);font-family:'Barlow',sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden;min-height:100vh;}
+
+/* SCANLINES + VIGNETTE */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);
+}
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9997;
+  background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.6) 100%);
+}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);z-index:100;display:flex;align-items:center;padding:0 40px;}
+.nav-logo-fb{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;color:var(--white);margin-right:48px;text-transform:uppercase;text-decoration:none;}
+.nav-links{display:flex;gap:2px;flex:1;}
+.nav-link{padding:0 16px;height:58px;display:flex;align-items:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white3);border:none;background:none;border-bottom:2px solid transparent;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;text-decoration:none;}
+.nav-link:hover{color:var(--white2);}
+.nav-link.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* PARTICLES CANVAS */
+#particles{position:fixed;inset:0;pointer-events:none;z-index:0;}
+
+/* MAIN LAYOUT */
+main{position:relative;z-index:1;padding-top:58px;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+
+/* LED ROW */
+.led-row{width:100%;max-width:900px;display:flex;justify-content:center;gap:8px;padding:16px 0 8px;flex-wrap:wrap;}
+.led{width:8px;height:8px;border-radius:50%;background:var(--white3);box-shadow:0 0 4px currentColor;transition:background .1s,box-shadow .1s;}
+.led.on-gold{background:var(--gold);box-shadow:0 0 8px var(--gold),0 0 16px rgba(200,168,74,0.4);}
+.led.on-red{background:#e05555;box-shadow:0 0 8px #e05555;}
+.led.on-green{background:var(--streak);box-shadow:0 0 8px var(--streak);}
+
+/* HEADER */
+.kluis-header{text-align:center;padding:24px 0 8px;position:relative;}
+.kluis-title{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(52px,8vw,96px);
+  font-weight:900;
+  letter-spacing:12px;
+  text-transform:uppercase;
+  color:var(--white);
+  line-height:1;
+  position:relative;
+  display:inline-block;
+}
+.kluis-title.glitch{animation:glitch 0.15s steps(2) forwards;}
+@keyframes glitch{
+  0%{text-shadow:2px 0 var(--gold),−2px 0 #ff0055;transform:translate(2px,0);}
+  25%{text-shadow:−2px 0 var(--gold),2px 0 #ff0055;transform:translate(−2px,1px);}
+  50%{text-shadow:2px 2px var(--gold),−2px −2px #ff0055;transform:translate(0,−1px);}
+  75%{text-shadow:−1px 0 #0ff,1px 0 var(--gold);transform:translate(1px,0);}
+  100%{text-shadow:none;transform:translate(0,0);}
+}
+.kluis-subtitle{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-top:4px;}
+
+/* VAULT CONTAINER */
+.vault-container{position:relative;width:340px;height:340px;margin:20px auto;flex-shrink:0;}
+
+/* RINGS */
+.ring{position:absolute;border-radius:50%;border:2px solid transparent;}
+.ring-1{
+  inset:0;
+  border-color:rgba(200,168,74,0.35);
+  box-shadow:0 0 20px rgba(200,168,74,0.15),inset 0 0 20px rgba(200,168,74,0.05);
+  animation:spin1 12s linear infinite;
+}
+.ring-2{
+  inset:20px;
+  border-color:rgba(200,168,74,0.25);
+  animation:spin2 8s linear infinite;
+}
+.ring-3{
+  inset:40px;
+  border-color:rgba(200,168,74,0.15);
+  animation:spin3 20s linear infinite reverse;
+}
+@keyframes spin1{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes spin2{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes spin3{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+
+/* RING DOTS */
+.ring-dot{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold),0 0 20px rgba(200,168,74,0.5);transform:translate(-50%,-50%);}
+
+/* VAULT DOOR */
+.vault-door{
+  position:absolute;inset:60px;
+  border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,#2a2415,#0d0d0d 70%);
+  border:3px solid rgba(200,168,74,0.5);
+  box-shadow:0 0 30px rgba(200,168,74,0.2),inset 0 0 40px rgba(0,0,0,0.8);
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  transition:box-shadow 0.5s,border-color 0.5s;
+}
+.vault-door.unlocked{
+  border-color:rgba(61,171,106,0.8);
+  box-shadow:0 0 50px rgba(61,171,106,0.4),inset 0 0 30px rgba(61,171,106,0.1);
+}
+.vault-door.error-flash{
+  animation:error-flash 0.4s ease;
+}
+@keyframes error-flash{
+  0%,100%{border-color:rgba(200,168,74,0.5);}
+  50%{border-color:rgba(200,50,50,0.9);box-shadow:0 0 40px rgba(200,50,50,0.5);}
+}
+
+/* SCAN BEAM */
+.scan-beam{
+  position:absolute;
+  width:100%;height:3px;
+  background:linear-gradient(90deg,transparent,rgba(200,168,74,0.6),transparent);
+  top:0;
+  animation:scan 3s linear infinite;
+}
+@keyframes scan{
+  0%{top:0%;opacity:0;}
+  5%{opacity:1;}
+  95%{opacity:1;}
+  100%{top:100%;opacity:0;}
+}
+
+/* VAULT EMBLEM */
+.vault-emblem{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:28px;font-weight:900;
+  letter-spacing:4px;
+  color:rgba(200,168,74,0.6);
+  text-transform:uppercase;
+  user-select:none;
+  text-shadow:0 0 20px rgba(200,168,74,0.3);
+}
+
+/* BOTTOM LIGHTS */
+.lights-row{display:flex;justify-content:center;gap:16px;margin:8px 0 20px;}
+.light{width:14px;height:14px;border-radius:50%;position:relative;}
+.light::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:1px solid rgba(255,255,255,0.08);}
+.light-red{background:#c84040;box-shadow:0 0 10px rgba(200,64,64,0.6),0 0 20px rgba(200,64,64,0.2);}
+.light-gold{background:var(--gold);box-shadow:0 0 10px rgba(200,168,74,0.6),0 0 20px rgba(200,168,74,0.2);animation:pulse-light 2s ease-in-out infinite;}
+.light-green{background:#3DAB6A;box-shadow:0 0 10px rgba(61,171,106,0.6),0 0 20px rgba(61,171,106,0.2);}
+.light-blue{background:#4080cc;box-shadow:0 0 10px rgba(64,128,204,0.6),0 0 20px rgba(64,128,204,0.2);}
+@keyframes pulse-light{
+  0%,100%{opacity:1;}
+  50%{opacity:0.5;}
+}
+
+/* PAGE GRID */
+.page-grid{
+  width:100%;max-width:1100px;
+  padding:0 24px 60px;
+  display:grid;
+  grid-template-columns:1fr 380px;
+  gap:32px;
+  align-items:start;
+}
+@media(max-width:860px){
+  .page-grid{grid-template-columns:1fr;}
+}
+
+/* KLUIS NAAM */
+.kluis-naam{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:20px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+  color:var(--gold);text-align:center;
+  margin-bottom:4px;
+}
+
+/* NUMPAD */
+.numpad-section{
+  background:var(--bg2);
+  border:1px solid var(--vault-border);
+  border-radius:12px;
+  padding:28px;
+  box-shadow:0 0 40px rgba(200,168,74,0.05);
+}
+.numpad-label{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;
+  color:var(--white3);text-align:center;margin-bottom:14px;
+}
+.code-display{
+  display:flex;gap:10px;justify-content:center;margin-bottom:20px;
+}
+.code-digit{
+  width:48px;height:64px;
+  border:2px solid rgba(200,168,74,0.25);
+  border-radius:6px;
+  background:rgba(200,168,74,0.03);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:32px;font-weight:800;
+  color:var(--gold);
+  transition:border-color .15s,background .15s,box-shadow .15s;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,0.4);
+}
+.code-digit.filled{
+  border-color:rgba(200,168,74,0.6);
+  background:rgba(200,168,74,0.06);
+  box-shadow:inset 0 2px 8px rgba(0,0,0,0.4),0 0 12px rgba(200,168,74,0.15);
+}
+.code-digit.correct{border-color:rgba(61,171,106,0.8);color:var(--streak);}
+.code-digit.wrong{border-color:rgba(200,50,50,0.8);color:#e05555;}
+
+.numpad{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-bottom:14px;
+}
+.numpad-btn{
+  height:58px;
+  border:1px solid var(--border2);
+  border-radius:8px;
+  background:var(--bg3);
+  color:var(--white);
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:22px;font-weight:700;
+  cursor:pointer;
+  transition:background .1s,border-color .1s,transform .08s;
+  user-select:none;
+}
+.numpad-btn:hover{background:var(--bg4);border-color:rgba(200,168,74,0.3);}
+.numpad-btn:active{transform:scale(0.94);}
+.numpad-btn.btn-del{font-size:16px;color:var(--white3);}
+.numpad-btn.btn-send{
+  background:rgba(200,168,74,0.12);
+  border-color:rgba(200,168,74,0.4);
+  color:var(--gold);
+  font-size:14px;letter-spacing:1px;
+}
+.numpad-btn.btn-send:hover{background:rgba(200,168,74,0.22);}
+
+.username-input-wrap{margin-bottom:14px;}
+.username-input{
+  width:100%;
+  background:var(--bg3);
+  border:1px solid var(--border2);
+  border-radius:6px;
+  color:var(--white);
+  font-family:'Barlow',sans-serif;
+  font-size:14px;
+  padding:10px 14px;
+  outline:none;
+  transition:border-color .15s;
+}
+.username-input:focus{border-color:rgba(200,168,74,0.4);}
+.username-input::placeholder{color:var(--white3);}
+
+.numpad-status{
+  text-align:center;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;letter-spacing:1px;
+  min-height:20px;
+  transition:color .2s;
+}
+.numpad-status.error{color:#e05555;}
+.numpad-status.success{color:var(--streak);}
+.numpad-status.info{color:var(--white3);}
+
+/* POGINGEN COUNTER */
+.pogingen-bar{
+  display:flex;gap:6px;justify-content:center;margin:14px 0 6px;
+}
+.poging-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:rgba(200,168,74,0.6);
+  box-shadow:0 0 6px rgba(200,168,74,0.3);
+  transition:background .3s;
+}
+.poging-dot.used{background:rgba(200,50,50,0.5);box-shadow:none;}
+
+/* STATS STRIP */
+.stats-strip{
+  display:flex;gap:1px;
+  background:var(--border);
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
+  margin-bottom:28px;
+}
+.stat-item{
+  flex:1;padding:14px 10px;
+  background:var(--bg2);
+  text-align:center;
+}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:var(--white);line-height:1;}
+.stat-lbl{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--white3);margin-top:2px;}
+
+/* HINTS */
+.section-title{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;
+  color:var(--white3);margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.hints-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+.hint-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:14px 16px;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.hint-card.locked{opacity:0.7;}
+.hint-num{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:22px;font-weight:900;
+  color:var(--gold);
+  line-height:1;
+  flex-shrink:0;
+  min-width:28px;
+}
+.hint-body{flex:1;}
+.hint-kanaal{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--white3);margin-bottom:4px;
+}
+.hint-tekst{font-size:14px;color:var(--white2);}
+.hint-blurred{
+  font-size:14px;color:var(--white3);
+  filter:blur(6px);
+  user-select:none;
+}
+.hint-locked-label{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:11px;letter-spacing:1px;text-transform:uppercase;
+  color:var(--white3);margin-top:4px;
+}
+.hint-lock-icon{font-size:18px;flex-shrink:0;opacity:0.4;margin-top:2px;}
+
+/* LEADERBOARD */
+.krakers-list{display:flex;flex-direction:column;gap:8px;}
+.kraker-row{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px 14px;
+}
+.kraker-pos{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:20px;font-weight:800;
+  color:var(--white3);
+  min-width:28px;text-align:center;
+}
+.kraker-pos.p1{color:var(--gold);}
+.kraker-pos.p2{color:#a0a0a0;}
+.kraker-pos.p3{color:#b87040;}
+.kraker-name{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--white);}
+.kraker-time{font-size:12px;color:var(--white3);}
+
+/* BELONING BANNER */
+.beloning-banner{
+  background:linear-gradient(135deg,rgba(200,168,74,0.08),rgba(200,168,74,0.03));
+  border:1px solid rgba(200,168,74,0.25);
+  border-radius:8px;
+  padding:16px 20px;
+  margin-bottom:28px;
+  display:flex;align-items:center;gap:12px;
+}
+.beloning-icon{font-size:24px;}
+.beloning-text{font-size:13px;color:var(--white2);}
+.beloning-text strong{color:var(--gold);}
+
+/* SUCCESS OVERLAY */
+.success-overlay{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,0.92);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .4s;
+}
+.success-overlay.show{opacity:1;pointer-events:all;}
+.success-box{
+  background:var(--bg2);
+  border:1px solid rgba(61,171,106,0.5);
+  border-radius:16px;
+  padding:48px 40px;
+  text-align:center;
+  max-width:480px;
+  box-shadow:0 0 80px rgba(61,171,106,0.2);
+}
+.success-icon{font-size:64px;margin-bottom:16px;}
+.success-title{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:36px;font-weight:900;
+  text-transform:uppercase;letter-spacing:4px;
+  color:var(--streak);margin-bottom:8px;
+}
+.success-sub{font-size:15px;color:var(--white2);margin-bottom:8px;}
+.success-pos{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:900;color:var(--gold);margin:12px 0;}
+.success-pts{font-size:14px;color:var(--streak);margin-bottom:24px;}
+.success-discord{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(88,101,242,0.15);
+  border:1px solid rgba(88,101,242,0.4);
+  border-radius:8px;
+  padding:12px 20px;
+  color:var(--white);
+  text-decoration:none;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:14px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  transition:background .15s;
+}
+.success-discord:hover{background:rgba(88,101,242,0.25);}
+.success-close{
+  display:block;margin:16px auto 0;
+  background:none;border:none;
+  color:var(--white3);font-size:13px;cursor:pointer;
+  font-family:'Barlow',sans-serif;
+}
+.success-close:hover{color:var(--white2);}
+
+/* LEEG STATE */
+.no-kluis{
+  grid-column:1/-1;
+  text-align:center;padding:80px 20px;
+  color:var(--white3);
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:18px;letter-spacing:2px;text-transform:uppercase;
+}
+
+/* FOOTER */
+footer{
+  position:relative;z-index:1;
+  border-top:1px solid var(--border);
+  padding:24px 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:12px;color:var(--white3);
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo-fb" href="index.html">MORROG</a>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html">Loyalty</a>
+    <a class="nav-link" href="battlepass.html">Battle Pass</a>
+    <a class="nav-link" href="charity.html">Charity</a>
+    <a class="nav-link active" href="morrog-kluis.html">Kluis</a>
+  </div>
+</nav>
+
+<canvas id="particles"></canvas>
+
+<div class="success-overlay" id="successOverlay">
+  <div class="success-box">
+    <div class="success-icon">🔓</div>
+    <div class="success-title">Kluis Gekraakt!</div>
+    <div class="success-sub">Jij bent kraker nummer</div>
+    <div class="success-pos" id="successPos">#1</div>
+    <div class="success-pts" id="successPts">+500 Morrog Punten bijgeschreven</div>
+    <div class="success-sub" id="successBeloning"></div>
+    <br>
+    <a class="success-discord" href="https://discord.gg/morrog" target="_blank">
+      🏆 Claim je prijs op Discord
+    </a>
+    <button class="success-close" onclick="document.getElementById('successOverlay').classList.remove('show')">sluiten</button>
+  </div>
+</div>
+
+<main>
+  <!-- LED ROW -->
+  <div class="led-row" id="ledRow"></div>
+
+  <!-- HEADER -->
+  <div class="kluis-header">
+    <div class="kluis-title" id="kluisTitle">MORROG</div>
+    <div class="kluis-subtitle">Kluis Systeem — Kraak de Code</div>
+  </div>
+
+  <!-- VAULT VISUAL -->
+  <div class="vault-container" id="vaultContainer">
+    <div class="ring ring-1" id="ring1">
+      <div class="ring-dot" style="top:50%;left:0;"></div>
+      <div class="ring-dot" style="top:0;left:50%;"></div>
+    </div>
+    <div class="ring ring-2" id="ring2">
+      <div class="ring-dot" style="top:50%;right:-4px;transform:translate(50%,-50%);"></div>
+      <div class="ring-dot" style="bottom:-4px;left:50%;transform:translate(-50%,50%);"></div>
+    </div>
+    <div class="ring ring-3" id="ring3">
+      <div class="ring-dot" style="top:50%;left:-4px;transform:translate(-50%,-50%);"></div>
+    </div>
+    <div class="vault-door" id="vaultDoor">
+      <div class="scan-beam" id="scanBeam"></div>
+      <div class="vault-emblem" id="vaultEmblem">MORROG</div>
+    </div>
+  </div>
+
+  <!-- KLUIS NAAM -->
+  <div class="kluis-naam" id="kluisNaam">Laden...</div>
+
+  <!-- LIGHTS -->
+  <div class="lights-row">
+    <div class="light light-red" id="lightRed"></div>
+    <div class="light light-gold" id="lightGold"></div>
+    <div class="light light-green" id="lightGreen"></div>
+    <div class="light light-blue" id="lightBlue"></div>
+  </div>
+
+  <!-- STATS STRIP -->
+  <div style="width:100%;max-width:1100px;padding:0 24px;">
+    <div class="stats-strip">
+      <div class="stat-item">
+        <div class="stat-val" id="statPogingen">—</div>
+        <div class="stat-lbl">Pogingen Vandaag</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="statKrakers">—</div>
+        <div class="stat-lbl">Krakers</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="statDagen">—</div>
+        <div class="stat-lbl">Dagen Actief</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="page-grid" id="mainGrid">
+    <div class="no-kluis" id="noKluisMsg" style="display:none;">
+      Geen actieve kluis op dit moment.<br>Wacht op de volgende stream.
+    </div>
+
+    <!-- LEFT: hints + beloning + leaderboard -->
+    <div id="leftCol">
+      <div id="beloningWrap" style="display:none;">
+        <div class="beloning-banner">
+          <div class="beloning-icon">🏆</div>
+          <div class="beloning-text">Beloning: <strong id="beloningTekst"></strong></div>
+        </div>
+      </div>
+
+      <div class="section-title">Hints</div>
+      <div class="hints-grid" id="hintsGrid">
+        <div style="color:var(--white3);font-size:13px;">Laden...</div>
+      </div>
+
+      <div class="section-title">Eerste Krakers</div>
+      <div class="krakers-list" id="krakersList">
+        <div style="color:var(--white3);font-size:13px;">Nog geen krakers</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: numpad -->
+    <div id="rightCol">
+      <div class="numpad-section">
+        <div class="numpad-label">Voer de 6-cijferige code in</div>
+
+        <div class="code-display" id="codeDisplay">
+          <div class="code-digit" id="d0">_</div>
+          <div class="code-digit" id="d1">_</div>
+          <div class="code-digit" id="d2">_</div>
+          <div class="code-digit" id="d3">_</div>
+          <div class="code-digit" id="d4">_</div>
+          <div class="code-digit" id="d5">_</div>
+        </div>
+
+        <div class="username-input-wrap">
+          <input class="username-input" type="text" id="usernameInput"
+            placeholder="Jouw Twitch gebruikersnaam (optioneel)"
+            autocomplete="off" spellcheck="false">
+        </div>
+
+        <div class="numpad">
+          <button class="numpad-btn" onclick="numpadPress('1')">1</button>
+          <button class="numpad-btn" onclick="numpadPress('2')">2</button>
+          <button class="numpad-btn" onclick="numpadPress('3')">3</button>
+          <button class="numpad-btn" onclick="numpadPress('4')">4</button>
+          <button class="numpad-btn" onclick="numpadPress('5')">5</button>
+          <button class="numpad-btn" onclick="numpadPress('6')">6</button>
+          <button class="numpad-btn" onclick="numpadPress('7')">7</button>
+          <button class="numpad-btn" onclick="numpadPress('8')">8</button>
+          <button class="numpad-btn" onclick="numpadPress('9')">9</button>
+          <button class="numpad-btn btn-del" onclick="numpadDel()">⌫ Wis</button>
+          <button class="numpad-btn" onclick="numpadPress('0')">0</button>
+          <button class="numpad-btn btn-send" onclick="probeerCode()" id="sendBtn">OPEN</button>
+        </div>
+
+        <div class="pogingen-bar" id="pogingenBar"></div>
+        <div class="numpad-status info" id="numpadStatus">Voer de code in en druk OPEN</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>© 2025 Morrog — Community Hub</span>
+  <span style="color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;">Kluis Systeem</span>
+</footer>
+
+<script>
+const API = 'https://morrog-loyalty-backend-production.up.railway.app';
+const CODE_LEN = 6;
+
+let currentCode = '';
+let maxPogingen = 5;
+let kluisId = null;
+let geblokeerd = false;
+
+// ── PARTICLES ──────────────────────────────────────────────
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let W, H;
+
+function resizeCanvas() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function spawnParticle(x, y, burst) {
+  const count = burst ? 20 : 1;
+  for (let i = 0; i < count; i++) {
+    const angle = burst ? Math.random() * Math.PI * 2 : Math.random() * Math.PI * 2;
+    const speed = burst ? 2 + Math.random() * 4 : 0.3 + Math.random() * 0.7;
+    particles.push({
+      x: x || Math.random() * W,
+      y: y || Math.random() * H,
+      vx: Math.cos(angle) * speed,
+      vy: burst ? Math.sin(angle) * speed : -speed * 0.5 - Math.random() * 0.5,
+      life: burst ? 0.8 + Math.random() * 0.4 : 0.6 + Math.random() * 0.6,
+      maxLife: burst ? 1.2 : 1.6,
+      size: burst ? 2 + Math.random() * 4 : 1 + Math.random() * 2,
+      gold: true,
+    });
+  }
+}
+
+// Spawn ambient particles slowly
+setInterval(() => {
+  if (particles.length < 80) spawnParticle(null, null, false);
+}, 120);
+
+function animateParticles() {
+  ctx.clearRect(0, 0, W, H);
+  particles = particles.filter(p => p.life > 0);
+  for (const p of particles) {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= 0.008;
+    const alpha = Math.min(p.life / 0.3, 1) * 0.7;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(200,168,74,${alpha})`;
+    ctx.fill();
+  }
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// ── LED ROW ────────────────────────────────────────────────
+const ledRow = document.getElementById('ledRow');
+const LED_COUNT = 32;
+for (let i = 0; i < LED_COUNT; i++) {
+  const led = document.createElement('div');
+  led.className = 'led';
+  led.id = 'led' + i;
+  ledRow.appendChild(led);
+}
+
+function flickerLeds() {
+  const leds = ledRow.querySelectorAll('.led');
+  leds.forEach(l => {
+    l.className = 'led';
+    const r = Math.random();
+    if (r > 0.7) l.classList.add('on-gold');
+    else if (r > 0.6) l.classList.add('on-red');
+  });
+}
+setInterval(flickerLeds, 300);
+flickerLeds();
+
+function setLedsGreen() {
+  const leds = ledRow.querySelectorAll('.led');
+  leds.forEach(l => { l.className = 'led on-green'; });
+}
+
+// ── GLITCH ─────────────────────────────────────────────────
+function triggerGlitch() {
+  const el = document.getElementById('kluisTitle');
+  el.classList.remove('glitch');
+  void el.offsetWidth;
+  el.classList.add('glitch');
+  setTimeout(() => el.classList.remove('glitch'), 200);
+}
+setInterval(triggerGlitch, 4000 + Math.random() * 6000);
+
+// ── NUMPAD ─────────────────────────────────────────────────
+function updateDisplay() {
+  for (let i = 0; i < CODE_LEN; i++) {
+    const el = document.getElementById('d' + i);
+    el.className = 'code-digit';
+    if (i < currentCode.length) {
+      el.textContent = currentCode[i];
+      el.classList.add('filled');
+    } else {
+      el.textContent = '_';
+    }
+  }
+}
+
+function numpadPress(digit) {
+  if (geblokeerd) return;
+  if (currentCode.length >= CODE_LEN) return;
+  currentCode += digit;
+  updateDisplay();
+  if (currentCode.length === CODE_LEN) {
+    document.getElementById('numpadStatus').textContent = 'Druk OPEN om te proberen';
+    document.getElementById('numpadStatus').className = 'numpad-status info';
+  }
+}
+
+function numpadDel() {
+  if (geblokeerd) return;
+  currentCode = currentCode.slice(0, -1);
+  updateDisplay();
+  document.getElementById('numpadStatus').textContent = 'Voer de code in en druk OPEN';
+  document.getElementById('numpadStatus').className = 'numpad-status info';
+}
+
+// Keyboard support
+document.addEventListener('keydown', e => {
+  if (e.key >= '0' && e.key <= '9') numpadPress(e.key);
+  else if (e.key === 'Backspace' || e.key === 'Delete') numpadDel();
+  else if (e.key === 'Enter') probeerCode();
+});
+
+// ── PROBEER CODE ───────────────────────────────────────────
+async function probeerCode() {
+  if (geblokeerd) return;
+  if (currentCode.length < CODE_LEN) {
+    setStatus('Vul alle 6 cijfers in', 'error');
+    return;
+  }
+
+  const username = document.getElementById('usernameInput').value.trim().toLowerCase() || null;
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  btn.textContent = '...';
+  setStatus('Controleren...', 'info');
+
+  try {
+    const res = await fetch(`${API}/api/kluis/probeer`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: currentCode, username }),
+    });
+    const data = await res.json();
+
+    if (res.status === 429 || data.max_bereikt) {
+      geblokeerd = true;
+      setStatus(`Maximum ${maxPogingen} pogingen per dag bereikt. Probeer morgen opnieuw.`, 'error');
+      btn.disabled = true;
+      btn.textContent = 'GEBLOKKEERD';
+      updatePogingenBar(0);
+      return;
+    }
+
+    if (data.error) {
+      setStatus(data.error, 'error');
+      btn.disabled = false;
+      btn.textContent = 'OPEN';
+      return;
+    }
+
+    if (data.correct) {
+      // SUCCESS
+      for (let i = 0; i < CODE_LEN; i++) {
+        document.getElementById('d' + i).className = 'code-digit filled correct';
+      }
+      document.getElementById('vaultDoor').classList.add('unlocked');
+      document.getElementById('vaultEmblem').textContent = '✓';
+      setLedsGreen();
+
+      // Particle burst
+      const rect = document.getElementById('vaultContainer').getBoundingClientRect();
+      spawnParticle(rect.left + rect.width / 2, rect.top + rect.height / 2, true);
+      setTimeout(() => spawnParticle(rect.left + rect.width / 2, rect.top + rect.height / 2, true), 200);
+
+      // Success overlay
+      document.getElementById('successPos').textContent = '#' + data.positie;
+      document.getElementById('successBeloning').textContent = data.beloning || '';
+      if (username) {
+        document.getElementById('successPts').textContent = '+500 Morrog Punten bijgeschreven voor ' + username;
+      } else {
+        document.getElementById('successPts').textContent = 'Log in met je Twitch naam om punten te ontvangen';
+      }
+      setTimeout(() => document.getElementById('successOverlay').classList.add('show'), 600);
+
+      geblokeerd = true;
+      setStatus('KLUIS GEKRAAKT!', 'success');
+
+      // Reload data
+      setTimeout(laadKluis, 1500);
+    } else {
+      // WRONG
+      document.getElementById('vaultDoor').classList.add('error-flash');
+      setTimeout(() => document.getElementById('vaultDoor').classList.remove('error-flash'), 500);
+
+      for (let i = 0; i < CODE_LEN; i++) {
+        document.getElementById('d' + i).className = 'code-digit filled wrong';
+      }
+      setTimeout(() => {
+        currentCode = '';
+        updateDisplay();
+      }, 600);
+
+      const over = data.pogingen_over;
+      if (over <= 0) {
+        geblokeerd = true;
+        setStatus(`Maximum ${maxPogingen} pogingen bereikt. Morgen opnieuw.`, 'error');
+        btn.disabled = true;
+        btn.textContent = 'GEBLOKKEERD';
+      } else {
+        setStatus(`Verkeerde code. Nog ${over} ${over === 1 ? 'poging' : 'pogingen'} over vandaag.`, 'error');
+        btn.disabled = false;
+        btn.textContent = 'OPEN';
+      }
+      updatePogingenBar(over);
+
+      // Reload data to check hint unlocks
+      setTimeout(laadKluis, 500);
+    }
+  } catch (e) {
+    setStatus('Verbindingsfout — probeer opnieuw', 'error');
+    btn.disabled = false;
+    btn.textContent = 'OPEN';
+  }
+}
+
+function setStatus(msg, type) {
+  const el = document.getElementById('numpadStatus');
+  el.textContent = msg;
+  el.className = 'numpad-status ' + type;
+}
+
+function updatePogingenBar(over) {
+  const bar = document.getElementById('pogingenBar');
+  bar.innerHTML = '';
+  for (let i = 0; i < maxPogingen; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'poging-dot' + (i >= over ? ' used' : '');
+    bar.appendChild(dot);
+  }
+}
+
+// ── LAAD KLUIS DATA ────────────────────────────────────────
+async function laadKluis() {
+  try {
+    const res = await fetch(`${API}/api/kluis/actief`);
+    const data = await res.json();
+
+    if (!data) {
+      document.getElementById('noKluisMsg').style.display = 'block';
+      document.getElementById('leftCol').style.display = 'none';
+      document.getElementById('rightCol').style.display = 'none';
+      document.getElementById('kluisNaam').textContent = 'Geen actieve kluis';
+      document.getElementById('statPogingen').textContent = '—';
+      document.getElementById('statKrakers').textContent = '—';
+      document.getElementById('statDagen').textContent = '—';
+      return;
+    }
+
+    kluisId = data.id;
+    maxPogingen = data.max_pogingen || 5;
+
+    document.getElementById('kluisNaam').textContent = data.naam;
+    document.getElementById('statPogingen').textContent = data.pogingen_vandaag ?? '0';
+    document.getElementById('statKrakers').textContent = data.totaal_krakers ?? '0';
+    document.getElementById('statDagen').textContent = data.dagen_actief ?? '0';
+
+    // Beloning
+    if (data.beloning) {
+      document.getElementById('beloningTekst').textContent = data.beloning;
+      document.getElementById('beloningWrap').style.display = 'block';
+    }
+
+    // Hints
+    renderHints(data.hints || []);
+
+    // Krakers
+    renderKrakers(data.krakers || []);
+
+    // Pogingen bar
+    updatePogingenBar(maxPogingen);
+
+  } catch (e) {
+    document.getElementById('kluisNaam').textContent = 'Fout bij laden';
+  }
+}
+
+function renderHints(hints) {
+  const grid = document.getElementById('hintsGrid');
+  if (!hints.length) {
+    grid.innerHTML = '<div style="color:var(--white3);font-size:13px;">Nog geen hints vrijgegeven</div>';
+    return;
+  }
+  grid.innerHTML = '';
+  hints.forEach((h, i) => {
+    const card = document.createElement('div');
+    card.className = 'hint-card' + (h.vrijgegeven ? '' : ' locked');
+    const num = h.cijfer !== null && h.cijfer !== undefined
+      ? `<div class="hint-num">${h.cijfer}</div>`
+      : `<div class="hint-num" style="color:var(--white3);">${i + 1}</div>`;
+    const lockIcon = h.vrijgegeven ? '' : '<div class="hint-lock-icon">🔒</div>';
+    const body = h.vrijgegeven
+      ? `<div class="hint-body">
+           ${h.kanaal ? `<div class="hint-kanaal">${h.kanaal}</div>` : ''}
+           <div class="hint-tekst">${h.tekst}</div>
+         </div>`
+      : `<div class="hint-body">
+           ${h.kanaal ? `<div class="hint-kanaal">${h.kanaal}</div>` : ''}
+           <div class="hint-blurred">Dit is een verborgen aanwijzing voor de kluis code</div>
+           ${h.unlock_na_pogingen ? `<div class="hint-locked-label">Vrijgave na ${h.unlock_na_pogingen} pogingen</div>` : '<div class="hint-locked-label">Vergrendeld</div>'}
+         </div>`;
+    card.innerHTML = num + body + lockIcon;
+    grid.appendChild(card);
+  });
+}
+
+function renderKrakers(krakers) {
+  const list = document.getElementById('krakersList');
+  if (!krakers.length) {
+    list.innerHTML = '<div style="color:var(--white3);font-size:13px;">Nog geen krakers — wees de eerste!</div>';
+    return;
+  }
+  list.innerHTML = '';
+  krakers.forEach(k => {
+    const posClass = k.positie === 1 ? 'p1' : k.positie === 2 ? 'p2' : k.positie === 3 ? 'p3' : '';
+    const tijdstip = k.tijdstip ? new Date(k.tijdstip).toLocaleString('nl-NL', { dateStyle: 'short', timeStyle: 'short' }) : '';
+    const row = document.createElement('div');
+    row.className = 'kraker-row';
+    row.innerHTML = `
+      <div class="kraker-pos ${posClass}">#${k.positie}</div>
+      <div class="kraker-name">${k.kijker_username}</div>
+      <div class="kraker-time">${tijdstip}</div>
+    `;
+    list.appendChild(row);
+  });
+}
+
+// ── INIT ───────────────────────────────────────────────────
+laadKluis();
+
+// Refresh elke 30 seconden
+setInterval(laadKluis, 30000);
+</script>
+</body>
+</html>
