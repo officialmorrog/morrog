@@ -39,6 +39,18 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
 .nav-link:hover{color:var(--white2);}
 .nav-link.active{color:var(--white);border-bottom-color:var(--white);}
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.btn-twitch-login{display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white);padding:6px 14px;border:1px solid rgba(145,71,255,.4);border-radius:3px;background:rgba(145,71,255,.12);cursor:pointer;transition:background .15s;}
+.btn-twitch-login:hover{background:rgba(145,71,255,.22);}
+.btn-twitch-login svg{width:14px;height:14px;fill:var(--twitch);flex-shrink:0;}
+.nav-user{display:flex;align-items:center;gap:8px;cursor:pointer;position:relative;}
+.nav-user-avatar{width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);object-fit:cover;}
+.nav-user-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--white2);}
+.nav-user-rang{font-size:10px;color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.nav-user-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;min-width:180px;padding:8px 0;display:none;z-index:200;}
+.nav-user:hover .nav-user-dropdown{display:block;}
+.nav-user-dropdown-item{padding:10px 16px;font-size:13px;color:var(--white3);cursor:pointer;transition:background .12s;display:block;text-decoration:none;white-space:nowrap;}
+.nav-user-dropdown-item:hover{background:var(--bg3);color:var(--white);}
+.nav-user-dropdown-sep{border-top:1px solid var(--border);margin:4px 0;}
 .nav-live{display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--streak);padding:6px 14px;border:1px solid rgba(61,171,106,.3);border-radius:3px;background:rgba(61,171,106,.06);text-decoration:none;transition:background .15s;}
 .nav-live:hover{background:rgba(61,171,106,.12);}
 .nav-live-dot{width:6px;height:6px;border-radius:50%;background:var(--streak);animation:pulse-nav 1.5s ease-in-out infinite;}
@@ -476,6 +488,22 @@ footer{
     <a class="nav-link active" href="morrog-kluis.html">Kluis</a>
   </div>
   <div class="nav-right">
+    <button class="btn-twitch-login" id="btn-login" onclick="twitchLogin()" style="display:none">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+      Inloggen
+    </button>
+    <div class="nav-user" id="nav-user" style="display:none">
+      <img class="nav-user-avatar" id="nav-avatar" src="" alt="">
+      <div>
+        <div class="nav-user-name" id="nav-username"></div>
+        <div class="nav-user-rang" id="nav-rang"></div>
+      </div>
+      <div class="nav-user-dropdown">
+        <a class="nav-user-dropdown-item" href="index.html">Mijn loyaliteit</a>
+        <div class="nav-user-dropdown-sep"></div>
+        <a class="nav-user-dropdown-item" onclick="uitloggen()" style="cursor:pointer;color:var(--here)">Uitloggen</a>
+      </div>
+    </div>
     <a class="nav-live" href="https://twitch.tv/morrog" target="_blank">
       <span class="nav-live-dot"></span>Kijk live
     </a>
@@ -633,6 +661,74 @@ footer{
 
 <script>
 const API = 'https://morrog-loyalty-backend-production.up.railway.app';
+const TWITCH_CLIENT_ID = 'r6uuslartqla0c52af9wc4j7eobcnu';
+const REDIRECT_URI     = 'https://officialmorrog.github.io/morrog/morrog-kluis.html';
+const MORROG_ID        = '65660593';
+
+function twitchLogin() {
+  window.location.href =
+    `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}` +
+    `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+    `&response_type=token&scope=user%3Aread%3Afollows`;
+}
+
+function uitloggen() {
+  localStorage.removeItem('twitch_token');
+  localStorage.removeItem('twitch_user');
+  localStorage.removeItem('loyalty_score');
+  toonIngelogdUI(false);
+}
+
+async function verwerkTwitchCallback() {
+  const params = new URLSearchParams(window.location.hash.replace('#', '?'));
+  const token  = params.get('access_token');
+  if (!token) return false;
+  history.replaceState(null, '', window.location.pathname);
+  localStorage.setItem('twitch_token', token);
+  await laadGebruikersData(token);
+  return true;
+}
+
+async function laadGebruikersData(token) {
+  try {
+    const res  = await fetch(API + '/api/auth/verify', { method: 'POST', headers: { 'x-twitch-token': token } });
+    if (!res.ok) { uitloggen(); return; }
+    const data = await res.json();
+    localStorage.setItem('twitch_user', JSON.stringify(data.user));
+    if (data.score) localStorage.setItem('loyalty_score', JSON.stringify(data.score));
+    toonIngelogdUI(true, data.user, data.score);
+  } catch {
+    const cachedUser  = JSON.parse(localStorage.getItem('twitch_user') || 'null');
+    const cachedScore = JSON.parse(localStorage.getItem('loyalty_score') || 'null');
+    if (cachedUser) toonIngelogdUI(true, cachedUser, cachedScore);
+  }
+}
+
+function toonIngelogdUI(ingelogd, user = null, score = null) {
+  document.getElementById('btn-login').style.display  = ingelogd ? 'none' : 'flex';
+  document.getElementById('nav-user').style.display   = ingelogd ? 'flex' : 'none';
+  if (ingelogd && user) {
+    document.getElementById('nav-avatar').src           = user.profile_image_url || '';
+    document.getElementById('nav-username').textContent = user.display_name || user.login;
+    document.getElementById('nav-rang').textContent     = score?.rang || '';
+    // Vul username in het numpad veld als dat leeg is
+    const uInput = document.getElementById('usernameInput');
+    if (!uInput.value) uInput.value = user.login || '';
+  }
+}
+
+// Auth init
+(async () => {
+  const isCallback = await verwerkTwitchCallback();
+  if (!isCallback) {
+    const token = localStorage.getItem('twitch_token');
+    if (token) {
+      await laadGebruikersData(token);
+    } else {
+      toonIngelogdUI(false);
+    }
+  }
+})();
 const CODE_LEN = 6;
 
 let currentCode = '';
