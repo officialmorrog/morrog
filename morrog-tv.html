@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Morrog TV — Clip Player</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,600;1,300&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#090909;--bg2:#111111;--bg3:#181818;--bg4:#202020;--bg5:#282828;
+  --bg:#090909;--bg2:#111111;--bg3:#181818;--bg4:#202020;
   --white:#FFFFFF;--white2:#CECECE;--white3:#888888;--dim:#333333;
   --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
-  --gold:#b17438;--brand:#b17438;--brand-dark:#2e0f38;
+  --brand:#b17438;--brand-dark:#2e0f38;
   --streak:#3DAB6A;--here:#C85050;--twitch:#9147FF;
 }
 html{scroll-behavior:smooth;}
@@ -53,11 +53,7 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
 .player-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;overflow:hidden;}
 .player-embed{position:relative;padding-bottom:56.25%;height:0;background:#000;}
 .player-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
-.player-loading{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#000;color:var(--white3);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;}
-
-/* VOORTGANGSBALK */
-.progress-bar-wrap{height:3px;background:var(--bg4);position:relative;cursor:pointer;}
-.progress-bar-fill{height:100%;background:var(--brand);width:0%;transition:width .5s linear;}
+.player-loading{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#000;color:var(--white3);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;z-index:2;}
 
 /* CLIP INFO */
 .clip-info{padding:16px 20px;border-top:1px solid var(--border);}
@@ -70,15 +66,9 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
 .player-controls{padding:14px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;}
 .ctrl-btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:7px 16px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--white3);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;}
 .ctrl-btn:hover{color:var(--white);border-color:var(--border2);}
-.ctrl-btn.primary{background:rgba(177,116,56,.15);border-color:var(--brand);color:var(--brand);}
-.ctrl-btn.primary:hover{background:rgba(177,116,56,.25);}
 .ctrl-btn svg{width:12px;height:12px;fill:currentColor;flex-shrink:0;}
-.ctrl-spacer{flex:1;}
-.autoplay-status{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--white3);}
-.autoplay-status span{color:var(--brand);}
 
 /* WACHTRIJ */
-.queue-wrap{display:flex;flex-direction:column;gap:1px;background:var(--border);}
 .queue-head{background:var(--bg2);padding:14px 16px;border-bottom:1px solid var(--border);}
 .queue-head-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--white3);}
 .queue-list{background:var(--bg2);max-height:580px;overflow-y:auto;}
@@ -94,11 +84,8 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
 .queue-sub{font-size:11px;color:var(--white3);display:flex;gap:8px;flex-wrap:wrap;}
 .queue-num{width:20px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--dim);flex-shrink:0;padding-top:2px;}
 .queue-num.current{color:var(--brand);}
-
-/* LEGE STAAT */
 .empty-state{padding:40px 20px;text-align:center;color:var(--white3);font-size:13px;}
 
-/* RESPONSIVE */
 @media(max-width:900px){
   .tv-grid{grid-template-columns:1fr;}
   .queue-list{max-height:300px;}
@@ -129,22 +116,18 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
         <div class="tv-title">MORROG <span>TV</span></div>
       </div>
       <div class="tv-filters">
-        <button class="filter-btn active" data-filter="all_time" onclick="setFilter(this,'all_time')">Beste ooit</button>
-        <button class="filter-btn" data-filter="month" onclick="setFilter(this,'month')">Deze maand</button>
-        <button class="filter-btn" data-filter="week" onclick="setFilter(this,'week')">Deze week</button>
-        <button class="filter-btn" data-filter="random" onclick="setFilter(this,'random')">Willekeurig</button>
+        <button class="filter-btn active" onclick="setFilter(this,'all_time')">Beste ooit</button>
+        <button class="filter-btn" onclick="setFilter(this,'month')">Deze maand</button>
+        <button class="filter-btn" onclick="setFilter(this,'week')">Deze week</button>
+        <button class="filter-btn" onclick="setFilter(this,'random')">Willekeurig</button>
       </div>
     </div>
 
     <div class="tv-grid">
-      <!-- PLAYER KOLOM -->
       <div>
         <div class="player-wrap">
           <div class="player-embed" id="player-embed">
             <div class="player-loading" id="player-loading">Clips laden...</div>
-          </div>
-          <div class="progress-bar-wrap" id="progress-wrap">
-            <div class="progress-bar-fill" id="progress-bar"></div>
           </div>
           <div class="clip-info">
             <div class="clip-title" id="clip-title">—</div>
@@ -176,13 +159,10 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
               <svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
               Shuffle
             </button>
-            <div class="ctrl-spacer"></div>
-            <div class="autoplay-status" id="autoplay-status">Volgende clip in <span id="countdown">55</span>s</div>
           </div>
         </div>
       </div>
 
-      <!-- WACHTRIJ KOLOM -->
       <div class="player-wrap" style="overflow:hidden;">
         <div class="queue-head">
           <div class="queue-head-title">Wachtrij — <span id="queue-count">0</span> clips</div>
@@ -196,19 +176,15 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
 </div>
 
 <script>
-const CLIENT_ID = 'r6uuslartqla0c52af9wc4j7eobcnu';
+const CLIENT_ID  = 'r6uuslartqla0c52af9wc4j7eobcnu';
 const BROADCASTER_ID = '65660593';
-const BACKEND = 'https://morrog-loyalty-backend-production.up.railway.app';
-const PARENT = 'officialmorrog.github.io';
-const AUTOPLAY_SEC = 55;
+const BACKEND    = 'https://morrog-loyalty-backend-production.up.railway.app';
+const PARENT     = 'officialmorrog.github.io';
 
-let clips = [];
+let clips        = [];
 let currentIndex = 0;
-let countdownVal = AUTOPLAY_SEC;
-let countdownTimer = null;
-let progressTimer = null;
+let autoTimer    = null;
 let currentFilter = 'all_time';
-let token = null;
 
 async function getToken() {
   const cached = sessionStorage.getItem('morrog_tv_token');
@@ -218,141 +194,104 @@ async function getToken() {
     const d = await r.json();
     sessionStorage.setItem('morrog_tv_token', d.access_token);
     return d.access_token;
-  } catch(e) {
-    console.error('Token ophalen mislukt', e);
-    return null;
-  }
+  } catch(e) { return null; }
 }
 
 function getDateRange(filter) {
-  if (filter === 'week') {
-    const d = new Date(); d.setDate(d.getDate() - 7);
-    return `&started_at=${d.toISOString()}`;
-  }
-  if (filter === 'month') {
-    const d = new Date(); d.setMonth(d.getMonth() - 1);
-    return `&started_at=${d.toISOString()}`;
-  }
+  if (filter === 'week')  { const d = new Date(); d.setDate(d.getDate()-7);   return `&started_at=${d.toISOString()}`; }
+  if (filter === 'month') { const d = new Date(); d.setMonth(d.getMonth()-1); return `&started_at=${d.toISOString()}`; }
   return '';
 }
 
 async function loadClips(filter) {
+  clearTimeout(autoTimer);
   document.getElementById('player-loading').style.display = 'flex';
+  document.getElementById('player-loading').textContent = 'Clips laden...';
   document.getElementById('queue-list').innerHTML = '<div class="empty-state">Clips worden geladen...</div>';
 
-  token = await getToken();
-  if (!token) {
-    document.getElementById('player-loading').textContent = 'Kan clips niet laden.';
-    return;
-  }
+  const token = await getToken();
+  if (!token) { document.getElementById('player-loading').textContent = 'Kan clips niet laden.'; return; }
 
-  const dateRange = getDateRange(filter);
-  const sort = (filter === 'random') ? 'views' : 'views';
-  const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${BROADCASTER_ID}&first=50${dateRange}`;
-
+  const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${BROADCASTER_ID}&first=50${getDateRange(filter)}`;
   try {
-    const r = await fetch(url, {
-      headers: { 'Authorization': `Bearer ${token}`, 'Client-Id': CLIENT_ID }
-    });
+    const r = await fetch(url, { headers: { 'Authorization': `Bearer ${token}`, 'Client-Id': CLIENT_ID } });
     const d = await r.json();
     clips = d.data || [];
 
-    if (clips.length === 0) {
+    if (!clips.length) {
       document.getElementById('player-loading').textContent = 'Geen clips gevonden.';
       document.getElementById('queue-list').innerHTML = '<div class="empty-state">Geen clips gevonden voor dit filter.</div>';
       return;
     }
 
     if (filter === 'random') shuffleArray(clips);
-
     currentIndex = 0;
     renderQueue();
-    playClip(currentIndex);
+    playClip(0);
   } catch(e) {
     document.getElementById('player-loading').textContent = 'Fout bij laden.';
-    console.error(e);
   }
 }
 
 function shuffleArray(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+  for (let i = arr.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
 }
 
 function playClip(index) {
   if (!clips.length) return;
+  clearTimeout(autoTimer);
+
   currentIndex = index;
   const clip = clips[index];
 
+  // Laadscherm tonen
   const embed = document.getElementById('player-embed');
-  document.getElementById('player-loading').style.display = 'flex';
-  document.getElementById('player-loading').textContent = 'Clip laden...';
+  const loading = document.getElementById('player-loading');
+  loading.textContent = 'Clip laden...';
+  loading.style.display = 'flex';
 
-  // Hergebruik bestaande iframe zodat browser autoplay-toestemming behoudt
+  // Hergebruik iframe — browser behoudt zo de autoplay-toestemming
   let iframe = embed.querySelector('iframe');
   if (!iframe) {
     iframe = document.createElement('iframe');
-    iframe.allowFullscreen = true;
     iframe.setAttribute('allow', 'autoplay; fullscreen; encrypted-media');
-    iframe.onload = () => { document.getElementById('player-loading').style.display = 'none'; };
+    iframe.allowFullscreen = true;
     embed.appendChild(iframe);
-  } else {
-    iframe.onload = () => { document.getElementById('player-loading').style.display = 'none'; };
   }
+
+  iframe.onload = () => {
+    loading.style.display = 'none';
+    // Plan exacte doorschakeling op basis van clip duur
+    const duur = (clip.duration || 30) * 1000;
+    autoTimer = setTimeout(nextClip, duur);
+  };
+
   iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${PARENT}&autoplay=true`;
 
   // Info updaten
   document.getElementById('clip-title').textContent = clip.title || 'Onbekende clip';
   document.getElementById('clip-views').textContent = (clip.view_count || 0).toLocaleString('nl-NL');
   document.getElementById('clip-creator').textContent = clip.creator_name || '—';
-  const datum = clip.created_at ? new Date(clip.created_at).toLocaleDateString('nl-NL', {day:'numeric',month:'short',year:'numeric'}) : '—';
+  const datum = clip.created_at
+    ? new Date(clip.created_at).toLocaleDateString('nl-NL', {day:'numeric', month:'short', year:'numeric'})
+    : '—';
   document.getElementById('clip-date').textContent = datum;
 
-  // Wachtrij updaten
   renderQueue();
   scrollQueueToActive();
-
-  // Countdown starten
-  startCountdown();
-}
-
-function startCountdown() {
-  clearInterval(countdownTimer);
-  clearInterval(progressTimer);
-  countdownVal = AUTOPLAY_SEC;
-
-  document.getElementById('countdown').textContent = countdownVal;
-  document.getElementById('progress-bar').style.transition = 'none';
-  document.getElementById('progress-bar').style.width = '0%';
-
-  // Force reflow
-  document.getElementById('progress-bar').offsetHeight;
-
-  document.getElementById('progress-bar').style.transition = `width ${AUTOPLAY_SEC}s linear`;
-  document.getElementById('progress-bar').style.width = '100%';
-
-  countdownTimer = setInterval(() => {
-    countdownVal--;
-    document.getElementById('countdown').textContent = countdownVal;
-    if (countdownVal <= 0) {
-      clearInterval(countdownTimer);
-      nextClip();
-    }
-  }, 1000);
 }
 
 function nextClip() {
   if (!clips.length) return;
-  const next = (currentIndex + 1) % clips.length;
-  playClip(next);
+  playClip((currentIndex + 1) % clips.length);
 }
 
 function prevClip() {
   if (!clips.length) return;
-  const prev = (currentIndex - 1 + clips.length) % clips.length;
-  playClip(prev);
+  playClip((currentIndex - 1 + clips.length) % clips.length);
 }
 
 function shuffleQueue() {
@@ -373,37 +312,30 @@ function setFilter(btn, filter) {
 function renderQueue() {
   const list = document.getElementById('queue-list');
   document.getElementById('queue-count').textContent = clips.length;
-
-  if (!clips.length) {
-    list.innerHTML = '<div class="empty-state">Geen clips.</div>';
-    return;
-  }
-
+  if (!clips.length) { list.innerHTML = '<div class="empty-state">Geen clips.</div>'; return; }
   list.innerHTML = clips.map((c, i) => `
-    <div class="queue-item${i === currentIndex ? ' active' : ''}" onclick="playClip(${i})" id="qi-${i}">
-      <div class="queue-num${i === currentIndex ? ' current' : ''}">${i === currentIndex ? '▶' : i + 1}</div>
-      <img class="queue-thumb" src="${c.thumbnail_url || ''}" alt="" loading="lazy" onerror="this.style.opacity='.2'">
+    <div class="queue-item${i===currentIndex?' active':''}" onclick="playClip(${i})" id="qi-${i}">
+      <div class="queue-num${i===currentIndex?' current':''}">${i===currentIndex?'▶':i+1}</div>
+      <img class="queue-thumb" src="${c.thumbnail_url||''}" alt="" loading="lazy" onerror="this.style.opacity='.2'">
       <div class="queue-info">
-        <div class="queue-title">${escHtml(c.title || 'Clip')}</div>
+        <div class="queue-title">${esc(c.title||'Clip')}</div>
         <div class="queue-sub">
-          <span>${(c.view_count || 0).toLocaleString('nl-NL')} views</span>
-          <span>${escHtml(c.creator_name || '—')}</span>
+          <span>${(c.view_count||0).toLocaleString('nl-NL')} views</span>
+          <span>${esc(c.creator_name||'—')}</span>
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function scrollQueueToActive() {
   const el = document.getElementById(`qi-${currentIndex}`);
-  if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  if (el) el.scrollIntoView({ block:'nearest', behavior:'smooth' });
 }
 
-function escHtml(s) {
+function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// Start
 loadClips('all_time');
 </script>
 </body>
