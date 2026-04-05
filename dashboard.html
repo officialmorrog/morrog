@@ -1704,7 +1704,7 @@ async function laadHofLijst() {
         <div style="font-size:20px;flex-shrink:0">${h.icoon || '🏆'}</div>
         <div style="flex:1">
           <div class="lijst-rij-naam">${h.naam}</div>
-          <div class="lijst-rij-sub">${[h.game, h.type, h.resultaat].filter(Boolean).join(' · ')}${h.datum ? ' · ' + new Date(h.datum).toLocaleDateString('nl-NL') : ''}</div>
+          <div class="lijst-rij-sub">${[h.game, h.hof_type, h.resultaat].filter(Boolean).join(' · ')}${h.datum ? ' · ' + new Date(h.datum).toLocaleDateString('nl-NL') : ''}</div>
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0">
           <button class="btn btn-ghost btn-sm" onclick="bewerkHof(${h.id})">✎</button>
@@ -1754,7 +1754,7 @@ async function bewerkHof(id) {
   document.getElementById('hof-bewerk-naam').value         = h.naam || '';
   document.getElementById('hof-bewerk-icoon').value        = h.icoon || '🏆';
   document.getElementById('hof-bewerk-game').value         = h.game || '';
-  document.getElementById('hof-bewerk-type').value         = h.type || '';
+  document.getElementById('hof-bewerk-type').value         = h.hof_type || '';
   document.getElementById('hof-bewerk-resultaat').value    = h.resultaat || '';
   document.getElementById('hof-bewerk-tegenstander').value = h.tegenstander || '';
   document.getElementById('hof-bewerk-datum').value        = h.datum ? h.datum.slice(0,10) : '';
