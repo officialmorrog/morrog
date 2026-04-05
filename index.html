@@ -226,38 +226,39 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
 .card-footer-link:hover{color:var(--white);}
 
 /* ROADMAP TIJDLIJN */
-.roadmap{position:relative;max-width:760px;}
-.roadmap-year{font-family:'Barlow Condensed',sans-serif;font-size:clamp(48px,7vw,80px);font-weight:900;color:var(--white);letter-spacing:-2px;line-height:1;margin-bottom:48px;opacity:.08;user-select:none;pointer-events:none;position:absolute;top:-12px;right:0;}
-.roadmap-quarter{margin-bottom:8px;}
-.roadmap-quarter-label{display:flex;align-items:center;gap:14px;margin-bottom:0;padding-left:32px;position:relative;}
-.roadmap-quarter-label::before{content:'';position:absolute;left:0;top:50%;width:18px;height:2px;background:var(--gold);opacity:.5;}
-.roadmap-quarter-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);opacity:.7;}
-.roadmap-quarter-line{flex:1;height:1px;background:var(--border);}
-.roadmap-events{position:relative;padding-left:32px;padding-bottom:8px;}
-.roadmap-events::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--border2),var(--border),transparent);}
-.roadmap-event{position:relative;margin-bottom:6px;}
-.roadmap-event::before{content:'';position:absolute;left:-26px;top:18px;width:10px;height:10px;border-radius:50%;background:var(--bg3);border:2px solid var(--border2);transition:border-color .2s,background .2s;z-index:1;}
-.roadmap-event.open::before,.roadmap-event:hover::before{border-color:var(--gold);background:var(--gold);}
-.roadmap-event-header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none;}
-.roadmap-event:hover .roadmap-event-header,.roadmap-event.open .roadmap-event-header{border-color:var(--border2);background:var(--bg3);}
-.roadmap-event-icon{font-size:20px;flex-shrink:0;width:28px;text-align:center;}
-.roadmap-event-info{flex:1;min-width:0;}
-.roadmap-event-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--white);line-height:1.1;}
-.roadmap-event-cat{font-size:11px;color:var(--white3);margin-top:1px;}
-.roadmap-event-meta{display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.roadmap-event-when{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--white3);}
-.roadmap-event-status{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border-radius:2px;white-space:nowrap;}
-.roadmap-event-status.binnenkort{background:rgba(200,168,74,.12);color:var(--gold);border:1px solid rgba(200,168,74,.25);}
-.roadmap-event-status.gepland{background:rgba(104,88,204,.12);color:#9080EE;border:1px solid rgba(104,88,204,.25);}
-.roadmap-event-status.bezig{background:rgba(61,171,106,.1);color:var(--streak);border:1px solid rgba(61,171,106,.25);}
-.roadmap-event-status.afgerond{background:rgba(255,255,255,.05);color:var(--white3);border:1px solid var(--border);}
-.roadmap-event-arrow{color:var(--white3);font-size:11px;transition:transform .2s;flex-shrink:0;}
-.roadmap-event.open .roadmap-event-arrow{transform:rotate(180deg);}
-.roadmap-event-body{overflow:hidden;max-height:0;transition:max-height .3s ease,opacity .2s ease;opacity:0;}
-.roadmap-event.open .roadmap-event-body{max-height:300px;opacity:1;}
-.roadmap-event-body-inner{padding:14px 16px 16px;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;background:var(--bg2);font-size:13px;color:var(--white3);line-height:1.7;}
-.roadmap-tba{padding-left:32px;margin-top:24px;}
-.roadmap-tba-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--white3);opacity:.5;margin-bottom:10px;}
+/* TIMELINE */
+.tl-wrap{position:relative;max-width:720px;}
+.tl-year{font-family:'Barlow Condensed',sans-serif;font-size:clamp(80px,14vw,160px);font-weight:900;text-transform:uppercase;letter-spacing:-4px;color:var(--white);line-height:.85;margin-bottom:56px;display:block;}
+.tl-body{position:relative;padding-left:48px;}
+.tl-body::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--border2) 0%,var(--border2) 92%,transparent 100%);}
+.tl-month{position:relative;margin-bottom:4px;}
+.tl-month-head{display:flex;align-items:center;gap:14px;padding:10px 0 6px;}
+.tl-month-dot{width:17px;height:17px;border-radius:50%;background:var(--bg);border:2px solid var(--border2);position:absolute;left:-48px;top:50%;transform:translate(-50%,-50%);transition:border-color .2s,background .2s;flex-shrink:0;}
+.tl-month.has-events .tl-month-dot{border-color:var(--brand);background:rgba(177,116,56,.18);}
+.tl-month-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--white3);transition:color .15s;}
+.tl-month.has-events .tl-month-name{color:var(--white);}
+.tl-month-rule{flex:1;height:1px;background:var(--border);}
+.tl-month.has-events .tl-month-rule{background:var(--border2);}
+.tl-events{padding-bottom:12px;}
+.tl-event{position:relative;margin-bottom:5px;}
+.tl-event-header{display:flex;align-items:center;gap:12px;padding:11px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none;}
+.tl-event:hover .tl-event-header,.tl-event.open .tl-event-header{border-color:var(--border2);background:var(--bg3);}
+.tl-event-icon{font-size:19px;flex-shrink:0;width:26px;text-align:center;}
+.tl-event-info{flex:1;min-width:0;}
+.tl-event-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--white);line-height:1.1;}
+.tl-event-cat{font-size:11px;color:var(--white3);margin-top:1px;}
+.tl-event-status{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border-radius:2px;white-space:nowrap;flex-shrink:0;}
+.tl-event-status.binnenkort{background:rgba(200,168,74,.12);color:var(--gold);border:1px solid rgba(200,168,74,.25);}
+.tl-event-status.gepland{background:rgba(104,88,204,.12);color:#9080EE;border:1px solid rgba(104,88,204,.25);}
+.tl-event-status.bezig{background:rgba(61,171,106,.1);color:var(--streak);border:1px solid rgba(61,171,106,.25);}
+.tl-event-status.afgerond{background:rgba(255,255,255,.05);color:var(--white3);border:1px solid var(--border);}
+.tl-event-arrow{color:var(--white3);font-size:10px;transition:transform .2s;flex-shrink:0;margin-left:4px;}
+.tl-event.open .tl-event-arrow{transform:rotate(180deg);}
+.tl-event-body{overflow:hidden;max-height:0;transition:max-height .35s ease,opacity .25s ease;opacity:0;}
+.tl-event.open .tl-event-body{max-height:400px;opacity:1;}
+.tl-event-body-inner{padding:13px 16px 15px;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;background:var(--bg2);font-size:13px;color:var(--white3);line-height:1.7;}
+.tl-tba{padding-top:8px;padding-bottom:8px;}
+.tl-tba-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--white3);opacity:.35;}
 .charity-goal{margin-top:12px;}
 .charity-goal-label{font-size:11px;color:var(--white3);margin-bottom:5px;}
 .charity-bar-track{height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;}
@@ -627,140 +628,205 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
 <div id="view-agenda" class="view">
 <div class="section">
   <div class="eyebrow fade-up">Roadmap</div>
-  <h2 class="section-title fade-up">2026</h2>
-  <p class="section-desc fade-up">Marathons, charity streams en challenges die eraan komen. Klik op een event om meer te zien.</p>
+  <p class="section-desc fade-up" style="margin-top:8px;">Marathons, charity streams en challenges die eraan komen. Klik op een project om meer te zien.</p>
 
-  <div class="roadmap fade-up" id="roadmap-container">
-    <div class="roadmap-year">2026</div>
+  <div class="tl-wrap fade-up">
+    <span class="tl-year">2026</span>
 
-    <!-- Q1 -->
-    <div class="roadmap-quarter">
-      <div class="roadmap-quarter-label">
-        <span class="roadmap-quarter-name">Q1 — Jan · Feb · Mrt</span>
-        <div class="roadmap-quarter-line"></div>
-      </div>
-      <div class="roadmap-events">
-        <div class="roadmap-event" onclick="toggleEvent(this)">
-          <div class="roadmap-event-header">
-            <div class="roadmap-event-icon">⚔</div>
-            <div class="roadmap-event-info">
-              <div class="roadmap-event-title">WoW The War Within — Season 2</div>
-              <div class="roadmap-event-cat">Seizoensstart</div>
+    <div class="tl-body">
+
+      <!-- JANUARI -->
+      <div class="tl-month has-events">
+        <div class="tl-month-head">
+          <div class="tl-month-dot"></div>
+          <div class="tl-month-name">Januari</div>
+          <div class="tl-month-rule"></div>
+        </div>
+        <div class="tl-events">
+          <div class="tl-event" onclick="toggleEvent(this)">
+            <div class="tl-event-header">
+              <div class="tl-event-icon">⚔</div>
+              <div class="tl-event-info">
+                <div class="tl-event-title">WoW The War Within — Season 2</div>
+                <div class="tl-event-cat">Seizoensstart</div>
+              </div>
+              <span class="tl-event-status bezig">Binnenkort live</span>
+              <div class="tl-event-arrow">▼</div>
             </div>
-            <div class="roadmap-event-meta">
-              <div class="roadmap-event-when">Season 2 launch</div>
-              <span class="roadmap-event-status bezig">Binnenkort live</span>
+            <div class="tl-event-body">
+              <div class="tl-event-body-inner">Morrog speelt dag één van het nieuwe WoW seizoen live. Mythic+ race, eerste raid night en ranking push. Aanwezig zijn = potentieel Ik Was Hier moment.</div>
             </div>
-            <div class="roadmap-event-arrow">▼</div>
-          </div>
-          <div class="roadmap-event-body">
-            <div class="roadmap-event-body-inner">Morrog speelt dag één van het nieuwe WoW seizoen live. Mythic+ race, eerste raid night en ranking push. Aanwezig zijn = potentieel Ik Was Hier moment.</div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Q2 -->
-    <div class="roadmap-quarter">
-      <div class="roadmap-quarter-label">
-        <span class="roadmap-quarter-name">Q2 — Apr · Mei · Jun</span>
-        <div class="roadmap-quarter-line"></div>
+      <!-- FEBRUARI -->
+      <div class="tl-month">
+        <div class="tl-month-head">
+          <div class="tl-month-dot"></div>
+          <div class="tl-month-name">Februari</div>
+          <div class="tl-month-rule"></div>
+        </div>
       </div>
-      <div class="roadmap-events">
-        <div class="roadmap-event" onclick="toggleEvent(this)">
-          <div class="roadmap-event-header">
-            <div class="roadmap-event-icon">🌴</div>
-            <div class="roadmap-event-info">
-              <div class="roadmap-event-title">GTA 6 Marathon</div>
-              <div class="roadmap-event-cat">Launch stream</div>
+
+      <!-- MAART -->
+      <div class="tl-month">
+        <div class="tl-month-head">
+          <div class="tl-month-dot"></div>
+          <div class="tl-month-name">Maart</div>
+          <div class="tl-month-rule"></div>
+        </div>
+      </div>
+
+      <!-- APRIL -->
+      <div class="tl-month">
+        <div class="tl-month-head">
+          <div class="tl-month-dot"></div>
+          <div class="tl-month-name">April</div>
+          <div class="tl-month-rule"></div>
+        </div>
+      </div>
+
+      <!-- MEI -->
+      <div class="tl-month has-events">
+        <div class="tl-month-head">
+          <div class="tl-month-dot"></div>
+          <div class="tl-month-name">Mei</div>
+          <div class="tl-month-rule"></div>
+        </div>
+        <div class="tl-events">
+          <div class="tl-event" onclick="toggleEvent(this)">
+            <div class="tl-event-header">
+              <div class="tl-event-icon">🌴</div>
+              <div class="tl-event-info">
+                <div class="tl-event-title">GTA 6 Marathon</div>
+                <div class="tl-event-cat">Launch stream</div>
+              </div>
+              <span class="tl-event-status gepland">Gepland</span>
+              <div class="tl-event-arrow">▼</div>
             </div>
-            <div class="roadmap-event-meta">
-              <div class="roadmap-event-when">Launch day 2026</div>
-              <span class="roadmap-event-status gepland">Gepland</span>
+            <div class="tl-event-body">
+              <div class="tl-event-body-inner">Zodra GTA 6 uitkomt gaat Morrog live. Launch day marathon — van de eerste minuut tot diep in de nacht. De hele community kijkt mee.</div>
             </div>
-            <div class="roadmap-event-arrow">▼</div>
-          </div>
-          <div class="roadmap-event-body">
-            <div class="roadmap-event-body-inner">Zodra GTA 6 uitkomt gaat Morrog live. Launch day marathon — van de eerste minuut tot diep in de nacht. De hele community kijkt mee.</div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Q3 -->
-    <div class="roadmap-quarter">
-      <div class="roadmap-quarter-label">
-        <span class="roadmap-quarter-name">Q3 — Jul · Aug · Sep</span>
-        <div class="roadmap-quarter-line"></div>
-      </div>
-      <div class="roadmap-events">
-        <div class="roadmap-event" onclick="toggleEvent(this)">
-          <div class="roadmap-event-header">
-            <div class="roadmap-event-icon">🏰</div>
-            <div class="roadmap-event-info">
-              <div class="roadmap-event-title">Elden Ring Marathon</div>
-              <div class="roadmap-event-cat">Game marathon</div>
-            </div>
-            <div class="roadmap-event-meta">
-              <div class="roadmap-event-when">Zomer 2026</div>
-              <span class="roadmap-event-status binnenkort">Binnenkort</span>
-            </div>
-            <div class="roadmap-event-arrow">▼</div>
-          </div>
-          <div class="roadmap-event-body">
-            <div class="roadmap-event-body-inner">Van begin tot einde, non-stop. Morrog speelt Elden Ring door tot de credits rollen — alle graces, alle bosses, geen shortcuts. De chat bepaalt welke build hij speelt.</div>
-          </div>
-        </div>
-        <div class="roadmap-event" onclick="toggleEvent(this)">
-          <div class="roadmap-event-header">
-            <div class="roadmap-event-icon">⛏</div>
-            <div class="roadmap-event-info">
-              <div class="roadmap-event-title">Minecraft Rematch vs Linktijger</div>
-              <div class="roadmap-event-cat">Rematch · Speedrun</div>
-            </div>
-            <div class="roadmap-event-meta">
-              <div class="roadmap-event-when">Datum TBA</div>
-              <span class="roadmap-event-status gepland">In de planning</span>
-            </div>
-            <div class="roadmap-event-arrow">▼</div>
-          </div>
-          <div class="roadmap-event-body">
-            <div class="roadmap-event-body-inner">Morrog verloor de eerste Minecraft speedrun met 3 minuten en 34 seconden. De rematch wordt aangekondigd zodra de datum vast staat. Revanche is nabij.</div>
-          </div>
+      <!-- JUNI -->
+      <div class="tl-month">
+        <div class="tl-month-head">
+          <div class="tl-month-dot"></div>
+          <div class="tl-month-name">Juni</div>
+          <div class="tl-month-rule"></div>
         </div>
       </div>
-    </div>
 
-    <!-- Q4 -->
-    <div class="roadmap-quarter">
-      <div class="roadmap-quarter-label">
-        <span class="roadmap-quarter-name">Q4 — Okt · Nov · Dec</span>
-        <div class="roadmap-quarter-line"></div>
+      <!-- JULI -->
+      <div class="tl-month">
+        <div class="tl-month-head">
+          <div class="tl-month-dot"></div>
+          <div class="tl-month-name">Juli</div>
+          <div class="tl-month-rule"></div>
+        </div>
       </div>
-      <div class="roadmap-events">
-        <div class="roadmap-event" onclick="toggleEvent(this)">
-          <div class="roadmap-event-header">
-            <div class="roadmap-event-icon">💚</div>
-            <div class="roadmap-event-info">
-              <div class="roadmap-event-title">Charity Stream voor Kinderen</div>
-              <div class="roadmap-event-cat">Charity stream</div>
+
+      <!-- AUGUSTUS -->
+      <div class="tl-month has-events">
+        <div class="tl-month-head">
+          <div class="tl-month-dot"></div>
+          <div class="tl-month-name">Augustus</div>
+          <div class="tl-month-rule"></div>
+        </div>
+        <div class="tl-events">
+          <div class="tl-event" onclick="toggleEvent(this)">
+            <div class="tl-event-header">
+              <div class="tl-event-icon">🏰</div>
+              <div class="tl-event-info">
+                <div class="tl-event-title">Elden Ring Marathon</div>
+                <div class="tl-event-cat">Game marathon</div>
+              </div>
+              <span class="tl-event-status binnenkort">Datum volgt</span>
+              <div class="tl-event-arrow">▼</div>
             </div>
-            <div class="roadmap-event-meta">
-              <div class="roadmap-event-when">Q4 2026</div>
-              <span class="roadmap-event-status binnenkort">Datum volgt</span>
+            <div class="tl-event-body">
+              <div class="tl-event-body-inner">Van begin tot einde, non-stop. Morrog speelt Elden Ring door tot de credits rollen — alle graces, alle bosses, geen shortcuts. De chat bepaalt welke build hij speelt.</div>
             </div>
-            <div class="roadmap-event-arrow">▼</div>
-          </div>
-          <div class="roadmap-event-body">
-            <div class="roadmap-event-body-inner">Morrog zamelt samen met zijn community geld in voor een goed doel voor kinderen. Vorig jaar werd er €12.480 opgehaald voor de Nierstichting. Doel 2026: €20.000.</div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- TBA -->
-    <div class="roadmap-tba">
-      <div class="roadmap-tba-label">Meer volgt — volg Morrog op Twitch voor aankondigingen</div>
+      <!-- SEPTEMBER -->
+      <div class="tl-month has-events">
+        <div class="tl-month-head">
+          <div class="tl-month-dot"></div>
+          <div class="tl-month-name">September</div>
+          <div class="tl-month-rule"></div>
+        </div>
+        <div class="tl-events">
+          <div class="tl-event" onclick="toggleEvent(this)">
+            <div class="tl-event-header">
+              <div class="tl-event-icon">⛏</div>
+              <div class="tl-event-info">
+                <div class="tl-event-title">Minecraft Rematch vs Linktijger</div>
+                <div class="tl-event-cat">Rematch · Speedrun</div>
+              </div>
+              <span class="tl-event-status gepland">In de planning</span>
+              <div class="tl-event-arrow">▼</div>
+            </div>
+            <div class="tl-event-body">
+              <div class="tl-event-body-inner">Morrog verloor de eerste Minecraft speedrun met 3 minuten en 34 seconden. De rematch wordt aangekondigd zodra de datum vast staat. Revanche is nabij.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OKTOBER -->
+      <div class="tl-month">
+        <div class="tl-month-head">
+          <div class="tl-month-dot"></div>
+          <div class="tl-month-name">Oktober</div>
+          <div class="tl-month-rule"></div>
+        </div>
+      </div>
+
+      <!-- NOVEMBER -->
+      <div class="tl-month has-events">
+        <div class="tl-month-head">
+          <div class="tl-month-dot"></div>
+          <div class="tl-month-name">November</div>
+          <div class="tl-month-rule"></div>
+        </div>
+        <div class="tl-events">
+          <div class="tl-event" onclick="toggleEvent(this)">
+            <div class="tl-event-header">
+              <div class="tl-event-icon">💚</div>
+              <div class="tl-event-info">
+                <div class="tl-event-title">Charity Stream voor Kinderen</div>
+                <div class="tl-event-cat">Charity stream</div>
+              </div>
+              <span class="tl-event-status binnenkort">Datum volgt</span>
+              <div class="tl-event-arrow">▼</div>
+            </div>
+            <div class="tl-event-body">
+              <div class="tl-event-body-inner">Morrog zamelt samen met zijn community geld in voor een goed doel voor kinderen. Vorig jaar werd er €12.480 opgehaald voor de Nierstichting. Doel 2026: €20.000.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DECEMBER -->
+      <div class="tl-month">
+        <div class="tl-month-head">
+          <div class="tl-month-dot"></div>
+          <div class="tl-month-name">December</div>
+          <div class="tl-month-rule"></div>
+        </div>
+      </div>
+
+      <div class="tl-tba">
+        <div class="tl-tba-label">Meer volgt — volg Morrog op Twitch voor aankondigingen</div>
+      </div>
+
     </div>
   </div>
 
@@ -1142,7 +1208,7 @@ async function laadTrackmanTijden() {
 function toggleEvent(el) {
   const isOpen = el.classList.contains('open');
   // Sluit alle open events
-  document.querySelectorAll('.roadmap-event.open').forEach(e => e.classList.remove('open'));
+  document.querySelectorAll('.tl-event.open').forEach(e => e.classList.remove('open'));
   if (!isOpen) el.classList.add('open');
 }
 
@@ -1153,33 +1219,29 @@ async function laadAgenda() {
     const data = await res.json();
     if (!data || data.length === 0) return;
     const statusKlasse = { gepland:'gepland', binnenkort:'binnenkort', bezig:'bezig', 'in de planning':'gepland' };
-    // Voeg API events toe als TBA items onderaan de roadmap
+    // Voeg API events toe vóór de TBA-regel onderaan de timeline
     let html = '';
     data.forEach(e => {
       const klasse = statusKlasse[e.status?.toLowerCase()] || 'gepland';
-      html += `<div class="roadmap-event" onclick="toggleEvent(this)">
-        <div class="roadmap-event-header">
-          <div class="roadmap-event-icon">${e.icoon || '📅'}</div>
-          <div class="roadmap-event-info">
-            <div class="roadmap-event-title">${e.titel}</div>
-            <div class="roadmap-event-cat">${e.categorie || ''}</div>
+      html += `<div class="tl-event" onclick="toggleEvent(this)">
+        <div class="tl-event-header">
+          <div class="tl-event-icon">${e.icoon || '📅'}</div>
+          <div class="tl-event-info">
+            <div class="tl-event-title">${e.titel}</div>
+            <div class="tl-event-cat">${e.categorie || ''}</div>
           </div>
-          <div class="roadmap-event-meta">
-            <div class="roadmap-event-when">${e.wanneer || ''}</div>
-            <span class="roadmap-event-status ${klasse}">${e.status || 'Gepland'}</span>
-          </div>
-          <div class="roadmap-event-arrow">▼</div>
+          <span class="tl-event-status ${klasse}">${e.status || 'Gepland'}</span>
+          <div class="tl-event-arrow">▼</div>
         </div>
-        <div class="roadmap-event-body">
-          <div class="roadmap-event-body-inner">${e.beschrijving || ''}</div>
+        <div class="tl-event-body">
+          <div class="tl-event-body-inner">${e.beschrijving || ''}</div>
         </div>
       </div>`;
     });
-    const tba = document.querySelector('.roadmap-tba');
+    const tba = document.querySelector('.tl-tba');
     if (tba) {
       const extra = document.createElement('div');
-      extra.className = 'roadmap-events';
-      extra.style.marginBottom = '8px';
+      extra.className = 'tl-events';
       extra.innerHTML = html;
       tba.parentNode.insertBefore(extra, tba);
     }
