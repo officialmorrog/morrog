@@ -20,7 +20,7 @@ body{background:var(--bg);color:var(--white2);font-family:'Barlow',sans-serif;fo
 body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");}
 
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);z-index:100;display:flex;align-items:center;padding:0 40px;gap:0;overflow:hidden;}
+nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);z-index:100;display:flex;align-items:center;padding:0 40px;gap:0;overflow:visible;}
 .nav-logo{height:24px;margin-right:32px;opacity:.92;flex-shrink:0;}
 .nav-logo-fb{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;color:var(--white);margin-right:32px;text-transform:uppercase;flex-shrink:0;}
 .nav-links{display:flex;gap:2px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;}
@@ -43,7 +43,7 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
 .nav-user-avatar{width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);object-fit:cover;}
 .nav-user-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--white2);}
 .nav-user-rang{font-size:10px;color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
-.nav-user-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;min-width:200px;padding:8px 0;display:none;z-index:200;}
+.nav-user-dropdown{position:fixed;top:58px;right:40px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;min-width:200px;padding:8px 0;display:none;z-index:200;}
 .nav-user-dropdown::before{content:'';position:absolute;top:-8px;left:0;right:0;height:8px;}
 .nav-user:hover .nav-user-dropdown{display:block;}
 .nav-user-dropdown-item{padding:10px 16px;font-size:13px;color:var(--white3);cursor:pointer;transition:background .12s;display:block;text-decoration:none;white-space:nowrap;}
