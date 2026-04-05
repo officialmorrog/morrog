@@ -44,8 +44,7 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
 .nav-user-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--white2);}
 .nav-user-rang{font-size:10px;color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
 .nav-user-dropdown{position:fixed;top:58px;right:40px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;min-width:200px;padding:8px 0;display:none;z-index:200;}
-.nav-user-dropdown::before{content:'';position:absolute;top:-8px;left:0;right:0;height:8px;}
-.nav-user:hover .nav-user-dropdown{display:block;}
+.nav-user.open .nav-user-dropdown{display:block;}
 .nav-user-dropdown-item{padding:10px 16px;font-size:13px;color:var(--white3);cursor:pointer;transition:background .12s;display:block;text-decoration:none;white-space:nowrap;}
 .nav-user-dropdown-item:hover{background:var(--bg3);color:var(--white);}
 .nav-user-dropdown-sep{border-top:1px solid var(--border);margin:4px 0;}
@@ -318,7 +317,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
       Inloggen
     </button>
     <!-- Ingelogd -->
-    <div class="nav-user" id="nav-user" style="display:none">
+    <div class="nav-user" id="nav-user" style="display:none" onclick="toggleNavDropdown(event)">
       <img class="nav-user-avatar" id="nav-avatar" src="" alt="">
       <div>
         <div class="nav-user-name" id="nav-username"></div>
@@ -388,33 +387,25 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
   <h2 class="section-title fade-up">Jouw rang in de<br>Morrog community</h2>
   <p class="section-desc fade-up">Hoe langer en actiever je kijkt, hoe hoger je rang. Follow age weegt het zwaarst — wie er al jaren bij is hoeft niet harder zijn best te doen.</p>
 
-  <!-- MIJN RANG BANNER (zichtbaar na login) -->
-  <div class="mijn-rang-banner hidden fade-up" id="mijn-rang-banner">
-    <div class="mijn-rang-info">
-      <img class="mijn-rang-avatar" id="mijn-rang-avatar" src="" alt="">
-      <div class="mijn-rang-labels">
-        <div class="mijn-rang-name" id="mijn-rang-name"></div>
-        <div class="mijn-rang-sub" id="mijn-rang-sub"></div>
+  <!-- TWITCH LOGIN CTA (niet ingelogd) / POSITIE INFO (ingelogd) -->
+  <div class="fade-up" style="margin-bottom:40px">
+    <div id="loyalty-login-cta" style="display:none;align-items:center;gap:16px;padding:20px 24px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;max-width:520px">
+      <div style="flex:1">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--white);margin-bottom:4px">Waar sta jij in de community?</div>
+        <div style="font-size:13px;color:var(--white3)">Log in met Twitch om jouw rang, punten en positie te zien.</div>
       </div>
-    </div>
-    <div class="mijn-rang-score">
-      <div class="mijn-rang-pts" id="mijn-rang-pts"></div>
-      <div class="mijn-rang-rang" id="mijn-rang-rang"></div>
-    </div>
-  </div>
-
-  <!-- ZOEKBALK -->
-  <div style="margin-bottom:40px" class="fade-up">
-    <div style="display:flex;gap:10px;max-width:460px">
-      <input id="zoek-input" type="text" placeholder="Jouw Twitch gebruikersnaam..."
-        style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:11px 16px;font-family:'Barlow',sans-serif;font-size:14px;color:var(--white);outline:none"
-        onkeydown="if(event.key==='Enter')zoekKijker()">
-      <button onclick="zoekKijker()"
-        style="padding:11px 20px;background:var(--white);color:var(--bg);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer">
-        Zoek
+      <button onclick="twitchLogin()" style="display:flex;align-items:center;gap:8px;padding:10px 20px;background:#9147FF;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;flex-shrink:0">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+        Inloggen met Twitch
       </button>
     </div>
-    <div id="zoek-resultaat" style="margin-top:12px"></div>
+    <div id="loyalty-user-info" style="display:none;align-items:center;gap:12px;margin-bottom:0">
+      <img id="loyalty-avatar" src="" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border2)" alt="">
+      <div>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--white2)" id="loyalty-name"></span>
+        <span style="font-size:12px;color:var(--white3);margin-left:8px" id="loyalty-rang-info"></span>
+      </div>
+    </div>
   </div>
 
   <!-- 3 SCOREBOARDS -->
@@ -464,19 +455,6 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
 
   </div>
 
-  <!-- ZOEKBALK -->
-  <div style="margin-bottom:32px" class="fade-up">
-    <div style="display:flex;gap:10px;max-width:460px">
-      <input id="zoek-input" type="text" placeholder="Jouw Twitch gebruikersnaam..."
-        style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:11px 16px;font-family:'Barlow',sans-serif;font-size:14px;color:var(--white);outline:none"
-        onkeydown="if(event.key==='Enter')zoekKijker()">
-      <button onclick="zoekKijker()"
-        style="padding:11px 20px;background:var(--white);color:var(--bg);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer">
-        Zoek
-      </button>
-    </div>
-    <div id="zoek-resultaat" style="margin-top:12px"></div>
-  </div>
 
   <!-- COLLAPSIBLE SCORE UITLEG -->
   <div class="score-uitleg fade-up" id="score-uitleg">
@@ -903,47 +881,39 @@ function toonIngelogdUI(ingelogd, user = null, score = null, isAdmin = false) {
   document.getElementById('btn-login').style.display    = ingelogd ? 'none' : 'flex';
   document.getElementById('nav-user').style.display     = ingelogd ? 'flex' : 'none';
 
+  const cta      = document.getElementById('loyalty-login-cta');
+  const userInfo = document.getElementById('loyalty-user-info');
+
   if (ingelogd && user) {
     document.getElementById('nav-avatar').src           = user.profile_image_url || '';
     document.getElementById('nav-username').textContent = user.display_name || user.login;
     document.getElementById('nav-rang').textContent     = score?.rang || '';
     document.getElementById('nav-dashboard-link').style.display = isAdmin ? 'block' : 'none';
 
-    // Mijn rang banner in loyalty view
-    const banner = document.getElementById('mijn-rang-banner');
-    if (score) {
-      banner.classList.remove('hidden');
-      document.getElementById('mijn-rang-avatar').src         = user.profile_image_url || '';
-      document.getElementById('mijn-rang-name').textContent   = user.display_name || user.login;
-      const positie = score.rank_positie ? `#${score.rank_positie} · ` : '';
-      const follow  = score.follow_months ? `${score.follow_months} mnd gevolgd` : '';
-      const streak  = score.streak_current ? ` · ${score.streak_current}× streak` : '';
-      document.getElementById('mijn-rang-sub').textContent    = positie + follow + streak;
-      document.getElementById('mijn-rang-pts').textContent    = (score.score_totaal || 0).toLocaleString('nl-NL');
-
-      const rangKleuren = {'Legende':'#C8A84A','Veteraan':'#A8A8A8','Toegewijde':'#9080EE','Vaste kijker':'#3DAB6A','Beginner':'#555'};
-      const kleur = rangKleuren[score.rang] || '#555';
-      const rangEl = document.getElementById('mijn-rang-rang');
-      rangEl.textContent  = score.rang || '';
-      rangEl.style.color  = kleur;
-    } else {
-      // Wel ingelogd maar niet in systeem
-      banner.classList.remove('hidden');
-      document.getElementById('mijn-rang-avatar').src         = user.profile_image_url || '';
-      document.getElementById('mijn-rang-name').textContent   = user.display_name || user.login;
-      document.getElementById('mijn-rang-sub').textContent    = 'Nog niet geregistreerd — kijk een stream!';
-      document.getElementById('mijn-rang-pts').textContent    = '0';
-      document.getElementById('mijn-rang-rang').textContent   = 'Beginner';
-      document.getElementById('mijn-rang-rang').style.color   = '#555';
+    // Loyalty sectie: verberg CTA, toon compacte gebruikersinfo
+    if (cta)      cta.style.display      = 'none';
+    if (userInfo) {
+      userInfo.style.display = 'flex';
+      document.getElementById('loyalty-avatar').src    = user.profile_image_url || '';
+      document.getElementById('loyalty-name').textContent = user.display_name || user.login;
+      const positie = score?.rank_positie ? `#${score.rank_positie} in de community` : '';
+      const rang    = score?.rang ? ` · ${score.rang}` : '';
+      const pts     = score?.score_totaal != null ? ` · ${score.score_totaal.toLocaleString('nl-NL')} pts` : '';
+      document.getElementById('loyalty-rang-info').textContent = positie + rang + pts;
     }
-
-    // Vul zoekbalk voor met eigen naam
-    const zoekInput = document.getElementById('zoek-input');
-    if (zoekInput && !zoekInput.value) zoekInput.value = user.login;
   } else {
-    document.getElementById('mijn-rang-banner').classList.add('hidden');
+    if (cta)      cta.style.display      = 'flex';
+    if (userInfo) userInfo.style.display = 'none';
   }
 }
+
+function toggleNavDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('nav-user').classList.toggle('open');
+}
+document.addEventListener('click', () => {
+  document.getElementById('nav-user')?.classList.remove('open');
+});
 
 // ── VIEW SWITCHING ──
 function switchView(name, btn) {
