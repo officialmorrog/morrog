@@ -1277,7 +1277,7 @@ async function laadLeaderboard() {
 
   // All-time
   try {
-    const res  = await fetch(BACKEND + '/api/leaderboard?limit=10');
+    const res  = await fetch(BACKEND + '/api/leaderboard?limit=25');
     const data = await res.json();
     window._lbAlltimeSub = data.totaal.toLocaleString('nl-NL') + ' geregistreerd';
     document.getElementById('lb-sub').textContent = window._lbAlltimeSub;
@@ -1292,7 +1292,7 @@ async function laadLeaderboard() {
 
   // Maand
   try {
-    const res  = await fetch(BACKEND + '/api/leaderboard/maand' + (inlogUsername ? '?username='+encodeURIComponent(inlogUsername) : ''));
+    const res  = await fetch(BACKEND + '/api/leaderboard/maand?limit=25' + (inlogUsername ? '&username='+encodeURIComponent(inlogUsername) : ''));
     const data = await res.json();
     bouwLb3Rijen(data.leaderboard, data.eigen, 'lb-maand');
   } catch { document.getElementById('lb-maand').innerHTML = '<div class="lb3-empty">Fout bij laden</div>'; }
