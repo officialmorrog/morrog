@@ -113,8 +113,11 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
 .lb3-pos{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;width:18px;text-align:center;color:var(--white3);flex-shrink:0;}
 .lb3-pos.gold{color:#D4AF37;}.lb3-pos.silver{color:#A8A8A8;}.lb3-pos.bronze{color:#A06030;}
 .lb3-pos.eigen-pos{color:var(--gold);}
-.lb3-name{flex:1;font-size:12px;color:var(--white2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lb3-name{flex:1;font-size:12px;color:var(--white2);overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:5px;min-width:0;}
 .lb3-name.jij{color:var(--gold);}
+.lb3-name-txt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lb3-badges{display:flex;align-items:center;gap:2px;flex-shrink:0;}
+.lb3-badges img{width:18px;height:18px;display:block;}
 .lb3-score{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--white);flex-shrink:0;}
 .lb3-empty{padding:24px 14px;text-align:center;font-size:12px;color:var(--white3);}
 
@@ -973,6 +976,42 @@ function switchView(name, btn) {
   if (name === 'challenges') laadTrackmanTijden();
 }
 
+// ── TWITCH BADGES ──
+window.twBadges = null;
+
+async function laadBadges() {
+  try {
+    const res = await fetch(BACKEND + '/api/badges');
+    if (res.ok) window.twBadges = await res.json();
+  } catch {}
+}
+
+function getSubBadgeUrl(subMonths) {
+  const sub = window.twBadges?.subscriber;
+  if (!sub || !subMonths) return null;
+  const versies = Object.keys(sub).map(Number).sort((a, b) => a - b);
+  let beste = -1;
+  for (const v of versies) { if (v <= subMonths) beste = v; else break; }
+  if (beste < 0) return null;
+  return sub[String(beste)]?.url_2x || sub[String(beste)]?.url_1x || null;
+}
+
+function bouwBadgeHtml(k) {
+  let html = '';
+  if (k.is_sub && k.sub_months) {
+    const url = getSubBadgeUrl(k.sub_months);
+    const tier = k.sub_tier === '3000' ? 'Tier 3' : k.sub_tier === '2000' ? 'Tier 2' : 'Tier 1';
+    if (url) html += `<img src="${url}" title="${tier} sub · ${k.sub_months} mnd" loading="lazy">`;
+  }
+  if (k.is_vip && window.twBadges?.vip) {
+    html += `<img src="${window.twBadges.vip.url_2x||window.twBadges.vip.url_1x}" title="VIP" loading="lazy">`;
+  }
+  if (k.is_mod && window.twBadges?.moderator) {
+    html += `<img src="${window.twBadges.moderator.url_2x||window.twBadges.moderator.url_1x}" title="Moderator" loading="lazy">`;
+  }
+  return html ? `<span class="lb3-badges">${html}</span>` : '';
+}
+
 // ── LEADERBOARDS ──
 const posClass  = { 1:'gold', 2:'silver', 3:'bronze' };
 const rangClass = { 'Legende':'legende','Veteraan':'veteraan','Toegewijde':'toegewijde','Vaste kijker':'vaste','Beginner':'beginner' };
@@ -988,7 +1027,7 @@ function bouwLb3Rijen(rows, eigenRij, containerId) {
     return `
       <div class="lb3-row${isJij?' eigen':''}${isEigen?' eigen':''}" onclick="toggleLb3Detail('${uid}','${k.username}',this)">
         <div class="lb3-pos ${posClass[pos]||''}${isJij?' eigen-pos':''}">${pos}</div>
-        <div class="lb3-name${isJij?' jij':''}">${k.display_name || k.username}</div>
+        <div class="lb3-name${isJij?' jij':''}"><span class="lb3-name-txt">${k.display_name || k.username}</span>${bouwBadgeHtml(k)}</div>
         <span class="lb-badge ${rangClass[k.rang]||'beginner'}">${k.rang||''}</span>
         <div class="lb3-score">${(parseInt(k.score)||0).toLocaleString('nl-NL')}</div>
       </div>
@@ -1275,6 +1314,9 @@ async function init() {
       document.getElementById('btn-login').style.display = 'flex';
     }
   }
+
+  // Laad Twitch badges (kanaal sub badges + VIP/mod)
+  laadBadges();
 
   // Herstel actieve view vanuit URL hash
   const hash = window.location.hash.replace('#','');
