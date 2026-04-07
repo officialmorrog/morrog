@@ -490,11 +490,9 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
           <div class="factors-table">
             <div class="factor-row"><div class="factor-weight">⭐</div><div class="factor-info"><div class="factor-name">Follow age</div><div class="factor-desc">+50 punten per maand gevolgd</div></div><div class="factor-bar-track"><div class="factor-bar-fill" style="width:100%"></div></div></div>
             <div class="factor-row"><div class="factor-weight">👁</div><div class="factor-info"><div class="factor-name">Watch time</div><div class="factor-desc">+1 punt per uur gekeken</div></div><div class="factor-bar-track"><div class="factor-bar-fill" style="width:57%"></div></div></div>
-            <div class="factor-row"><div class="factor-weight">📺</div><div class="factor-info"><div class="factor-name">Streams aanwezig</div><div class="factor-desc">+10 punten per stream</div></div><div class="factor-bar-track"><div class="factor-bar-fill" style="width:43%"></div></div></div>
             <div class="factor-row"><div class="factor-weight">💬</div><div class="factor-info"><div class="factor-name">Chat activiteit</div><div class="factor-desc">+0.5 per bericht · max 1000 pts</div></div><div class="factor-bar-track"><div class="factor-bar-fill" style="width:29%"></div></div></div>
-
             <div class="factor-row"><div class="factor-weight">🏴</div><div class="factor-info"><div class="factor-name">Ik Was Hier</div><div class="factor-desc">+100 per bijzonder kanaalmoment</div></div><div class="factor-bar-track"><div class="factor-bar-fill" style="width:20%"></div></div></div>
-            <div class="factor-row"><div class="factor-weight">🎬</div><div class="factor-info"><div class="factor-name">Clips &amp; raids</div><div class="factor-desc">+15 per clip · +20 per raid</div></div><div class="factor-bar-track"><div class="factor-bar-fill" style="width:14%"></div></div></div>
+            <div class="factor-row"><div class="factor-weight">🎬</div><div class="factor-info"><div class="factor-name">Clip views</div><div class="factor-desc">+0.05 per view op jouw clips</div></div><div class="factor-bar-track"><div class="factor-bar-fill" style="width:14%"></div></div></div>
           </div>
         </div>
         <div>
@@ -1130,7 +1128,7 @@ function bouwKijkerDetail(k) {
     { icoon: emoteImg('morrogTiming', '⏱'),  lbl:'Watch Time',    raw: `${watchUren} uur`,                                                   score: k.score_watch,   dim: !parseFloat(k.watch_hours) },
     { icoon: emoteImg('morrogUUF',    '💬'), lbl:'Chat',           raw: `${(k.chat_messages||0).toLocaleString('nl-NL')} berichten`,          score: k.score_chat,    dim: !(k.chat_messages), max: chatMax },
     { icoon: emoteImg('morrogHier',   '✅'), lbl:'Ik Was Hier',    raw: `${iwhCount} momenten`,                                               score: k.score_iwh,     dim: !iwhCount },
-    { icoon: emoteImg('morrogSC',     '🎬'), lbl:'Clips',          raw: `${k.clips_made||0} clips`,                                           score: k.score_clips,   dim: !(k.clips_made) },
+    { icoon: emoteImg('morrogSC',     '🎬'), lbl:'Clip views',     raw: `${(k.clip_views||0).toLocaleString('nl-NL')} views`,               score: k.score_clips,   dim: !(k.clip_views) },
   ];
 
   return `
