@@ -227,9 +227,9 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.96);b
         <div id="giveaway-status-inhoud" style="font-size:13px;color:var(--white3)">Laden...</div>
       </div>
 
-      <!-- Nieuwe giveaway starten -->
+      <!-- Nieuwe giveaway starten / actieve drop wijzigen -->
       <div class="card" id="giveaway-start-card">
-        <div class="card-title">Nieuwe drop configureren</div>
+        <div class="card-title" id="gw-form-titel">Nieuwe drop configureren</div>
 
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--white3);margin:0 0 10px">Merk</div>
         <div class="form-row">
@@ -327,7 +327,7 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.96);b
           </div>
         </div>
 
-        <button class="btn btn-primary" onclick="startGiveaway()">🎁 Start drop</button>
+        <button class="btn btn-primary" id="gw-start-btn" onclick="startGiveaway()">🎁 Start drop</button>
         <div class="feedback" id="gw-start-feedback"></div>
       </div>
 
@@ -1042,6 +1042,46 @@ function toonFeedback(id, bericht, type = 'ok') {
 }
 
 // ── GIVEAWAY / MORROG DROPS ─────────────────────────────
+let _actiefDrop = null;
+
+function _leesFormulier() {
+  return {
+    merk_naam:    document.getElementById('gw-merk-naam').value.trim(),
+    merk_kleur:   document.getElementById('gw-merk-kleur').value,
+    merk_logo_url: document.getElementById('gw-merk-logo').value.trim() || null,
+    merk_url:     document.getElementById('gw-merk-url').value.trim() || null,
+    merk_tagline: document.getElementById('gw-merk-tagline').value.trim() || null,
+    eind_datum:   document.getElementById('gw-eind-datum').value || null,
+    tier1_rang:   document.getElementById('gw-tier1-rang').value,
+    tier1_prijs:  document.getElementById('gw-tier1-prijs').value.trim() || null,
+    tier1_foto_url: document.getElementById('gw-tier1-foto').value.trim() || null,
+    tier2_rang:   document.getElementById('gw-tier2-rang').value,
+    tier2_prijs:  document.getElementById('gw-tier2-prijs').value.trim() || null,
+    tier2_foto_url: document.getElementById('gw-tier2-foto').value.trim() || null,
+    tier3_rang:   document.getElementById('gw-tier3-rang').value,
+    tier3_prijs:  document.getElementById('gw-tier3-prijs').value.trim() || null,
+    tier3_foto_url: document.getElementById('gw-tier3-foto').value.trim() || null,
+  };
+}
+
+function _vulFormulierIn(data) {
+  document.getElementById('gw-merk-naam').value    = data.merk_naam || '';
+  document.getElementById('gw-merk-kleur').value   = data.merk_kleur || '#b17438';
+  document.getElementById('gw-merk-logo').value    = data.merk_logo_url || '';
+  document.getElementById('gw-merk-url').value     = data.merk_url || '';
+  document.getElementById('gw-merk-tagline').value = data.merk_tagline || '';
+  document.getElementById('gw-eind-datum').value   = data.eind_datum ? data.eind_datum.slice(0, 10) : '';
+  document.getElementById('gw-tier1-rang').value   = data.tier1_rang || 'Vaste kijker';
+  document.getElementById('gw-tier1-prijs').value  = data.tier1_prijs || '';
+  document.getElementById('gw-tier1-foto').value   = data.tier1_foto_url || '';
+  document.getElementById('gw-tier2-rang').value   = data.tier2_rang || 'Toegewijde';
+  document.getElementById('gw-tier2-prijs').value  = data.tier2_prijs || '';
+  document.getElementById('gw-tier2-foto').value   = data.tier2_foto_url || '';
+  document.getElementById('gw-tier3-rang').value   = data.tier3_rang || 'Veteraan';
+  document.getElementById('gw-tier3-prijs').value  = data.tier3_prijs || '';
+  document.getElementById('gw-tier3-foto').value   = data.tier3_foto_url || '';
+}
+
 async function laadGiveawayStatus() {
   try {
     const res  = await fetch(BACKEND + '/api/giveaway/actief');
@@ -1050,8 +1090,15 @@ async function laadGiveawayStatus() {
     const beheer = document.getElementById('giveaway-beheer-card');
     const start  = document.getElementById('giveaway-start-card');
     const dot    = document.getElementById('dot-giveaway');
+    const titel  = document.getElementById('gw-form-titel');
+    const btn    = document.getElementById('gw-start-btn');
 
     if (data && data.merk_naam) {
+      _actiefDrop = data;
+      _vulFormulierIn(data);
+      titel.textContent = 'Drop wijzigen';
+      btn.textContent   = '💾 Wijzigingen opslaan';
+
       const tiers = [1,2,3].map(t => {
         const prijs   = data[`tier${t}_prijs`];
         const rang    = data[`tier${t}_rang`];
@@ -1059,18 +1106,26 @@ async function laadGiveawayStatus() {
         if (!prijs) return '';
         return `<div style="margin-top:8px;font-size:12px;color:var(--white3)">Tier ${t} · <strong style="color:var(--white2)">${rang}+</strong> · ${prijs}${winnaar ? ` · <span style="color:var(--gold)">🏆 ${winnaar}</span>` : ''}</div>`;
       }).join('');
+
+      const eind = data.eind_datum ? new Date(data.eind_datum) : null;
+      const eindTxt = eind ? eind.toLocaleDateString('nl-NL', { day:'numeric', month:'long', year:'numeric' }) : null;
+
       el.innerHTML = `
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
           <span class="status-badge badge-actief"><span class="badge-dot" style="background:var(--streak)"></span> Actief</span>
+          ${eindTxt ? `<span style="font-size:11px;color:var(--white3)">sluit ${eindTxt}</span>` : ''}
         </div>
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;color:var(--white);margin-bottom:4px">MORROG × ${data.merk_naam.toUpperCase()}</div>
         ${data.merk_tagline ? `<div style="font-size:12px;color:var(--white3);margin-bottom:6px">${data.merk_tagline}</div>` : ''}
         ${tiers}
       `;
       beheer.style.display = 'block';
-      start.style.display  = 'none';
+      start.style.display  = 'block';
       dot.classList.add('actief');
     } else {
+      _actiefDrop = null;
+      titel.textContent = 'Nieuwe drop configureren';
+      btn.textContent   = '🎁 Start drop';
       el.innerHTML = '<span class="status-badge badge-inactief">Geen actieve drop</span>';
       beheer.style.display = 'none';
       start.style.display  = 'block';
@@ -1080,36 +1135,19 @@ async function laadGiveawayStatus() {
 }
 
 async function startGiveaway() {
-  const merk_naam    = document.getElementById('gw-merk-naam').value.trim();
-  const merk_kleur   = document.getElementById('gw-merk-kleur').value;
-  const merk_logo    = document.getElementById('gw-merk-logo').value.trim();
-  const merk_url     = document.getElementById('gw-merk-url').value.trim();
-  const merk_tagline = document.getElementById('gw-merk-tagline').value.trim();
-  const eind_datum   = document.getElementById('gw-eind-datum').value;
-  const tier1_rang   = document.getElementById('gw-tier1-rang').value;
-  const tier1_prijs  = document.getElementById('gw-tier1-prijs').value.trim();
-  const tier1_foto   = document.getElementById('gw-tier1-foto').value.trim();
-  const tier2_rang   = document.getElementById('gw-tier2-rang').value;
-  const tier2_prijs  = document.getElementById('gw-tier2-prijs').value.trim();
-  const tier2_foto   = document.getElementById('gw-tier2-foto').value.trim();
-  const tier3_rang   = document.getElementById('gw-tier3-rang').value;
-  const tier3_prijs  = document.getElementById('gw-tier3-prijs').value.trim();
-  const tier3_foto   = document.getElementById('gw-tier3-foto').value.trim();
-
-  if (!merk_naam) { toonFeedback('gw-start-feedback', 'Vul een merknaam in.', 'fout'); return; }
-  if (!tier1_prijs && !tier2_prijs && !tier3_prijs) { toonFeedback('gw-start-feedback', 'Vul minimaal één tierprijs in.', 'fout'); return; }
+  const payload = _leesFormulier();
+  if (!payload.merk_naam) { toonFeedback('gw-start-feedback', 'Vul een merknaam in.', 'fout'); return; }
+  if (!payload.tier1_prijs && !payload.tier2_prijs && !payload.tier3_prijs) { toonFeedback('gw-start-feedback', 'Vul minimaal één tierprijs in.', 'fout'); return; }
 
   try {
-    const res = await adminFetch('/api/giveaway/start', {
-      method: 'POST',
-      body: JSON.stringify({ merk_naam, merk_kleur, merk_logo_url: merk_logo, merk_url, merk_tagline, eind_datum: eind_datum || null,
-        tier1_rang, tier1_prijs, tier1_foto_url: tier1_foto || null,
-        tier2_rang, tier2_prijs, tier2_foto_url: tier2_foto || null,
-        tier3_rang, tier3_prijs, tier3_foto_url: tier3_foto || null }),
+    const isUpdate = !!_actiefDrop;
+    const res  = await adminFetch(isUpdate ? '/api/giveaway/actief' : '/api/giveaway/start', {
+      method: isUpdate ? 'PUT' : 'POST',
+      body: JSON.stringify(payload),
     });
     const data = await res.json();
     if (!res.ok) { toonFeedback('gw-start-feedback', data.error, 'fout'); return; }
-    toonFeedback('gw-start-feedback', `Drop gestart: MORROG × ${data.merk_naam}`, 'ok');
+    toonFeedback('gw-start-feedback', isUpdate ? `Drop bijgewerkt: MORROG × ${data.merk_naam}` : `Drop gestart: MORROG × ${data.merk_naam}`, 'ok');
     laadGiveawayStatus();
   } catch(e) { toonFeedback('gw-start-feedback', 'Fout: ' + e.message, 'fout'); }
 }

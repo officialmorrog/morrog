@@ -111,6 +111,14 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
 .brand-tagline{font-size:13px;color:var(--white3);line-height:1.45;margin-bottom:12px;}
 .brand-link{display:inline-flex;align-items:center;gap:5px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(var(--merk-rgb,177,116,56),1);text-decoration:none;transition:opacity .15s;}
 .brand-link:hover{opacity:.75;}
+.brand-timer{display:flex;align-items:center;gap:6px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(var(--merk-rgb,177,116,56),.15);}
+.brand-timer-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white3);display:block;text-align:center;margin-top:2px;}
+.brand-timer-box{display:flex;flex-direction:column;align-items:center;min-width:32px;}
+.brand-timer-val{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--white);line-height:1;tabular-nums:numeric;}
+.brand-timer-sep{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:rgba(var(--merk-rgb,177,116,56),.5);margin-bottom:10px;}
+.brand-timer-prefix{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--white3);margin-right:4px;}
+.tier-timer{display:flex;align-items:center;gap:5px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--white3);}
+.tier-timer-val{color:rgb(var(--tier-rgb));font-size:12px;}
 .drops-leeg{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:32px 20px;text-align:center;}
 .drops-leeg-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--white2);margin-bottom:6px;}
 .drops-leeg-sub{font-size:12px;color:var(--white3);}
@@ -1048,6 +1056,44 @@ function bouwBadgeHtml(k) {
 // ── MORROG DROPS ──
 const RANG_NIVEAU_FE = { 'Beginner': 1, 'Vaste kijker': 2, 'Toegewijde': 3, 'Veteraan': 4, 'Legende': 5 };
 const TIER_KLEUREN   = { 1: '61,171,106', 2: '104,88,204', 3: '168,168,168' };
+let _dropsTimer = null;
+
+function startDropsTimer(eindDatum) {
+  if (_dropsTimer) clearInterval(_dropsTimer);
+  if (!eindDatum) return;
+
+  const eind = new Date(eindDatum);
+  eind.setHours(23, 59, 59, 999);
+  const pad = n => String(n).padStart(2, '0');
+
+  const tick = () => {
+    const diff = eind - Date.now();
+    const dEl  = document.getElementById('bt-d');
+    const hEl  = document.getElementById('bt-h');
+    const mEl  = document.getElementById('bt-m');
+    const sEl  = document.getElementById('bt-s');
+    const tiers = document.querySelectorAll('.drops-timer-val');
+
+    if (diff <= 0) {
+      clearInterval(_dropsTimer);
+      if (dEl) dEl.closest('.brand-timer').innerHTML = '<span style="font-family:\'Barlow Condensed\',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;color:var(--here)">Giveaway gesloten</span>';
+      tiers.forEach(el => { el.textContent = 'Gesloten'; });
+      return;
+    }
+
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+
+    if (dEl) { dEl.textContent = d; hEl.textContent = pad(h); mEl.textContent = pad(m); sEl.textContent = pad(s); }
+    const compact = d > 0 ? `${d}d ${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(h)}:${pad(m)}:${pad(s)}`;
+    tiers.forEach(el => el.textContent = compact);
+  };
+
+  tick();
+  _dropsTimer = setInterval(tick, 1000);
+}
 
 function hexNaarRgb(hex) {
   if (!hex || hex.length < 7) return '177,116,56';
@@ -1078,22 +1124,33 @@ async function laadDrops() {
     const rgb = hexNaarRgb(data.merk_kleur || '#b17438');
 
     // Brand spotlight
-    const eindDatum = data.eind_datum ? new Date(data.eind_datum).toLocaleDateString('nl-NL', { day:'numeric', month:'long' }) : null;
+    const timerHtml = data.eind_datum ? `
+      <div class="brand-timer">
+        <span class="brand-timer-prefix">Sluit over</span>
+        <div class="brand-timer-box"><span class="brand-timer-val" id="bt-d">--</span><span class="brand-timer-lbl">dagen</span></div>
+        <span class="brand-timer-sep">:</span>
+        <div class="brand-timer-box"><span class="brand-timer-val" id="bt-h">--</span><span class="brand-timer-lbl">uren</span></div>
+        <span class="brand-timer-sep">:</span>
+        <div class="brand-timer-box"><span class="brand-timer-val" id="bt-m">--</span><span class="brand-timer-lbl">min</span></div>
+        <span class="brand-timer-sep">:</span>
+        <div class="brand-timer-box"><span class="brand-timer-val" id="bt-s">--</span><span class="brand-timer-lbl">sec</span></div>
+      </div>` : '';
+
     spotWrap.innerHTML = `
       <div class="brand-spotlight" style="--merk-rgb:${rgb}">
         <div class="brand-eyebrow">◈ Partner van de maand</div>
         <div class="brand-inner">
           ${data.merk_logo_url ? `<div class="brand-logo-wrap"><img src="${data.merk_logo_url}" alt="${data.merk_naam}"></div>` : ''}
-          <div>
+          <div style="flex:1">
             <div class="brand-collab">MORROG × <span>${data.merk_naam.toUpperCase()}</span></div>
             ${data.merk_tagline ? `<div class="brand-tagline">${data.merk_tagline}</div>` : ''}
-            <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-              ${data.merk_url ? `<a class="brand-link" href="${data.merk_url}" target="_blank" rel="noopener">Bekijk website →</a>` : ''}
-              ${eindDatum ? `<span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white3)">t/m ${eindDatum}</span>` : ''}
-            </div>
+            ${data.merk_url ? `<a class="brand-link" href="${data.merk_url}" target="_blank" rel="noopener">Bekijk website →</a>` : ''}
           </div>
         </div>
+        ${timerHtml}
       </div>`;
+
+    if (data.eind_datum) startDropsTimer(data.eind_datum);
 
     // Tier cards
     const gebruikerRang   = window._ingelogdScore?.rang || null;
@@ -1128,6 +1185,7 @@ async function laadDrops() {
               ? `<div class="tier-winnaar">🏆 ${winnaar}</div>`
               : `<div class="tier-status">${eligible ? 'Jij doet automatisch mee' : gebruikerRang ? `Bereik ${rang} om mee te doen` : 'Log in om te checken'}</div>`
             }
+            ${data.eind_datum && !winnaar ? `<div class="tier-timer">⏱ <span class="drops-timer-val">--</span></div>` : ''}
           </div>
         </div>`;
     }
