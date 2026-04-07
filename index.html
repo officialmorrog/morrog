@@ -95,7 +95,11 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
 .hero-stat-arrow{color:var(--brand);font-size:16px;opacity:.6;}
 
 /* LOYALTY SCOREBOARDS */
-.lb3-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:40px;}
+.lb3-grid{display:grid;grid-template-columns:1fr;margin-bottom:40px;}
+.lb3-tabs{display:flex;gap:0;margin-bottom:3px;}
+.lb3-tab{background:none;border:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--white3);padding:0;transition:color .15s;}
+.lb3-tab.active{color:var(--white);}
+.lb3-tab+.lb3-tab::before{content:'|';margin:0 8px;color:var(--border);font-weight:400;}
 .lb3-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;}
 .lb3-head{padding:14px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .lb3-title{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--white);}
@@ -307,7 +311,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
   .hero-stats{display:none;}
   .section{padding:60px 20px;}
   .loyalty-grid{grid-template-columns:1fr;}
-  .lb3-grid{grid-template-columns:1fr;}
+
   .uitleg-grid{grid-template-columns:1fr;}
   .challenges-grid{grid-template-columns:1fr;}
   footer{flex-direction:column;gap:16px;text-align:center;padding:24px 20px;}
@@ -430,51 +434,26 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
     </div>
   </div>
 
-  <!-- 3 SCOREBOARDS -->
+  <!-- LEADERBOARD -->
   <div class="lb3-grid fade-up">
-
-    <!-- ALL-TIME -->
     <div class="lb3-card">
       <div class="lb3-head">
         <div>
-          <div class="lb3-title">All-time</div>
-          <div class="lb3-sub" id="lb-totaal">laden...</div>
+          <div class="lb3-tabs">
+            <button class="lb3-tab active" id="tab-alltime" onclick="switchLbTab('alltime')">All-time</button>
+            <button class="lb3-tab" id="tab-maand" onclick="switchLbTab('maand')">Deze maand</button>
+          </div>
+          <div class="lb3-sub" id="lb-sub">laden...</div>
         </div>
-        <div class="lb3-badge alltime">★ Totaal</div>
+        <div class="lb3-badge alltime" id="lb-badge">★ Totaal</div>
       </div>
       <div class="lb3-rows" id="lb-alltime">
         <div class="lb3-empty">Laden...</div>
       </div>
-    </div>
-
-    <!-- DEZE MAAND -->
-    <div class="lb3-card">
-      <div class="lb3-head">
-        <div>
-          <div class="lb3-title">Deze maand</div>
-          <div class="lb3-sub">Chat + streams bijgewoond</div>
-        </div>
-        <div class="lb3-badge maand">◉ Maand</div>
-      </div>
-      <div class="lb3-rows" id="lb-maand">
+      <div class="lb3-rows" id="lb-maand" style="display:none">
         <div class="lb3-empty">Laden...</div>
       </div>
     </div>
-
-    <!-- DEZE WEEK -->
-    <div class="lb3-card">
-      <div class="lb3-head">
-        <div>
-          <div class="lb3-title">Deze week</div>
-          <div class="lb3-sub">Chat + streams bijgewoond</div>
-        </div>
-        <div class="lb3-badge week">▶ Week</div>
-      </div>
-      <div class="lb3-rows" id="lb-week">
-        <div class="lb3-empty">Laden...</div>
-      </div>
-    </div>
-
   </div>
 
 
@@ -1056,6 +1035,28 @@ async function toggleLb3Detail(uid, username, rij) {
   } catch { detail.innerHTML = '<div style="font-size:12px;color:var(--here)">Fout bij laden.</div>'; }
 }
 
+let _lbActiefTab = 'alltime';
+
+function switchLbTab(tab) {
+  _lbActiefTab = tab;
+  const isAlltime = tab === 'alltime';
+  document.getElementById('lb-alltime').style.display = isAlltime ? '' : 'none';
+  document.getElementById('lb-maand').style.display   = isAlltime ? 'none' : '';
+  document.getElementById('tab-alltime').classList.toggle('active', isAlltime);
+  document.getElementById('tab-maand').classList.toggle('active', !isAlltime);
+  const badge = document.getElementById('lb-badge');
+  const sub   = document.getElementById('lb-sub');
+  if (isAlltime) {
+    badge.className   = 'lb3-badge alltime';
+    badge.textContent = '★ Totaal';
+    sub.textContent   = window._lbAlltimeSub || '';
+  } else {
+    badge.className   = 'lb3-badge maand';
+    badge.textContent = '◉ Maand';
+    sub.textContent   = 'Chat + streams bijgewoond';
+  }
+}
+
 async function laadLeaderboard() {
   const inlogUsername = window._ingelogdUser?.login?.toLowerCase() || '';
 
@@ -1063,7 +1064,8 @@ async function laadLeaderboard() {
   try {
     const res  = await fetch(BACKEND + '/api/leaderboard?limit=10');
     const data = await res.json();
-    document.getElementById('lb-totaal').textContent = data.totaal.toLocaleString('nl-NL') + ' geregistreerd';
+    window._lbAlltimeSub = data.totaal.toLocaleString('nl-NL') + ' geregistreerd';
+    document.getElementById('lb-sub').textContent = window._lbAlltimeSub;
     let eigen = null;
     if (inlogUsername && !data.leaderboard.some(k => k.username === inlogUsername)) {
       const r = await fetch(BACKEND + '/api/kijker/' + encodeURIComponent(inlogUsername));
@@ -1072,13 +1074,6 @@ async function laadLeaderboard() {
     data.leaderboard.forEach((k, i) => { k.rank = i + 1; });
     bouwLb3Rijen(data.leaderboard, eigen, 'lb-alltime');
   } catch { document.getElementById('lb-alltime').innerHTML = '<div class="lb3-empty">Fout bij laden</div>'; }
-
-  // Week
-  try {
-    const res  = await fetch(BACKEND + '/api/leaderboard/week' + (inlogUsername ? '?username='+encodeURIComponent(inlogUsername) : ''));
-    const data = await res.json();
-    bouwLb3Rijen(data.leaderboard, data.eigen, 'lb-week');
-  } catch { document.getElementById('lb-week').innerHTML = '<div class="lb3-empty">Fout bij laden</div>'; }
 
   // Maand
   try {
