@@ -1090,20 +1090,16 @@ function bouwKijkerDetail(k) {
   const followJr  = followMnd >= 12 ? `${Math.floor(followMnd/12)} jr ${followMnd%12} mnd` : `${followMnd} mnd`;
   const watchUren = parseFloat(k.watch_hours||0).toLocaleString('nl-NL', {maximumFractionDigits:0});
   const iwhCount  = Math.round((k.score_iwh||0) / 100);
-  const bonus     = parseFloat(k.streak_bonus||1);
-  const bonusTxt  = bonus > 1 ? `×${bonus.toFixed(2)}` : '×1.00';
   const pts       = n => `+${(n||0).toLocaleString('nl-NL')} pts`;
   const chatMax   = (k.score_chat||0) >= 1000;
 
   const rijen = [
     { icoon:'📅', lbl:'Follow age',    raw: followJr,                          score: k.score_follow,  dim: !followMnd },
     { icoon:'⏱',  lbl:'Watch tijd',    raw: `${watchUren} uur`,                score: k.score_watch,   dim: !parseFloat(k.watch_hours) },
-    { icoon:'📺', lbl:'Streams',        raw: `${k.streams_present||0}×`,        score: k.score_streams, dim: !(k.streams_present) },
     { icoon:'💬', lbl:'Chat',           raw: `${(k.chat_messages||0).toLocaleString('nl-NL')} berichten`, score: k.score_chat, dim: !(k.chat_messages), max: chatMax },
     { icoon:'💜', lbl:'Sub',            raw: `${k.sub_months||0} mnd`,          score: k.score_sub,     dim: !(k.sub_months) },
     { icoon:'✅', lbl:'Ik Was Hier',    raw: `${iwhCount} momenten`,            score: k.score_iwh,     dim: !iwhCount },
     { icoon:'🎬', lbl:'Clips',          raw: `${k.clips_made||0} clips`,        score: k.score_clips,   dim: !(k.clips_made) },
-    { icoon:'⚡', lbl:'Raids',          raw: `${k.raids_joined||0} raids`,      score: k.score_raids,   dim: !(k.raids_joined) },
   ];
 
   return `
@@ -1133,11 +1129,6 @@ function bouwKijkerDetail(k) {
           <div class="kijker-bdr-raw">${r.raw}${r.max ? ' <span style="font-size:10px;color:var(--white3)">(max)</span>' : ''}</div>
           <div class="kijker-bdr-pts">${pts(r.score)}</div>
         </div>`).join('')}
-      <div class="kijker-bdr streak">
-        <div class="kijker-bdr-lbl">🔥&ensp;<span>Streak bonus</span></div>
-        <div class="kijker-bdr-raw">${k.streak_current||0} streams op rij</div>
-        <div class="kijker-bdr-pts">${bonusTxt}</div>
-      </div>
     </div>`;
 }
 
