@@ -280,6 +280,10 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.96);b
               <label class="form-label">Prijs</label>
               <input class="form-input" id="gw-tier1-prijs" type="text" placeholder="bijv. Merchandise pack">
             </div>
+            <div class="form-group">
+              <label class="form-label">Foto URL</label>
+              <input class="form-input" id="gw-tier1-foto" type="url" placeholder="https://...">
+            </div>
           </div>
           <div>
             <div style="font-size:11px;color:#6858CC;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Tier 2</div>
@@ -296,6 +300,10 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.96);b
               <label class="form-label">Prijs</label>
               <input class="form-input" id="gw-tier2-prijs" type="text" placeholder="bijv. Premium pack">
             </div>
+            <div class="form-group">
+              <label class="form-label">Foto URL</label>
+              <input class="form-input" id="gw-tier2-foto" type="url" placeholder="https://...">
+            </div>
           </div>
           <div>
             <div style="font-size:11px;color:#A8A8A8;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Tier 3</div>
@@ -311,6 +319,10 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.96);b
             <div class="form-group">
               <label class="form-label">Prijs</label>
               <input class="form-input" id="gw-tier3-prijs" type="text" placeholder="bijv. Exclusief item">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Foto URL</label>
+              <input class="form-input" id="gw-tier3-foto" type="url" placeholder="https://...">
             </div>
           </div>
         </div>
@@ -1076,10 +1088,13 @@ async function startGiveaway() {
   const eind_datum   = document.getElementById('gw-eind-datum').value;
   const tier1_rang   = document.getElementById('gw-tier1-rang').value;
   const tier1_prijs  = document.getElementById('gw-tier1-prijs').value.trim();
+  const tier1_foto   = document.getElementById('gw-tier1-foto').value.trim();
   const tier2_rang   = document.getElementById('gw-tier2-rang').value;
   const tier2_prijs  = document.getElementById('gw-tier2-prijs').value.trim();
+  const tier2_foto   = document.getElementById('gw-tier2-foto').value.trim();
   const tier3_rang   = document.getElementById('gw-tier3-rang').value;
   const tier3_prijs  = document.getElementById('gw-tier3-prijs').value.trim();
+  const tier3_foto   = document.getElementById('gw-tier3-foto').value.trim();
 
   if (!merk_naam) { toonFeedback('gw-start-feedback', 'Vul een merknaam in.', 'fout'); return; }
   if (!tier1_prijs && !tier2_prijs && !tier3_prijs) { toonFeedback('gw-start-feedback', 'Vul minimaal één tierprijs in.', 'fout'); return; }
@@ -1088,7 +1103,9 @@ async function startGiveaway() {
     const res = await adminFetch('/api/giveaway/start', {
       method: 'POST',
       body: JSON.stringify({ merk_naam, merk_kleur, merk_logo_url: merk_logo, merk_url, merk_tagline, eind_datum: eind_datum || null,
-        tier1_rang, tier1_prijs, tier2_rang, tier2_prijs, tier3_rang, tier3_prijs }),
+        tier1_rang, tier1_prijs, tier1_foto_url: tier1_foto || null,
+        tier2_rang, tier2_prijs, tier2_foto_url: tier2_foto || null,
+        tier3_rang, tier3_prijs, tier3_foto_url: tier3_foto || null }),
     });
     const data = await res.json();
     if (!res.ok) { toonFeedback('gw-start-feedback', data.error, 'fout'); return; }
