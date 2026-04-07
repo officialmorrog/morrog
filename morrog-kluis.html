@@ -32,27 +32,28 @@ body::after{
 }
 
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);z-index:100;display:flex;align-items:center;padding:0 40px;}
-.nav-logo{height:24px;margin-right:48px;opacity:.92;flex-shrink:0;}
-.nav-logo-fb{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;color:var(--white);margin-right:48px;text-transform:uppercase;}
-.nav-links{display:flex;gap:2px;flex:1;}
-.nav-link{padding:0 16px;height:58px;display:flex;align-items:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white3);border:none;background:none;border-bottom:2px solid transparent;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;text-decoration:none;}
+nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);z-index:100;display:flex;align-items:center;padding:0 40px;gap:0;overflow:visible;}
+.nav-logo{height:24px;margin-right:32px;opacity:.92;flex-shrink:0;}
+.nav-logo-fb{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;color:var(--white);margin-right:32px;text-transform:uppercase;flex-shrink:0;}
+.nav-links{display:flex;gap:2px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;}
+.nav-links::-webkit-scrollbar{display:none;}
+.nav-link{padding:0 13px;height:58px;display:flex;align-items:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white3);border:none;background:none;border-bottom:2px solid transparent;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;flex-shrink:0;text-decoration:none;}
 .nav-link:hover{color:var(--white2);}
 .nav-link.active{color:var(--white);border-bottom-color:var(--white);}
-.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
-.btn-twitch-login{display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white);padding:6px 14px;border:1px solid rgba(145,71,255,.4);border-radius:3px;background:rgba(145,71,255,.12);cursor:pointer;transition:background .15s;}
+.nav-right{margin-left:12px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.btn-twitch-login{display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white);padding:6px 14px;border:1px solid rgba(145,71,255,.4);border-radius:3px;background:rgba(145,71,255,.12);cursor:pointer;transition:background .15s;white-space:nowrap;flex-shrink:0;}
 .btn-twitch-login:hover{background:rgba(145,71,255,.22);}
 .btn-twitch-login svg{width:14px;height:14px;fill:var(--twitch);flex-shrink:0;}
 .nav-user{display:flex;align-items:center;gap:8px;cursor:pointer;position:relative;}
 .nav-user-avatar{width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);object-fit:cover;}
 .nav-user-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--white2);}
 .nav-user-rang{font-size:10px;color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
-.nav-user-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;min-width:180px;padding:8px 0;display:none;z-index:200;}
-.nav-user:hover .nav-user-dropdown{display:block;}
+.nav-user-dropdown{position:fixed;top:58px;right:40px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;min-width:200px;padding:8px 0;display:none;z-index:200;}
+.nav-user.open .nav-user-dropdown{display:block;}
 .nav-user-dropdown-item{padding:10px 16px;font-size:13px;color:var(--white3);cursor:pointer;transition:background .12s;display:block;text-decoration:none;white-space:nowrap;}
 .nav-user-dropdown-item:hover{background:var(--bg3);color:var(--white);}
 .nav-user-dropdown-sep{border-top:1px solid var(--border);margin:4px 0;}
-.nav-live{display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--streak);padding:6px 14px;border:1px solid rgba(61,171,106,.3);border-radius:3px;background:rgba(61,171,106,.06);text-decoration:none;transition:background .15s;}
+.nav-live{display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--streak);padding:6px 14px;border:1px solid rgba(61,171,106,.3);border-radius:3px;background:rgba(61,171,106,.06);text-decoration:none;transition:background .15s;white-space:nowrap;flex-shrink:0;}
 .nav-live:hover{background:rgba(61,171,106,.12);}
 .nav-live-dot{width:6px;height:6px;border-radius:50%;background:var(--streak);animation:pulse-nav 1.5s ease-in-out infinite;}
 @keyframes pulse-nav{0%,100%{opacity:1;}50%{opacity:0.4;}}
@@ -558,7 +559,7 @@ footer{
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
       Inloggen
     </button>
-    <div class="nav-user" id="nav-user" style="display:none">
+    <div class="nav-user" id="nav-user" style="display:none" onclick="toggleNavDropdown(event)">
       <img class="nav-user-avatar" id="nav-avatar" src="" alt="">
       <div>
         <div class="nav-user-name" id="nav-username"></div>
@@ -791,6 +792,12 @@ const API = 'https://morrog-loyalty-backend-production.up.railway.app';
 const TWITCH_CLIENT_ID = 'r6uuslartqla0c52af9wc4j7eobcnu';
 const REDIRECT_URI     = 'https://officialmorrog.github.io/morrog/morrog-kluis.html';
 const MORROG_ID        = '65660593';
+
+function toggleNavDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('nav-user').classList.toggle('open');
+}
+document.addEventListener('click', () => document.getElementById('nav-user')?.classList.remove('open'));
 
 function twitchLogin() {
   window.location.href =
