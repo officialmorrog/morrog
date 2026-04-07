@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morrog — Hall of Fame</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#090909;--bg2:#111111;--bg3:#181818;--bg4:#202020;--bg5:#282828;
+  --white:#FFFFFF;--white2:#CECECE;--white3:#888888;--dim:#333333;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --gold:#C8A84A;--streak:#3DAB6A;--here:#C85050;--sub:#6858CC;
+  --twitch:#9147FF;
+  --hof:#C8A84A;--hof-glow:rgba(200,168,74,.15);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--white2);font-family:'Barlow',sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);z-index:100;display:flex;align-items:center;padding:0 40px;}
+.nav-logo{height:24px;margin-right:48px;opacity:.92;flex-shrink:0;}
+.nav-logo-fb{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;color:var(--white);margin-right:48px;text-transform:uppercase;}
+.nav-links{display:flex;gap:2px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;}
+.nav-links::-webkit-scrollbar{display:none;}
+.nav-link{padding:0 13px;height:58px;display:flex;align-items:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white3);border:none;background:none;border-bottom:2px solid transparent;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;text-decoration:none;flex-shrink:0;}
+.nav-link:hover{color:var(--white2);}
+.nav-link.active{color:var(--white);border-bottom-color:var(--white);}
+.nav-right{margin-left:12px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.nav-live{display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--streak);padding:6px 14px;border:1px solid rgba(61,171,106,.3);border-radius:3px;background:rgba(61,171,106,.06);text-decoration:none;transition:background .15s;white-space:nowrap;flex-shrink:0;}
+.nav-live:hover{background:rgba(61,171,106,.12);}
+.nav-live-dot{width:6px;height:6px;border-radius:50%;background:var(--streak);animation:pulse 1.5s ease-in-out infinite;}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 40px 80px;position:relative;overflow:hidden;text-align:center;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 30%, var(--hof-glow) 0%, transparent 70%);pointer-events:none;}
+.hero-bg2{position:absolute;inset:0;background:radial-gradient(ellipse 50% 35% at 50% 85%, rgba(200,168,74,.04) 0%, transparent 60%);pointer-events:none;}
+.hero-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--hof);display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:24px;}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';display:block;width:32px;height:1px;background:var(--hof);opacity:.5;}
+.hero-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(56px,10vw,120px);font-weight:900;text-transform:uppercase;letter-spacing:-2px;line-height:.88;color:var(--white);margin-bottom:16px;position:relative;}
+.hero-title .accent{color:var(--hof);}
+.hero-title-glow{position:absolute;inset:-60px;background:radial-gradient(ellipse at 50% 50%, var(--hof-glow) 0%, transparent 70%);pointer-events:none;z-index:-1;}
+.hero-desc{font-size:16px;color:var(--white3);line-height:1.8;font-weight:300;max-width:540px;margin:20px auto 0;}
+.scroll-hint{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);animation:float 2.5s ease-in-out infinite;}
+.scroll-hint-arrow{width:1px;height:32px;background:linear-gradient(to bottom,transparent,var(--dim));}
+
+/* STATS */
+.stats-row{max-width:900px;margin:0 auto;padding:0 32px 80px;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);}
+.stat-cell{background:var(--bg);padding:28px 24px;text-align:center;}
+.stat-num{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:900;color:var(--white);line-height:1;margin-bottom:6px;}
+.stat-num.gold{color:var(--gold);}
+.stat-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--white3);}
+
+/* DIVIDER */
+.divider{max-width:900px;margin:0 auto;padding:0 32px;display:flex;align-items:center;gap:20px;margin-bottom:56px;}
+.divider-line{flex:1;height:1px;background:var(--border);}
+.divider-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--dim);}
+
+/* FILTER TABS */
+.filter-bar{max-width:900px;margin:0 auto;padding:0 32px 40px;display:flex;gap:8px;flex-wrap:wrap;}
+.filter-btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 16px;border-radius:3px;border:1px solid var(--border2);background:none;color:var(--white3);cursor:pointer;transition:all .15s;}
+.filter-btn:hover{color:var(--white2);border-color:var(--border2);}
+.filter-btn.active{background:rgba(200,168,74,.1);border-color:rgba(200,168,74,.4);color:var(--hof);}
+
+/* HOF GRID */
+.hof-section{max-width:900px;margin:0 auto;padding:0 32px 120px;}
+.hof-type-group{margin-bottom:56px;}
+.hof-type-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--hof);display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+.hof-type-label::after{content:'';flex:1;height:1px;background:rgba(200,168,74,.2);}
+.hof-cards{display:flex;flex-direction:column;gap:10px;}
+.hof-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:22px 24px;display:flex;align-items:center;gap:20px;transition:border-color .2s,transform .2s;position:relative;overflow:hidden;}
+.hof-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--hof);opacity:0;transition:opacity .2s;}
+.hof-card:hover{border-color:rgba(200,168,74,.3);transform:translateX(4px);}
+.hof-card:hover::before{opacity:1;}
+.hof-card-icon{width:52px;height:52px;border-radius:8px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;}
+.hof-card-body{flex:1;min-width:0;}
+.hof-card-naam{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--white);line-height:1;margin-bottom:4px;}
+.hof-card-meta{font-size:13px;color:var(--white3);line-height:1.5;}
+.hof-card-meta span{color:var(--white2);}
+.hof-card-desc{font-size:13px;color:var(--white3);margin-top:4px;line-height:1.5;}
+.hof-card-right{text-align:right;flex-shrink:0;}
+.hof-card-resultaat{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--hof);line-height:1;margin-bottom:4px;}
+.hof-card-datum{font-size:11px;color:var(--white3);font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:1px;}
+
+/* LEEG STATE */
+.hof-empty{text-align:center;padding:80px 32px;color:var(--white3);}
+.hof-empty-icon{font-size:48px;display:block;margin-bottom:16px;opacity:.4;}
+.hof-empty-txt{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:600;letter-spacing:1px;text-transform:uppercase;}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;max-width:1080px;margin:0 auto;}
+.footer-fb{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;letter-spacing:2px;color:var(--dim);text-transform:uppercase;}
+.footer-txt{font-size:12px;color:var(--dim);}
+.footer-links{display:flex;gap:20px;}
+.footer-link{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color .15s;}
+.footer-link:hover{color:var(--white3);}
+
+/* ANIMATIES */
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+@keyframes float{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
+.fade-up{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;}
+.fade-up.visible{opacity:1;transform:translateY(0);}
+
+@media(max-width:700px){
+  nav{padding:0 16px;}
+  .hero{padding:100px 20px 60px;}
+  .stats-row{grid-template-columns:1fr;padding:0 20px 60px;}
+  .hof-section{padding:0 20px 80px;}
+  .filter-bar{padding:0 20px 32px;}
+  .divider{padding:0 20px;}
+  .hof-card{flex-direction:column;align-items:flex-start;gap:12px;}
+  .hof-card-right{text-align:left;}
+  footer{flex-direction:column;gap:12px;text-align:center;padding:24px 20px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <img class="nav-logo" src="https://shop.morrog.nl/cdn/shop/files/Morrog-Logo_90x.png?v=1701878792" alt="Morrog"
+    onerror="this.style.display='none';document.getElementById('nav-logo-fb').style.display='block'">
+  <span id="nav-logo-fb" class="nav-logo-fb" style="display:none">MORROG</span>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html">Home</a>
+    <a class="nav-link" href="index.html#loyalty">Loyaliteit</a>
+    <a class="nav-link active" href="hall-of-fame.html">Hall of Fame</a>
+    <a class="nav-link" href="index.html#agenda">Agenda</a>
+    <a class="nav-link" href="charity.html">Charity</a>
+    <a class="nav-link" href="morrog-tv.html">Morrog TV</a>
+    <a class="nav-link" href="battlepass.html">Battle Pass</a>
+    <a class="nav-link" href="morrog-kluis.html">Kluis</a>
+  </div>
+  <div class="nav-right">
+    <a class="nav-live" href="https://twitch.tv/morrog" target="_blank">
+      <span class="nav-live-dot"></span>Kijk live
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-bg2"></div>
+  <div class="hero-eyebrow">Morrog Community</div>
+  <div class="hero-title">
+    Hall of<br><span class="accent">Fame</span>
+    <div class="hero-title-glow"></div>
+  </div>
+  <p class="hero-desc">Speedrun records, streamer duels en prestaties. Alles wat Morrog ooit heeft bereikt, bijgehouden op één plek.</p>
+  <div class="scroll-hint">Scroll<div class="scroll-hint-arrow"></div></div>
+</div>
+
+<!-- STATS -->
+<div class="stats-row" id="stats-row">
+  <div class="stat-cell fade-up">
+    <div class="stat-num gold" id="stat-totaal">—</div>
+    <div class="stat-label">Prestaties</div>
+  </div>
+  <div class="stat-cell fade-up" style="transition-delay:.1s">
+    <div class="stat-num" id="stat-types">—</div>
+    <div class="stat-label">Categorieën</div>
+  </div>
+  <div class="stat-cell fade-up" style="transition-delay:.2s">
+    <div class="stat-num gold" id="stat-gewonnen">—</div>
+    <div class="stat-label">Gewonnen</div>
+  </div>
+</div>
+
+<div class="divider fade-up">
+  <div class="divider-line"></div>
+  <div class="divider-label">De prestaties</div>
+  <div class="divider-line"></div>
+</div>
+
+<!-- FILTER -->
+<div class="filter-bar fade-up" id="filter-bar">
+  <button class="filter-btn active" data-type="all" onclick="filterType('all',this)">Alles</button>
+</div>
+
+<!-- HOF ENTRIES -->
+<div class="hof-section" id="hof-inhoud">
+  <div class="hof-empty">
+    <span class="hof-empty-icon">🏆</span>
+    <div class="hof-empty-txt">Laden...</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-fb">Morrog</div>
+    <div class="footer-txt">Hall of Fame — alle prestaties</div>
+  </div>
+  <div class="footer-links">
+    <a class="footer-link" href="index.html">Community Hub</a>
+    <a class="footer-link" href="https://twitch.tv/morrog" target="_blank">Twitch</a>
+  </div>
+</footer>
+
+<script>
+const BACKEND = 'https://morrog-loyalty-backend-production.up.railway.app';
+
+let alleEntries = [];
+
+async function laadHof() {
+  try {
+    const res = await fetch(`${BACKEND}/api/hof`);
+    const data = await res.json();
+    alleEntries = data;
+    renderStats(data);
+    renderFilters(data);
+    renderEntries(data);
+  } catch(e) {
+    document.getElementById('hof-inhoud').innerHTML = `
+      <div class="hof-empty">
+        <span class="hof-empty-icon">⚠️</span>
+        <div class="hof-empty-txt">Kon gegevens niet laden</div>
+      </div>`;
+  }
+}
+
+function renderStats(data) {
+  const types = new Set(data.map(e => e.hof_type).filter(Boolean));
+  const gewonnen = data.filter(e => e.resultaat && e.resultaat.toLowerCase().includes('gewon')).length;
+  document.getElementById('stat-totaal').textContent = data.length;
+  document.getElementById('stat-types').textContent = types.size || '—';
+  document.getElementById('stat-gewonnen').textContent = gewonnen || '—';
+}
+
+function renderFilters(data) {
+  const types = [...new Set(data.map(e => e.hof_type).filter(Boolean))].sort();
+  const bar = document.getElementById('filter-bar');
+  types.forEach(type => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.dataset.type = type;
+    btn.textContent = type;
+    btn.onclick = () => filterType(type, btn);
+    bar.appendChild(btn);
+  });
+}
+
+function filterType(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const gefilterd = type === 'all' ? alleEntries : alleEntries.filter(e => e.hof_type === type);
+  renderEntries(gefilterd);
+}
+
+function renderEntries(data) {
+  const container = document.getElementById('hof-inhoud');
+  if (!data.length) {
+    container.innerHTML = `<div class="hof-empty"><span class="hof-empty-icon">🏆</span><div class="hof-empty-txt">Nog geen prestaties in deze categorie</div></div>`;
+    return;
+  }
+
+  // Groepeer per hof_type
+  const groepen = {};
+  data.forEach(e => {
+    const type = e.hof_type || 'Overig';
+    if (!groepen[type]) groepen[type] = [];
+    groepen[type].push(e);
+  });
+
+  container.innerHTML = Object.entries(groepen).map(([type, entries]) => `
+    <div class="hof-type-group fade-up">
+      <div class="hof-type-label">${type}</div>
+      <div class="hof-cards">
+        ${entries.map(e => `
+          <div class="hof-card">
+            <div class="hof-card-icon">${e.icoon || '🏆'}</div>
+            <div class="hof-card-body">
+              <div class="hof-card-naam">${escHtml(e.naam)}</div>
+              <div class="hof-card-meta">
+                ${e.game ? `<span>${escHtml(e.game)}</span>` : ''}
+                ${e.game && e.tegenstander ? ' &nbsp;·&nbsp; ' : ''}
+                ${e.tegenstander ? `vs <span>${escHtml(e.tegenstander)}</span>` : ''}
+              </div>
+              ${e.beschrijving ? `<div class="hof-card-desc">${escHtml(e.beschrijving)}</div>` : ''}
+            </div>
+            <div class="hof-card-right">
+              ${e.resultaat ? `<div class="hof-card-resultaat">${escHtml(e.resultaat)}</div>` : ''}
+              ${e.datum ? `<div class="hof-card-datum">${formatDatum(e.datum)}</div>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  // Fade-up activeren
+  setTimeout(() => {
+    container.querySelectorAll('.fade-up').forEach((el, i) => {
+      setTimeout(() => el.classList.add('visible'), i * 60);
+    });
+  }, 30);
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatDatum(datum) {
+  if (!datum) return '';
+  try {
+    return new Date(datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+  } catch(e) { return datum; }
+}
+
+// Fade-up observer
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }});
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+laadHof();
+</script>
+</body>
+</html>
