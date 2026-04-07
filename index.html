@@ -165,6 +165,21 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
 .kijker-detail{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:18px 20px;margin:8px 0 4px;display:none;}
 .kijker-detail.open{display:block;}
 .kijker-detail-naam{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--white);margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.kijker-detail-top{display:flex;gap:8px;margin-bottom:14px;}
+.kijker-detail-top-blok{background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:10px 14px;flex:1;text-align:center;}
+.kijker-detail-top-val{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--white);line-height:1;margin-bottom:2px;}
+.kijker-detail-top-lbl{font-size:10px;color:var(--white3);text-transform:uppercase;letter-spacing:1px;font-family:'Barlow Condensed',sans-serif;font-weight:600;}
+.kijker-breakdown-titel{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--white3);margin-bottom:6px;}
+.kijker-breakdown{background:var(--bg4);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.kijker-bdr{display:grid;grid-template-columns:1fr auto auto;align-items:center;padding:7px 12px;border-bottom:1px solid var(--border);gap:10px;}
+.kijker-bdr:last-child{border-bottom:none;}
+.kijker-bdr-lbl{font-size:12px;color:var(--white3);display:flex;align-items:center;gap:6px;}
+.kijker-bdr-lbl span{color:var(--white2);}
+.kijker-bdr-raw{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:var(--white3);white-space:nowrap;text-align:right;}
+.kijker-bdr-pts{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;color:var(--gold);white-space:nowrap;text-align:right;min-width:72px;}
+.kijker-bdr.streak .kijker-bdr-pts{color:var(--streak);}
+.kijker-bdr.dimmed .kijker-bdr-pts{color:var(--dim);}
+/* oud grid blijft voor backward compat */
 .kijker-stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;}
 .kijker-stat-blok{background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:10px 12px;}
 .kijker-stat-val{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:var(--white);line-height:1;margin-bottom:2px;}
@@ -1070,43 +1085,58 @@ async function toggleLbDetail(rij, username) {
 
 // ── KIJKER DETAIL OPBOUW (gedeeld tussen leaderboard en zoekbalk) ──
 function bouwKijkerDetail(k) {
-  const rangKleur = {'Legende':'#C8A84A','Veteraan':'#A8A8A8','Toegewijde':'#9080EE','Vaste kijker':'#3DAB6A','Beginner':'#555'}[k.rang]||'#555';
-  const watchUren = parseFloat(k.watch_hours||0).toLocaleString('nl-NL', {maximumFractionDigits:0});
+  const rangClass = {'Legende':'legende','Veteraan':'veteraan','Toegewijde':'toegewijde','Vaste kijker':'vaste','Beginner':'beginner'}[k.rang]||'beginner';
   const followMnd = k.follow_months || 0;
-  const followJr  = followMnd >= 12 ? `${Math.floor(followMnd/12)}j ${followMnd%12}m` : `${followMnd} mnd`;
+  const followJr  = followMnd >= 12 ? `${Math.floor(followMnd/12)} jr ${followMnd%12} mnd` : `${followMnd} mnd`;
+  const watchUren = parseFloat(k.watch_hours||0).toLocaleString('nl-NL', {maximumFractionDigits:0});
+  const iwhCount  = Math.round((k.score_iwh||0) / 100);
+  const bonus     = parseFloat(k.streak_bonus||1);
+  const bonusTxt  = bonus > 1 ? `×${bonus.toFixed(2)}` : '×1.00';
+  const pts       = n => `+${(n||0).toLocaleString('nl-NL')} pts`;
+  const chatMax   = (k.score_chat||0) >= 1000;
+
+  const rijen = [
+    { icoon:'📅', lbl:'Follow age',    raw: followJr,                          score: k.score_follow,  dim: !followMnd },
+    { icoon:'⏱',  lbl:'Watch tijd',    raw: `${watchUren} uur`,                score: k.score_watch,   dim: !parseFloat(k.watch_hours) },
+    { icoon:'📺', lbl:'Streams',        raw: `${k.streams_present||0}×`,        score: k.score_streams, dim: !(k.streams_present) },
+    { icoon:'💬', lbl:'Chat',           raw: `${(k.chat_messages||0).toLocaleString('nl-NL')} berichten`, score: k.score_chat, dim: !(k.chat_messages), max: chatMax },
+    { icoon:'💜', lbl:'Sub',            raw: `${k.sub_months||0} mnd`,          score: k.score_sub,     dim: !(k.sub_months) },
+    { icoon:'✅', lbl:'Ik Was Hier',    raw: `${iwhCount} momenten`,            score: k.score_iwh,     dim: !iwhCount },
+    { icoon:'🎬', lbl:'Clips',          raw: `${k.clips_made||0} clips`,        score: k.score_clips,   dim: !(k.clips_made) },
+    { icoon:'⚡', lbl:'Raids',          raw: `${k.raids_joined||0} raids`,      score: k.score_raids,   dim: !(k.raids_joined) },
+  ];
+
   return `
     <div class="kijker-detail-naam">
       ${k.display_name || k.username}
-      <span class="lb-badge ${({'Legende':'legende','Veteraan':'veteraan','Toegewijde':'toegewijde','Vaste kijker':'vaste','Beginner':'beginner'}[k.rang]||'beginner')}">${k.rang}</span>
+      <span class="lb-badge ${rangClass}">${k.rang||'Beginner'}</span>
     </div>
-    <div class="kijker-stats-grid">
-      <div class="kijker-stat-blok">
-        <div class="kijker-stat-val" style="color:var(--white)">${(k.score_totaal||0).toLocaleString('nl-NL')}</div>
-        <div class="kijker-stat-lbl">Punten</div>
+    <div class="kijker-detail-top">
+      <div class="kijker-detail-top-blok">
+        <div class="kijker-detail-top-val" style="color:var(--gold)">${(k.score_totaal||0).toLocaleString('nl-NL')}</div>
+        <div class="kijker-detail-top-lbl">Totaal punten</div>
       </div>
-      <div class="kijker-stat-blok">
-        <div class="kijker-stat-val">#${k.rank||k.rank_positie||'?'}</div>
-        <div class="kijker-stat-lbl">Positie</div>
+      <div class="kijker-detail-top-blok">
+        <div class="kijker-detail-top-val">#${k.rank||k.rank_positie||'?'}</div>
+        <div class="kijker-detail-top-lbl">Positie</div>
       </div>
-      <div class="kijker-stat-blok">
-        <div class="kijker-stat-val">${followJr}</div>
-        <div class="kijker-stat-lbl">Follow age</div>
+      <div class="kijker-detail-top-blok">
+        <div class="kijker-detail-top-val" style="color:var(--streak)">${k.streak_current||0}×</div>
+        <div class="kijker-detail-top-lbl">Streak</div>
       </div>
-      <div class="kijker-stat-blok">
-        <div class="kijker-stat-val">${k.sub_months||0}</div>
-        <div class="kijker-stat-lbl">Sub maanden</div>
-      </div>
-      <div class="kijker-stat-blok">
-        <div class="kijker-stat-val">${watchUren}</div>
-        <div class="kijker-stat-lbl">Watch uren</div>
-      </div>
-      <div class="kijker-stat-blok">
-        <div class="kijker-stat-val" style="color:var(--streak)">${k.streak_current||0}×</div>
-        <div class="kijker-stat-lbl">Streak</div>
-      </div>
-      <div class="kijker-stat-blok">
-        <div class="kijker-stat-val">${k.streams_present||0}</div>
-        <div class="kijker-stat-lbl">Streams</div>
+    </div>
+    <div class="kijker-breakdown-titel">Puntenopbouw</div>
+    <div class="kijker-breakdown">
+      ${rijen.map(r => `
+        <div class="kijker-bdr${r.dim ? ' dimmed' : ''}">
+          <div class="kijker-bdr-lbl">${r.icoon}&ensp;<span>${r.lbl}</span></div>
+          <div class="kijker-bdr-raw">${r.raw}${r.max ? ' <span style="font-size:10px;color:var(--white3)">(max)</span>' : ''}</div>
+          <div class="kijker-bdr-pts">${pts(r.score)}</div>
+        </div>`).join('')}
+      <div class="kijker-bdr streak">
+        <div class="kijker-bdr-lbl">🔥&ensp;<span>Streak bonus</span></div>
+        <div class="kijker-bdr-raw">${k.streak_current||0} streams op rij</div>
+        <div class="kijker-bdr-pts">${bonusTxt}</div>
       </div>
     </div>`;
 }
