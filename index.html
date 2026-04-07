@@ -177,6 +177,7 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);b
 .kijker-bdr{display:grid;grid-template-columns:1fr auto auto;align-items:center;padding:7px 12px;border-bottom:1px solid var(--border);gap:10px;}
 .kijker-bdr:last-child{border-bottom:none;}
 .kijker-bdr-lbl{font-size:12px;color:var(--white3);display:flex;align-items:center;gap:6px;}
+.bdr-emote{width:20px;height:20px;object-fit:contain;flex-shrink:0;}
 .kijker-bdr-lbl span{color:var(--white2);}
 .kijker-bdr-raw{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:var(--white3);white-space:nowrap;text-align:left;}
 .kijker-bdr-pts{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;color:var(--gold);white-space:nowrap;text-align:left;}
@@ -967,6 +968,22 @@ async function laadBadges() {
   } catch {}
 }
 
+window.twEmotes = {};
+async function laadEmotes() {
+  try {
+    const res    = await fetch(BACKEND + '/api/emotes');
+    if (!res.ok) return;
+    const lijst  = await res.json();
+    for (const e of lijst) window.twEmotes[e.naam] = e.url_2x || e.url_1x;
+  } catch {}
+}
+
+function emoteImg(naam, fallback) {
+  const url = window.twEmotes[naam];
+  if (url) return `<img src="${url}" class="bdr-emote" title="${naam}">`;
+  return fallback;
+}
+
 function getSubBadgeUrl(subMonths) {
   const sub = window.twBadges?.subscriber;
   if (!sub || !subMonths) return null;
@@ -1109,11 +1126,11 @@ function bouwKijkerDetail(k) {
   const chatMax   = (k.score_chat||0) >= 1000;
 
   const rijen = [
-    { icoon:'📅', lbl:'Follow age',    raw: followJr,                          score: k.score_follow,  dim: !followMnd },
-    { icoon:'⏱',  lbl:'Watch Time',    raw: `${watchUren} uur`,                score: k.score_watch,   dim: !parseFloat(k.watch_hours) },
-    { icoon:'💬', lbl:'Chat',           raw: `${(k.chat_messages||0).toLocaleString('nl-NL')} berichten`, score: k.score_chat, dim: !(k.chat_messages), max: chatMax },
-    { icoon:'✅', lbl:'Ik Was Hier',    raw: `${iwhCount} momenten`,            score: k.score_iwh,     dim: !iwhCount },
-    { icoon:'🎬', lbl:'Clips',          raw: `${k.clips_made||0} clips`,        score: k.score_clips,   dim: !(k.clips_made) },
+    { icoon: emoteImg('morrogL',      '📅'), lbl:'Follow age',    raw: followJr,                                                             score: k.score_follow,  dim: !followMnd },
+    { icoon: emoteImg('morrogTiming', '⏱'),  lbl:'Watch Time',    raw: `${watchUren} uur`,                                                   score: k.score_watch,   dim: !parseFloat(k.watch_hours) },
+    { icoon: emoteImg('morrogUUF',    '💬'), lbl:'Chat',           raw: `${(k.chat_messages||0).toLocaleString('nl-NL')} berichten`,          score: k.score_chat,    dim: !(k.chat_messages), max: chatMax },
+    { icoon: emoteImg('morrogHier',   '✅'), lbl:'Ik Was Hier',    raw: `${iwhCount} momenten`,                                               score: k.score_iwh,     dim: !iwhCount },
+    { icoon: emoteImg('morrogSC',     '🎬'), lbl:'Clips',          raw: `${k.clips_made||0} clips`,                                           score: k.score_clips,   dim: !(k.clips_made) },
   ];
 
   return `
@@ -1290,8 +1307,9 @@ async function init() {
     }
   }
 
-  // Laad Twitch badges (kanaal sub badges + VIP/mod)
+  // Laad Twitch badges en emotes
   laadBadges();
+  laadEmotes();
 
   // Herstel actieve view vanuit URL hash
   const hash = window.location.hash.replace('#','');
