@@ -430,8 +430,8 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
       </div>
       <div class="hero-stats">
         <div class="hero-stat" onclick="switchView('loyalty',document.querySelectorAll('.nav-link')[1])">
-          <div class="hero-stat-num" id="stat-kijkers">9.995</div>
-          <div class="hero-stat-info"><div class="hero-stat-label">MORROGS</div><div class="hero-stat-sub">Geregistreerd in het systeem</div></div>
+          <div class="hero-stat-num" id="stat-kijkers">—</div>
+          <div class="hero-stat-info"><div class="hero-stat-label">Twitch accounts gesynced</div><div class="hero-stat-sub">Gekoppeld aan het loyaliteitssysteem</div></div>
           <div class="hero-stat-arrow">→</div>
         </div>
         <div class="hero-stat" onclick="switchView('challenges')">
@@ -1488,6 +1488,17 @@ async function laadAgenda() {
   } catch(e) { console.log('Agenda fout:', e.message); }
 }
 
+// ── HERO STATS ──
+async function laadHeroStats() {
+  try {
+    const res  = await fetch(BACKEND + '/api/stats');
+    if (!res.ok) return;
+    const data = await res.json();
+    document.getElementById('stat-kijkers').textContent =
+      data.twitch_gekoppeld.toLocaleString('nl-NL');
+  } catch { /* stil falen, standaard streepje blijft staan */ }
+}
+
 // ── INIT ──
 async function init() {
   // Verwerk OAuth callback (als er een token in de hash zit)
@@ -1519,6 +1530,9 @@ async function init() {
   // Laad Twitch badges en emotes
   laadBadges();
   laadEmotes();
+
+  // Laad hero stat: aantal Twitch accounts gesynced
+  laadHeroStats();
 
   // Herstel actieve view vanuit URL hash
   const hash = window.location.hash.replace('#','');
