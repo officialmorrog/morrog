@@ -430,7 +430,9 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
 .hv-toevoeg-knop:disabled{opacity:.4;cursor:not-allowed;}
 .hv-toevoeg-hint{font-size:13px;color:var(--white3);margin-top:7px;text-align:center;}
 .hv-toevoeg-hint.ok{color:#2ecc71;}
-.hv-toevoeg-hint.fout{color:#ff2d1a;}
+.hv-toevoeg-hint.fout{color:#ff2d1a;font-weight:600;}
+@keyframes hv-schud{0%,100%{transform:translateX(0)}15%{transform:translateX(-6px)}30%{transform:translateX(6px)}45%{transform:translateX(-5px)}60%{transform:translateX(5px)}75%{transform:translateX(-3px)}90%{transform:translateX(3px)}}
+.hv-toevoeg-knop.schud{animation:hv-schud .45s ease;}
 .hv-admin{background:rgba(192,57,43,.06);border:1px solid #2a0808;border-radius:7px;padding:16px 20px;margin-top:16px;}
 .hv-admin-titel{font-family:'Creepster',cursive;font-size:20px;color:#ff2d1a;letter-spacing:.06em;margin-bottom:12px;}
 .hv-admin-game{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid rgba(42,8,8,.6);}
@@ -2002,7 +2004,7 @@ async function laadHeroStats() {
         body: JSON.stringify({ steam_appid: hvGeselecteerd.id, naam: hvGeselecteerd.naam, afbeelding: hvGeselecteerd.afbeelding })
       });
       if (data.error) {
-        if(knop) { knop.disabled = false; knop.textContent = '+ Voeg toe aan stemlijst'; }
+        if(knop) { knop.disabled = false; knop.textContent = '+ Voeg toe aan stemlijst'; knop.classList.remove('schud'); void knop.offsetWidth; knop.classList.add('schud'); setTimeout(() => knop.classList.remove('schud'), 500); }
         const hint = document.getElementById('hv-toevoeg-hint');
         if(hint) { hint.textContent = data.error; hint.className = 'hv-toevoeg-hint fout'; }
       } else {
