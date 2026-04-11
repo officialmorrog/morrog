@@ -471,6 +471,11 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
 .hv-stem-knop.actief{background:rgba(192,57,43,.18);border-color:#c0392b;color:#ff2d1a;}
 .hv-stem-knop:disabled{opacity:.4;cursor:not-allowed;}
 .hv-populair{position:absolute;/* n.v.t. inline */display:inline-block;margin-left:6px;font-size:11px;background:#c0392b;color:#fff;border-radius:2px;padding:1px 6px;vertical-align:middle;animation:hv-puls 1.5s ease-in-out infinite;}
+.hv-rating{display:inline-block;font-size:11px;font-weight:700;border-radius:3px;padding:2px 7px;margin-left:7px;vertical-align:middle;letter-spacing:.03em;}
+.hv-rating.pos-hoog{background:rgba(61,171,106,.15);color:#3DAB6A;border:1px solid rgba(61,171,106,.3);}
+.hv-rating.pos-midden{background:rgba(61,171,106,.1);color:#7dc99a;border:1px solid rgba(61,171,106,.2);}
+.hv-rating.gemengd{background:rgba(177,116,56,.12);color:#b17438;border:1px solid rgba(177,116,56,.25);}
+.hv-rating.negatief{background:rgba(255,45,26,.1);color:#ff6b6b;border:1px solid rgba(255,45,26,.2);}
 @keyframes hv-puls{0%,100%{box-shadow:0 0 8px rgba(255,45,26,.4)}50%{box-shadow:0 0 18px rgba(255,45,26,.8)}}
 .hv-geen{text-align:center;padding:48px 20px;color:var(--white3);}
 .hv-geen span{display:block;font-size:40px;margin-bottom:10px;opacity:.3;}
@@ -1874,6 +1879,16 @@ async function laadHeroStats() {
   }
 
   // ── Render ──
+  function hvRatingBadge(score) {
+    if (score === null || score === undefined) return '';
+    let kls, label;
+    if (score >= 80)      { kls = 'pos-hoog';    label = score >= 95 ? 'Overwhelmingly Positive' : 'Very Positive'; }
+    else if (score >= 70) { kls = 'pos-midden';  label = 'Mostly Positive'; }
+    else if (score >= 40) { kls = 'gemengd';     label = 'Mixed'; }
+    else                  { kls = 'negatief';    label = score >= 20 ? 'Mostly Negative' : 'Overwhelmingly Negative'; }
+    return `<span class="hv-rating ${kls}" title="${score}% positief">${label}</span>`;
+  }
+
   function hvEsc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
@@ -1904,7 +1919,7 @@ async function laadHeroStats() {
         <div class="hv-rang ${rc}">${rang}</div>
         ${cover}
         <div class="hv-info">
-          <div class="hv-game-naam">${hvEsc(g.naam)}${g.stemmen>=50?'<span class="hv-populair">🔥 POPULAIR</span>':''}</div>
+          <div class="hv-game-naam">${hvEsc(g.naam)}${g.stemmen>=50?'<span class="hv-populair">🔥 POPULAIR</span>':''}${hvRatingBadge(g.steam_score)}</div>
           <div class="hv-game-sub">door @${hvEsc(g.toegevoegd_door)}</div>
         </div>
         <div class="hv-rechts">
