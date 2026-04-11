@@ -430,6 +430,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
 .hv-toevoeg-knop:disabled{opacity:.4;cursor:not-allowed;}
 .hv-toevoeg-hint{font-size:13px;color:var(--white3);margin-top:7px;text-align:center;}
 .hv-toevoeg-hint.ok{color:#2ecc71;}
+.hv-toevoeg-hint.fout{color:#ff2d1a;}
 
 /* Filter tabs */
 .hv-filters{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap;}
@@ -1944,6 +1945,8 @@ async function laadHeroStats() {
       });
       if (data.error) {
         if(knop) { knop.disabled = false; knop.textContent = '+ Voeg toe aan stemlijst'; }
+        const hint = document.getElementById('hv-toevoeg-hint');
+        if(hint) { hint.textContent = data.error; hint.className = 'hv-toevoeg-hint fout'; }
       } else {
         hvHeeftGame = true;
         hvAnnuleer();
@@ -1952,6 +1955,8 @@ async function laadHeroStats() {
       }
     } catch {
       if(knop) { knop.disabled = false; knop.textContent = '+ Voeg toe aan stemlijst'; }
+      const hint = document.getElementById('hv-toevoeg-hint');
+      if(hint) { hint.textContent = 'Fout bij toevoegen — probeer opnieuw'; hint.className = 'hv-toevoeg-hint fout'; }
     }
   };
 
