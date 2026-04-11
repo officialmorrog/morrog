@@ -1187,7 +1187,8 @@ function switchView(name, btn) {
   if (name === 'agenda')         { setTimeout(() => { const b = document.getElementById('charity-bar'); if(b) b.style.width='62%'; }, 500); laadAgenda(); }
   if (name === 'loyalty')        { laadLeaderboard(); laadIwhMomenten(); laadDrops(); }
   if (name === 'challenges')     laadTrackmanTijden();
-  if (name === 'horror-vrijdag') hvInit();
+  if (name === 'horror-vrijdag') { hvInit(); document.querySelector('nav').style.display = 'none'; }
+  else { document.querySelector('nav').style.display = ''; }
 }
 
 // ── TWITCH BADGES ──
