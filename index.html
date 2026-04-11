@@ -494,8 +494,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
     <a class="nav-link" href="morrog-tv.html">Morrog TV</a>
     <a class="nav-link" href="battlepass.html">Battle Pass</a>
     <a class="nav-link" href="morrog-kluis.html">Kluis</a>
-    <!-- Horror Vrijdag knop verborgen — directe link: #horror-vrijdag -->
-    <!-- <button class="nav-link" onclick="switchView('horror-vrijdag',this)" style="color:#c0392b;">☠ Horror Vrijdag</button> -->
+    <button class="nav-link" onclick="switchView('horror-vrijdag',this)" style="color:#c0392b;">☠ Horror Vrijdag</button>
   </div>
   <div class="nav-right">
     <!-- Niet ingelogd -->
@@ -1164,8 +1163,6 @@ document.addEventListener('click', () => {
 
 // ── VIEW SWITCHING ──
 function switchView(name, btn) {
-  const isAdmin = window._ingelogdUser && window._ingelogdUser.id === MORROG_ID;
-  if (!isAdmin && name !== 'horror-vrijdag') name = 'horror-vrijdag';
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
   const activeView = document.getElementById('view-' + name);
@@ -1189,8 +1186,7 @@ function switchView(name, btn) {
   if (name === 'agenda')         { setTimeout(() => { const b = document.getElementById('charity-bar'); if(b) b.style.width='62%'; }, 500); laadAgenda(); }
   if (name === 'loyalty')        { laadLeaderboard(); laadIwhMomenten(); laadDrops(); }
   if (name === 'challenges')     laadTrackmanTijden();
-  if (name === 'horror-vrijdag') { hvInit(); document.querySelector('nav').style.display = 'none'; }
-  else { document.querySelector('nav').style.display = ''; }
+  if (name === 'horror-vrijdag') hvInit();
 }
 
 // ── TWITCH BADGES ──
@@ -2137,15 +2133,8 @@ async function init() {
   // Herstel actieve view vanuit URL hash
   const hash = window.location.hash.replace('#','');
   const geldigeViews = ['home','loyalty','challenges','agenda','horror-vrijdag'];
-  const isAdmin = opgeslagenUser && opgeslagenUser.id === MORROG_ID;
-
-  if (!isAdmin) {
-    // Niet ingelogd als Morrog: alleen Horror Vrijdag toegankelijk
-    setTimeout(() => { switchView('horror-vrijdag'); }, 150);
-  } else {
-    const startView = geldigeViews.includes(hash) ? hash : 'home';
-    setTimeout(() => { switchView(startView); }, 150);
-  }
+  const startView = geldigeViews.includes(hash) ? hash : 'home';
+  setTimeout(() => { switchView(startView); }, 150);
 }
 
 init();
