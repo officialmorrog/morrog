@@ -1164,6 +1164,8 @@ document.addEventListener('click', () => {
 
 // ── VIEW SWITCHING ──
 function switchView(name, btn) {
+  const isAdmin = window._ingelogdUser && window._ingelogdUser.id === MORROG_ID;
+  if (!isAdmin && name !== 'horror-vrijdag') name = 'horror-vrijdag';
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
   const activeView = document.getElementById('view-' + name);
@@ -2135,8 +2137,15 @@ async function init() {
   // Herstel actieve view vanuit URL hash
   const hash = window.location.hash.replace('#','');
   const geldigeViews = ['home','loyalty','challenges','agenda','horror-vrijdag'];
-  const startView = geldigeViews.includes(hash) ? hash : 'home';
-  setTimeout(() => { switchView(startView); }, 150);
+  const isAdmin = opgeslagenUser && opgeslagenUser.id === MORROG_ID;
+
+  if (!isAdmin) {
+    // Niet ingelogd als Morrog: alleen Horror Vrijdag toegankelijk
+    setTimeout(() => { switchView('horror-vrijdag'); }, 150);
+  } else {
+    const startView = geldigeViews.includes(hash) ? hash : 'home';
+    setTimeout(() => { switchView(startView); }, 150);
+  }
 }
 
 init();
