@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Morrog — Community Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Barlow+Condensed:wght@400;600;700;800;900&family=Creepster&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -366,6 +366,111 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
   footer{flex-direction:column;gap:16px;text-align:center;padding:24px 20px;}
   .mijn-rang-banner{flex-direction:column;align-items:flex-start;gap:12px;}
 }
+
+/* ── HORROR VRIJDAG VIEW ── */
+#view-horror-vrijdag{background:var(--bg);}
+.hv-wrap{max-width:860px;margin:0 auto;padding:80px 32px 64px;}
+
+/* Bloed balk */
+.hv-bloed-balk{position:relative;height:4px;background:#c0392b;box-shadow:0 0 18px rgba(192,57,43,.7);border-radius:2px;margin-bottom:0;overflow:visible;}
+.hv-drip{position:absolute;top:4px;background:#c0392b;border-radius:0 0 6px 6px;animation:hv-drip-val var(--dur) ease-in var(--delay) infinite;}
+.hv-drip::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:9px;height:9px;background:#c0392b;border-radius:50%;}
+@keyframes hv-drip-val{0%{height:0;opacity:1}65%{height:var(--h);opacity:1}85%{height:var(--h);opacity:.8}100%{height:var(--h);opacity:0}}
+
+/* Header */
+.hv-header{text-align:center;padding:28px 16px 24px;position:relative;}
+.hv-schedels{display:flex;justify-content:space-between;position:absolute;top:16px;left:0;right:0;pointer-events:none;}
+.hv-schedel{font-size:36px;opacity:.3;filter:drop-shadow(0 0 6px #c0392b);animation:hv-schedel-wib 3s ease-in-out infinite alternate;}
+.hv-schedel:last-child{animation-delay:-1.5s;}
+@keyframes hv-schedel-wib{0%{transform:rotate(-8deg) scale(1)}100%{transform:rotate(8deg) scale(1.05)}}
+.hv-title{font-family:'Creepster',cursive;font-size:clamp(42px,8vw,76px);letter-spacing:.06em;line-height:1;color:#ff2d1a;text-shadow:0 0 18px rgba(255,45,26,.8),0 0 50px rgba(192,57,43,.4),2px 2px 0 #3a0000;animation:hv-glitch 5s ease-in-out infinite;}
+@keyframes hv-glitch{0%,90%,100%{text-shadow:0 0 18px rgba(255,45,26,.8),0 0 50px rgba(192,57,43,.4),2px 2px 0 #3a0000}92%{text-shadow:-2px 0 #ff2d1a,0 0 18px rgba(255,45,26,.8);transform:translateX(-1px)}94%{text-shadow:2px 0 #c0392b,0 0 18px rgba(255,45,26,.8);transform:translateX(1px)}96%{text-shadow:none;transform:translateX(0)}}
+.hv-subtitle{font-family:'Barlow Condensed',sans-serif;font-size:15px;color:var(--white3);letter-spacing:.15em;text-transform:uppercase;margin-top:6px;}
+
+/* Countdown */
+.hv-countdown{display:flex;justify-content:center;align-items:flex-end;gap:4px;margin-top:18px;}
+.hv-cd-blok{text-align:center;min-width:60px;}
+.hv-cd-num{display:block;font-family:'Creepster',cursive;font-size:38px;line-height:1;color:var(--white2);text-shadow:0 0 10px rgba(192,57,43,.4);background:var(--bg2);border:1px solid #2a0808;border-radius:5px;padding:5px 10px;}
+.hv-cd-label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--white3);margin-top:3px;}
+.hv-cd-sep{font-family:'Creepster',cursive;font-size:32px;color:#7a1a10;margin-bottom:12px;line-height:1;}
+
+/* Stats balk */
+.hv-stats{display:flex;background:var(--bg2);border:1px solid #2a0808;border-radius:7px;margin-bottom:18px;overflow:hidden;}
+.hv-stat{flex:1;text-align:center;padding:12px 8px;border-right:1px solid #2a0808;}
+.hv-stat:last-child{border-right:none;}
+.hv-stat-num{display:block;font-family:'Creepster',cursive;font-size:26px;color:#ff2d1a;text-shadow:0 0 8px rgba(255,45,26,.35);line-height:1;}
+.hv-stat-label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--white3);margin-top:2px;}
+
+/* Auth balk */
+.hv-auth{background:var(--bg2);border:1px solid #2a0808;border-radius:7px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.hv-ingelogd-info{display:flex;align-items:center;gap:12px;}
+.hv-avatar{width:36px;height:36px;border-radius:50%;border:1px solid #2a0808;object-fit:cover;background:var(--bg3);}
+.hv-naam{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;color:var(--white);}
+.hv-stem-status{font-size:12px;color:var(--white3);}
+.hv-stem-status.heeft-stem{color:#2ecc71;}
+.hv-login-hint{font-size:14px;color:var(--white3);}
+
+/* Toevoeg sectie */
+.hv-toevoeg{background:var(--bg2);border:1px solid #2a0808;border-radius:7px;padding:18px 20px;margin-bottom:16px;}
+.hv-toevoeg-titel{font-family:'Creepster',cursive;font-size:22px;color:#ff2d1a;letter-spacing:.06em;margin-bottom:12px;}
+.hv-zoek-wrap{position:relative;}
+.hv-zoek-input{width:100%;background:var(--bg3);border:1px solid #2a0808;border-radius:5px;color:var(--white2);font-family:'Barlow Condensed',sans-serif;font-size:16px;padding:9px 12px 9px 38px;outline:none;transition:border-color .2s;}
+.hv-zoek-input:focus{border-color:#7a1a10;}
+.hv-zoek-input::placeholder{color:var(--white3);}
+.hv-zoek-icoon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--white3);pointer-events:none;font-size:16px;}
+.hv-zoek-resultaten{position:absolute;left:0;right:0;top:calc(100% + 3px);background:var(--bg3);border:1px solid #2a0808;border-radius:5px;z-index:50;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.5);}
+.hv-zoek-item{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;border-bottom:1px solid rgba(42,8,8,.4);transition:background .12s;}
+.hv-zoek-item:last-child{border-bottom:none;}
+.hv-zoek-item:hover{background:rgba(192,57,43,.1);}
+.hv-zoek-item img{width:60px;height:28px;object-fit:cover;border-radius:3px;background:var(--bg2);flex-shrink:0;}
+.hv-zoek-item-naam{font-size:15px;color:var(--white2);}
+.hv-zoek-bericht{padding:12px;color:var(--white3);font-size:14px;text-align:center;}
+.hv-geselecteerd{display:flex;align-items:center;gap:12px;background:rgba(192,57,43,.07);border:1px solid #7a1a10;border-radius:5px;padding:10px 14px;margin-top:10px;}
+.hv-geselecteerd img{width:90px;height:42px;object-fit:cover;border-radius:3px;background:var(--bg3);}
+.hv-geselecteerd-naam{font-size:16px;font-weight:600;color:var(--white);flex:1;}
+.hv-geselecteerd-annuleer{background:none;border:none;color:var(--white3);font-size:20px;cursor:pointer;padding:2px;transition:color .15s;}
+.hv-geselecteerd-annuleer:hover{color:#ff2d1a;}
+.hv-toevoeg-knop{margin-top:12px;width:100%;background:#c0392b;border:none;border-radius:5px;color:#fff;font-family:'Creepster',cursive;font-size:18px;letter-spacing:.08em;padding:11px;cursor:pointer;transition:background .2s,box-shadow .2s;}
+.hv-toevoeg-knop:not(:disabled):hover{background:#ff2d1a;box-shadow:0 0 16px rgba(255,45,26,.35);}
+.hv-toevoeg-knop:disabled{opacity:.4;cursor:not-allowed;}
+.hv-toevoeg-hint{font-size:13px;color:var(--white3);margin-top:7px;text-align:center;}
+.hv-toevoeg-hint.ok{color:#2ecc71;}
+
+/* Filter tabs */
+.hv-filters{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap;}
+.hv-filter{background:var(--bg2);border:1px solid #2a0808;border-radius:4px;color:var(--white3);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.06em;padding:7px 16px;cursor:pointer;transition:background .15s,color .15s,border-color .15s;}
+.hv-filter:hover{color:var(--white2);border-color:#7a1a10;}
+.hv-filter.actief{background:#c0392b;border-color:#c0392b;color:#fff;}
+
+/* Game kaarten */
+.hv-games{display:flex;flex-direction:column;gap:8px;}
+.hv-kaart{display:flex;align-items:center;background:var(--bg2);border:1px solid #2a0808;border-radius:7px;overflow:hidden;transition:border-color .15s,transform .1s;}
+.hv-kaart:hover{border-color:#7a1a10;transform:translateX(2px);}
+.hv-kaart.eigen-stem{border-color:rgba(192,57,43,.45);}
+.hv-rang{width:48px;flex-shrink:0;text-align:center;font-family:'Creepster',cursive;font-size:24px;color:var(--white3);padding:0 6px;}
+.hv-rang.r1{color:#c8a82e;text-shadow:0 0 6px rgba(200,168,46,.4);}
+.hv-rang.r2{color:#9da3aa;}
+.hv-rang.r3{color:#a0623a;}
+.hv-cover{width:110px;height:52px;object-fit:cover;flex-shrink:0;background:var(--bg3);}
+.hv-cover-ph{width:110px;height:52px;flex-shrink:0;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:20px;opacity:.3;}
+.hv-info{flex:1;padding:9px 12px;min-width:0;}
+.hv-game-naam{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hv-game-sub{font-size:12px;color:var(--white3);}
+.hv-rechts{display:flex;align-items:center;gap:10px;padding:9px 12px;flex-shrink:0;}
+.hv-teller{text-align:center;min-width:40px;}
+.hv-teller-num{display:block;font-family:'Creepster',cursive;font-size:24px;color:#ff2d1a;line-height:1;}
+.hv-teller-label{display:block;font-size:10px;color:var(--white3);text-transform:uppercase;letter-spacing:.08em;}
+.hv-stem-knop{background:var(--bg3);border:1px solid #2a0808;border-radius:4px;color:var(--white3);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.04em;padding:6px 12px;cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s,color .15s;min-width:110px;text-align:center;}
+.hv-stem-knop:hover:not(:disabled){background:rgba(192,57,43,.12);border-color:#7a1a10;color:var(--white2);}
+.hv-stem-knop.actief{background:rgba(192,57,43,.18);border-color:#c0392b;color:#ff2d1a;}
+.hv-stem-knop:disabled{opacity:.4;cursor:not-allowed;}
+.hv-populair{position:absolute;/* n.v.t. inline */display:inline-block;margin-left:6px;font-size:11px;background:#c0392b;color:#fff;border-radius:2px;padding:1px 6px;vertical-align:middle;animation:hv-puls 1.5s ease-in-out infinite;}
+@keyframes hv-puls{0%,100%{box-shadow:0 0 8px rgba(255,45,26,.4)}50%{box-shadow:0 0 18px rgba(255,45,26,.8)}}
+.hv-geen{text-align:center;padding:48px 20px;color:var(--white3);}
+.hv-geen span{display:block;font-size:40px;margin-bottom:10px;opacity:.3;}
+.hv-laden{text-align:center;padding:40px;color:var(--white3);font-size:15px;}
+#hv-confetti{position:fixed;inset:0;z-index:9998;pointer-events:none;display:none;}
+@media(max-width:560px){.hv-cover,.hv-cover-ph{display:none;}.hv-rang{width:32px;font-size:18px;}.hv-stats{flex-wrap:wrap;}.hv-stat{min-width:50%;}}
 </style>
 </head>
 <body>
@@ -383,6 +488,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
     <a class="nav-link" href="morrog-tv.html">Morrog TV</a>
     <a class="nav-link" href="battlepass.html">Battle Pass</a>
     <a class="nav-link" href="morrog-kluis.html">Kluis</a>
+    <button class="nav-link" onclick="switchView('horror-vrijdag',this)" style="color:#c0392b;">☠ Horror Vrijdag</button>
   </div>
   <div class="nav-right">
     <!-- Niet ingelogd -->
@@ -873,6 +979,90 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
 </div>
 </div>
 
+<!-- ── HORROR VRIJDAG VIEW ── -->
+<div id="view-horror-vrijdag" class="view">
+  <canvas id="hv-confetti"></canvas>
+  <div class="hv-wrap">
+
+    <!-- Bloed balk decoratie -->
+    <div class="hv-bloed-balk" id="hv-bloed-balk"></div>
+
+    <!-- Header -->
+    <div class="hv-header">
+      <div class="hv-schedels">
+        <span class="hv-schedel">☠</span>
+        <span class="hv-schedel">☠</span>
+      </div>
+      <div class="hv-title">HORROR VRIJDAG</div>
+      <div class="hv-subtitle">Stem op de games van de Vrijdagavondstream · 20:00</div>
+      <div class="hv-countdown">
+        <div class="hv-cd-blok"><span class="hv-cd-num" id="hv-cd-d">--</span><span class="hv-cd-label">dagen</span></div>
+        <div class="hv-cd-sep">:</div>
+        <div class="hv-cd-blok"><span class="hv-cd-num" id="hv-cd-h">--</span><span class="hv-cd-label">uren</span></div>
+        <div class="hv-cd-sep">:</div>
+        <div class="hv-cd-blok"><span class="hv-cd-num" id="hv-cd-m">--</span><span class="hv-cd-label">min</span></div>
+        <div class="hv-cd-sep">:</div>
+        <div class="hv-cd-blok"><span class="hv-cd-num" id="hv-cd-s">--</span><span class="hv-cd-label">sec</span></div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="hv-stats">
+      <div class="hv-stat"><span class="hv-stat-num" id="hv-s-stemmen">–</span><span class="hv-stat-label">Stemmen</span></div>
+      <div class="hv-stat"><span class="hv-stat-num" id="hv-s-games">–</span><span class="hv-stat-label">Games</span></div>
+      <div class="hv-stat"><span class="hv-stat-num" id="hv-s-stemmers">–</span><span class="hv-stat-label">Stemmers</span></div>
+      <div class="hv-stat"><span class="hv-stat-num" id="hv-s-dagen">–</span><span class="hv-stat-label">Dagen tot stream</span></div>
+    </div>
+
+    <!-- Auth balk -->
+    <div class="hv-auth" id="hv-auth">
+      <div id="hv-auth-uit">
+        <p class="hv-login-hint">Log in met Twitch om te stemmen en games toe te voegen</p>
+      </div>
+      <div id="hv-auth-in" style="display:none">
+        <div class="hv-ingelogd-info">
+          <img class="hv-avatar" id="hv-avatar" src="" alt="">
+          <div>
+            <div class="hv-naam" id="hv-naam"></div>
+            <div class="hv-stem-status" id="hv-stem-status">Nog geen stem uitgebracht</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game toevoegen -->
+    <div class="hv-toevoeg" id="hv-toevoeg" style="display:none">
+      <div class="hv-toevoeg-titel">☠ Game Toevoegen</div>
+      <div class="hv-zoek-wrap">
+        <span class="hv-zoek-icoon">🔍</span>
+        <input type="text" id="hv-zoek" class="hv-zoek-input" placeholder="Zoek een Steam game..."
+               autocomplete="off" oninput="hvZoekDebounced(this.value)" onfocus="hvToonResultaten()">
+        <div class="hv-zoek-resultaten" id="hv-zoek-resultaten" style="display:none"></div>
+      </div>
+      <div class="hv-geselecteerd" id="hv-geselecteerd" style="display:none">
+        <img id="hv-ges-img" src="" alt="">
+        <span class="hv-geselecteerd-naam" id="hv-ges-naam"></span>
+        <button class="hv-geselecteerd-annuleer" onclick="hvAnnuleer()">✕</button>
+      </div>
+      <button class="hv-toevoeg-knop" id="hv-toevoeg-knop" disabled onclick="hvVoegToe()">+ Voeg toe aan stemlijst</button>
+      <p class="hv-toevoeg-hint" id="hv-toevoeg-hint">Je kunt 1 game per week toevoegen</p>
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="hv-filters">
+      <button class="hv-filter actief" data-hv-filter="all"    onclick="hvSetFilter('all')">Alle games</button>
+      <button class="hv-filter"        data-hv-filter="top"    onclick="hvSetFilter('top')">Meest gestemd</button>
+      <button class="hv-filter"        data-hv-filter="recent" onclick="hvSetFilter('recent')">Recent toegevoegd</button>
+    </div>
+
+    <!-- Games lijst -->
+    <div class="hv-games" id="hv-games">
+      <div class="hv-laden">Games laden…</div>
+    </div>
+
+  </div>
+</div>
+
 <footer>
   <img class="footer-logo" src="https://shop.morrog.nl/cdn/shop/files/Morrog-Logo_90x.png?v=1701878792" alt="Morrog"
     onerror="this.style.display='none';document.getElementById('footer-fb').style.display='block'">
@@ -1002,9 +1192,10 @@ function switchView(name, btn) {
       setTimeout(() => el.classList.add('visible'), i * 55);
     });
   }, 30);
-  if (name === 'agenda')    { setTimeout(() => { const b = document.getElementById('charity-bar'); if(b) b.style.width='62%'; }, 500); laadAgenda(); }
-  if (name === 'loyalty')   { laadLeaderboard(); laadIwhMomenten(); laadDrops(); }
-  if (name === 'challenges') laadTrackmanTijden();
+  if (name === 'agenda')         { setTimeout(() => { const b = document.getElementById('charity-bar'); if(b) b.style.width='62%'; }, 500); laadAgenda(); }
+  if (name === 'loyalty')        { laadLeaderboard(); laadIwhMomenten(); laadDrops(); }
+  if (name === 'challenges')     laadTrackmanTijden();
+  if (name === 'horror-vrijdag') hvInit();
 }
 
 // ── TWITCH BADGES ──
@@ -1499,6 +1690,406 @@ async function laadHeroStats() {
   } catch { /* stil falen, standaard streepje blijft staan */ }
 }
 
+// ── HORROR VRIJDAG ──────────────────────────────────────────
+(function() {
+  let hvFilter      = 'all';
+  let hvGames       = [];
+  let hvStem        = null;   // { game_id, naam }
+  let hvHeeftGame   = false;
+  let hvGeselecteerd = null;  // { id, naam, afbeelding }
+  let hvZoekTimer   = null;
+  let hvConfettiGehad = new Set();
+  let hvCdInterval  = null;
+  let hvVerversInt  = null;
+  let hvDripsGemaakt = false;
+
+  function hvPad(n) { return String(n).padStart(2, '0'); }
+
+  function hvToken() { return localStorage.getItem('twitch_token'); }
+
+  async function hvApi(pad, opts = {}) {
+    const token = hvToken();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['x-twitch-token'] = token;
+    const r = await fetch(BACKEND + pad, { headers, ...opts });
+    return r.json();
+  }
+
+  // ── Countdown ──
+  function hvMsNaarVrijdag() {
+    const nu = new Date();
+    const dagLookup = { Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6 };
+    try {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Europe/Amsterdam', weekday:'short', hour:'2-digit', minute:'2-digit', hour12:false
+      }).formatToParts(nu);
+      const dag = dagLookup[parts.find(p=>p.type==='weekday').value];
+      const uur = parseInt(parts.find(p=>p.type==='hour').value);
+      const min = parseInt(parts.find(p=>p.type==='minute').value);
+      let dagenTot = (5 - dag + 7) % 7;
+      if (dagenTot === 0 && (uur > 20 || (uur === 20 && min > 0))) dagenTot = 7;
+      const targetMs = nu.getTime() + dagenTot * 86400000;
+      const target   = new Date(targetMs);
+      const tp = new Intl.DateTimeFormat('en-US', {
+        timeZone:'Europe/Amsterdam', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false
+      }).formatToParts(target);
+      const tH = parseInt(tp.find(p=>p.type==='hour').value);
+      const tM = parseInt(tp.find(p=>p.type==='minute').value);
+      const tS = parseInt(tp.find(p=>p.type==='second').value);
+      return (target.getTime() + ((20-tH)*3600 - tM*60 - tS)*1000) - nu.getTime();
+    } catch {
+      const d = nu.getDay(); let dt = (5-d+7)%7;
+      if (dt===0 && nu.getHours()>=20) dt=7;
+      const t = new Date(nu.getTime()+dt*86400000); t.setHours(19,0,0,0); return t-nu;
+    }
+  }
+
+  function hvUpdateCountdown() {
+    const ms = hvMsNaarVrijdag();
+    if (ms <= 0) { ['d','h','m','s'].forEach(k => { const el = document.getElementById('hv-cd-'+k); if(el) el.textContent='00'; }); return; }
+    const tot = Math.floor(ms/1000);
+    const d   = document.getElementById('hv-cd-d'), h = document.getElementById('hv-cd-h');
+    const m   = document.getElementById('hv-cd-m'), s = document.getElementById('hv-cd-s');
+    if(d) d.textContent = hvPad(Math.floor(tot/86400));
+    if(h) h.textContent = hvPad(Math.floor((tot%86400)/3600));
+    if(m) m.textContent = hvPad(Math.floor((tot%3600)/60));
+    if(s) s.textContent = hvPad(tot%60);
+    const el = document.getElementById('hv-s-dagen');
+    if(el) el.textContent = Math.ceil(ms/86400000);
+  }
+
+  // ── Bloed drips (eenmalig) ──
+  function hvMaakDrips() {
+    if (hvDripsGemaakt) return;
+    hvDripsGemaakt = true;
+    const balk = document.getElementById('hv-bloed-balk');
+    if (!balk) return;
+    [[6,5,32,1.8],[14,4,50,0.4],[22,6,38,2.9],[31,5,55,1.1],[40,4,28,3.4],
+     [49,6,44,0.7],[58,5,60,2.1],[67,4,35,1.5],[76,5,48,0.2],[85,6,40,2.7],[93,4,52,1.0]
+    ].forEach(([l,w,h,delay]) => {
+      const d = document.createElement('div');
+      d.className = 'hv-drip';
+      d.style.cssText = `left:${l}%;width:${w}px;--h:${h}px;--dur:${2+Math.random()*2}s;--delay:${delay}s`;
+      balk.appendChild(d);
+    });
+  }
+
+  // ── Auth UI ──
+  function hvUpdateAuth() {
+    const user  = window._ingelogdUser;
+    const token = hvToken();
+    const uit   = document.getElementById('hv-auth-uit');
+    const inp   = document.getElementById('hv-auth-in');
+    if (!uit || !inp) return;
+
+    if (user && token) {
+      uit.style.display = 'none';
+      inp.style.display = 'flex';
+      const naam = document.getElementById('hv-naam');
+      const av   = document.getElementById('hv-avatar');
+      if (naam) naam.textContent = user.display_name || user.login;
+      if (av)   av.src = user.profile_image_url || '';
+      document.getElementById('hv-toevoeg').style.display = 'block';
+    } else {
+      uit.style.display = 'block';
+      inp.style.display = 'none';
+      const toevoeg = document.getElementById('hv-toevoeg');
+      if (toevoeg) toevoeg.style.display = 'none';
+    }
+    hvUpdateStemStatus();
+    hvUpdateToevoegStatus();
+  }
+
+  function hvUpdateStemStatus() {
+    const el = document.getElementById('hv-stem-status');
+    if (!el) return;
+    if (hvStem) {
+      el.textContent = '✓ Gestemd op: ' + hvStem.naam;
+      el.className = 'hv-stem-status heeft-stem';
+    } else {
+      el.textContent = 'Nog geen stem uitgebracht';
+      el.className = 'hv-stem-status';
+    }
+  }
+
+  function hvUpdateToevoegStatus() {
+    const knop = document.getElementById('hv-toevoeg-knop');
+    const hint = document.getElementById('hv-toevoeg-hint');
+    if (!knop || !hint) return;
+    if (hvHeeftGame) {
+      knop.disabled = true;
+      hint.textContent = '✓ Je hebt deze week al een game toegevoegd';
+      hint.className = 'hv-toevoeg-hint ok';
+    } else {
+      knop.disabled = !hvGeselecteerd;
+      hint.textContent = hvGeselecteerd ? 'Klik om toe te voegen aan de stemlijst' : 'Je kunt 1 game per week toevoegen';
+      hint.className = 'hv-toevoeg-hint';
+    }
+  }
+
+  // ── Stats + games laden ──
+  async function hvLaadStats() {
+    try {
+      const data = await hvApi('/api/horror-vrijdag/stats');
+      const s = document.getElementById('hv-s-stemmen');
+      const g = document.getElementById('hv-s-games');
+      const st = document.getElementById('hv-s-stemmers');
+      if(s) s.textContent = data.stemmen ?? '–';
+      if(g) g.textContent = data.games   ?? '–';
+      if(st) st.textContent = data.stemmers ?? '–';
+    } catch {}
+  }
+
+  async function hvLaadMijnStem() {
+    if (!hvToken()) return;
+    try {
+      const data = await hvApi('/api/horror-vrijdag/mijn-stem');
+      hvStem       = data.stem || null;
+      hvHeeftGame  = data.heeftGameToegevoegd || false;
+      hvUpdateStemStatus();
+      hvUpdateToevoegStatus();
+    } catch {}
+  }
+
+  async function hvLaadGames() {
+    try {
+      const data = await hvApi('/api/horror-vrijdag/games?filter=' + hvFilter);
+      const oud  = hvGames;
+      hvGames    = data.games || [];
+      hvGames.forEach(g => {
+        if (g.stemmen >= 50 && !hvConfettiGehad.has(g.id)) {
+          const o = oud.find(x => x.id === g.id);
+          if (!o || o.stemmen < 50) hvConfetti();
+          hvConfettiGehad.add(g.id);
+        }
+      });
+      hvRender();
+      hvLaadStats();
+    } catch {
+      const el = document.getElementById('hv-games');
+      if(el) el.innerHTML = '<div class="hv-laden">Fout bij laden</div>';
+    }
+  }
+
+  // ── Render ──
+  function hvEsc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function hvRender() {
+    const el = document.getElementById('hv-games');
+    if (!el) return;
+    if (!hvGames.length) {
+      el.innerHTML = '<div class="hv-geen"><span>🎃</span>Nog geen games deze week — voeg de eerste toe!</div>';
+      return;
+    }
+    const token = hvToken();
+    el.innerHTML = hvGames.map((g, i) => {
+      const rang  = i + 1;
+      const isEigen = hvStem && hvStem.game_id === g.id;
+      const rc    = rang===1?'r1':rang===2?'r2':rang===3?'r3':'';
+      const img   = g.afbeelding || (g.steam_appid ? `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.steam_appid}/header.jpg` : null);
+      const cover = img
+        ? `<img class="hv-cover" src="${hvEsc(img)}" alt="${hvEsc(g.naam)}" onerror="this.style.display='none'">`
+        : `<div class="hv-cover-ph">☠</div>`;
+
+      let knopTxt = 'Stem', knopKls = 'hv-stem-knop', knopFn = `hvStemOp(${g.id})`, dis = '';
+      if (!token)      { knopTxt = 'Login om te stemmen'; dis = 'disabled'; }
+      else if (isEigen){ knopTxt = '✓ Gestemd (intrekken)'; knopKls += ' actief'; knopFn = 'hvTrekIn()'; }
+      else if (hvStem) { knopTxt = 'Wissel stem'; }
+
+      return `<div class="hv-kaart${isEigen?' eigen-stem':''}">
+        <div class="hv-rang ${rc}">${rang}</div>
+        ${cover}
+        <div class="hv-info">
+          <div class="hv-game-naam">${hvEsc(g.naam)}${g.stemmen>=50?'<span class="hv-populair">🔥 POPULAIR</span>':''}</div>
+          <div class="hv-game-sub">door @${hvEsc(g.toegevoegd_door)}</div>
+        </div>
+        <div class="hv-rechts">
+          <div class="hv-teller"><span class="hv-teller-num">${g.stemmen}</span><span class="hv-teller-label">stem${g.stemmen!==1?'men':''}</span></div>
+          <button class="${knopKls}" onclick="${knopFn}" ${dis}>${knopTxt}</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Stemmen ──
+  window.hvStemOp = async function(gameId) {
+    if (!hvToken()) return;
+    try {
+      const data = await hvApi('/api/horror-vrijdag/stem', {
+        method: 'POST', body: JSON.stringify({ game_id: gameId })
+      });
+      if (!data.error) {
+        hvStem = { game_id: gameId, naam: hvGames.find(g=>g.id===gameId)?.naam||'' };
+        hvUpdateStemStatus();
+      }
+    } catch {}
+    hvLaadGames();
+  };
+
+  window.hvTrekIn = async function() {
+    if (!hvToken()) return;
+    try {
+      await hvApi('/api/horror-vrijdag/stem', { method: 'DELETE' });
+      hvStem = null;
+      hvUpdateStemStatus();
+    } catch {}
+    hvLaadGames();
+  };
+
+  // ── Zoeken ──
+  window.hvZoekDebounced = function(val) {
+    clearTimeout(hvZoekTimer);
+    const res = document.getElementById('hv-zoek-resultaten');
+    if (val.trim().length < 2) { if(res) res.style.display='none'; return; }
+    hvZoekTimer = setTimeout(() => hvZoekGames(val), 320);
+  };
+
+  window.hvToonResultaten = function() {
+    const val = document.getElementById('hv-zoek')?.value||'';
+    if (val.trim().length >= 2 && !hvGeselecteerd) hvZoekGames(val);
+  };
+
+  async function hvZoekGames(query) {
+    const res = document.getElementById('hv-zoek-resultaten');
+    if (!res) return;
+    res.style.display = 'block';
+    res.innerHTML = '<div class="hv-zoek-bericht">Zoeken…</div>';
+    try {
+      const data = await hvApi('/api/horror-vrijdag/steam-zoek?q=' + encodeURIComponent(query));
+      const items = data.items || [];
+      if (!items.length) { res.innerHTML = '<div class="hv-zoek-bericht">Geen resultaten</div>'; return; }
+      res.innerHTML = items.map(item => `
+        <div class="hv-zoek-item" onclick='hvSelecteer(${JSON.stringify(item)})'>
+          <img src="${hvEsc(item.afbeelding)}" alt="${hvEsc(item.naam)}" onerror="this.style.opacity='.3'">
+          <span class="hv-zoek-item-naam">${hvEsc(item.naam)}</span>
+        </div>`).join('');
+    } catch { res.innerHTML = '<div class="hv-zoek-bericht">Fout bij zoeken</div>'; }
+  }
+
+  window.hvSelecteer = function(game) {
+    hvGeselecteerd = game;
+    const res = document.getElementById('hv-zoek-resultaten');
+    if(res) res.style.display = 'none';
+    const inp = document.getElementById('hv-zoek');
+    if(inp) inp.value = game.naam;
+    const ges = document.getElementById('hv-geselecteerd');
+    const img = document.getElementById('hv-ges-img');
+    const naam = document.getElementById('hv-ges-naam');
+    if(ges) ges.style.display = 'flex';
+    if(img) img.src = game.afbeelding || '';
+    if(naam) naam.textContent = game.naam;
+    hvUpdateToevoegStatus();
+  };
+
+  window.hvAnnuleer = function() {
+    hvGeselecteerd = null;
+    const inp = document.getElementById('hv-zoek');
+    if(inp) inp.value = '';
+    const ges = document.getElementById('hv-geselecteerd');
+    if(ges) ges.style.display = 'none';
+    hvUpdateToevoegStatus();
+  };
+
+  window.hvVoegToe = async function() {
+    if (!hvToken() || !hvGeselecteerd || hvHeeftGame) return;
+    const knop = document.getElementById('hv-toevoeg-knop');
+    if(knop) { knop.disabled = true; knop.textContent = 'Toevoegen…'; }
+    try {
+      const data = await hvApi('/api/horror-vrijdag/games', {
+        method: 'POST',
+        body: JSON.stringify({ steam_appid: hvGeselecteerd.id, naam: hvGeselecteerd.naam, afbeelding: hvGeselecteerd.afbeelding })
+      });
+      if (data.error) {
+        if(knop) { knop.disabled = false; knop.textContent = '+ Voeg toe aan stemlijst'; }
+      } else {
+        hvHeeftGame = true;
+        hvAnnuleer();
+        hvUpdateToevoegStatus();
+        hvLaadGames();
+      }
+    } catch {
+      if(knop) { knop.disabled = false; knop.textContent = '+ Voeg toe aan stemlijst'; }
+    }
+  };
+
+  // ── Filter ──
+  window.hvSetFilter = function(f) {
+    hvFilter = f;
+    document.querySelectorAll('[data-hv-filter]').forEach(b => b.classList.toggle('actief', b.dataset.hvFilter === f));
+    const el = document.getElementById('hv-games');
+    if(el) el.innerHTML = '<div class="hv-laden">Games laden…</div>';
+    hvLaadGames();
+  };
+
+  // ── Confetti ──
+  function hvConfetti() {
+    const canvas = document.getElementById('hv-confetti');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.display = 'block';
+    const kleuren = ['#c0392b','#ff2d1a','#8b0000','#ff6b6b','#3a0000'];
+    const deeltjes = Array.from({length:140}, () => ({
+      x: Math.random()*canvas.width, y: -20-Math.random()*80,
+      vx: (Math.random()-.5)*5, vy: Math.random()*3+2,
+      kleur: kleuren[Math.floor(Math.random()*kleuren.length)],
+      w: Math.random()*10+4, h: Math.random()*6+3,
+      hoek: Math.random()*Math.PI*2, draai: (Math.random()-.5)*.15,
+      schedel: Math.random() < .08
+    }));
+    let frame = 0;
+    const max = 200;
+    (function animeer() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      deeltjes.forEach(d => {
+        d.x+=d.vx; d.y+=d.vy; d.vy+=.08; d.hoek+=d.draai;
+        ctx.save(); ctx.translate(d.x,d.y); ctx.rotate(d.hoek);
+        ctx.globalAlpha = Math.max(0, 1-frame/max*1.2);
+        if (d.schedel) { ctx.font=`${d.w*2}px serif`; ctx.fillText('☠',-d.w,d.h); }
+        else { ctx.fillStyle=d.kleur; ctx.fillRect(-d.w/2,-d.h/2,d.w,d.h); }
+        ctx.restore();
+      });
+      frame++;
+      if (frame<max) requestAnimationFrame(animeer);
+      else { canvas.style.display='none'; ctx.clearRect(0,0,canvas.width,canvas.height); }
+    })();
+  }
+
+  // ── Klik buiten zoekresultaten ──
+  document.addEventListener('click', e => {
+    const wrap = document.querySelector('.hv-zoek-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+      const res = document.getElementById('hv-zoek-resultaten');
+      if(res) res.style.display = 'none';
+    }
+  });
+
+  // ── Init (wordt aangeroepen door switchView) ──
+  let hvGeinitialiseerd = false;
+  window.hvInit = function() {
+    hvMaakDrips();
+    hvUpdateAuth();
+
+    if (!hvCdInterval) {
+      hvUpdateCountdown();
+      hvCdInterval = setInterval(hvUpdateCountdown, 1000);
+    }
+
+    hvLaadGames();
+    hvLaadMijnStem();
+
+    if (!hvVerversInt) {
+      hvVerversInt = setInterval(() => {
+        hvLaadGames();
+        if (hvToken()) hvLaadMijnStem();
+      }, 30000);
+    }
+  };
+})();
+
 // ── INIT ──
 async function init() {
   // Verwerk OAuth callback (als er een token in de hash zit)
@@ -1536,7 +2127,7 @@ async function init() {
 
   // Herstel actieve view vanuit URL hash
   const hash = window.location.hash.replace('#','');
-  const geldigeViews = ['home','loyalty','challenges','agenda'];
+  const geldigeViews = ['home','loyalty','challenges','agenda','horror-vrijdag'];
   const startView = geldigeViews.includes(hash) ? hash : 'home';
   setTimeout(() => { switchView(startView); }, 150);
 }
