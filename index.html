@@ -1009,20 +1009,16 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
       <div class="hv-stat"><span class="hv-stat-num" id="hv-s-dagen">–</span><span class="hv-stat-label">Dagen tot stream</span></div>
     </div>
 
-    <!-- Auth balk -->
-    <div class="hv-auth" id="hv-auth">
-      <div id="hv-auth-uit">
-        <p class="hv-login-hint">Log in met Twitch om te stemmen en games toe te voegen</p>
-      </div>
-      <div id="hv-auth-in" style="display:none">
-        <div class="hv-ingelogd-info">
-          <img class="hv-avatar" id="hv-avatar" src="" alt="">
-          <div>
-            <div class="hv-naam" id="hv-naam"></div>
-            <div class="hv-stem-status" id="hv-stem-status">Nog geen stem uitgebracht</div>
-          </div>
-        </div>
-      </div>
+    <!-- Filter tabs -->
+    <div class="hv-filters">
+      <button class="hv-filter actief" data-hv-filter="all"    onclick="hvSetFilter('all')">Alle games</button>
+      <button class="hv-filter"        data-hv-filter="top"    onclick="hvSetFilter('top')">Meest gestemd</button>
+      <button class="hv-filter"        data-hv-filter="recent" onclick="hvSetFilter('recent')">Recent toegevoegd</button>
+    </div>
+
+    <!-- Games lijst -->
+    <div class="hv-games" id="hv-games">
+      <div class="hv-laden">Games laden…</div>
     </div>
 
     <!-- Game toevoegen -->
@@ -1042,18 +1038,6 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
       </div>
       <button class="hv-toevoeg-knop" id="hv-toevoeg-knop" disabled onclick="hvVoegToe()">+ Voeg toe aan stemlijst</button>
       <p class="hv-toevoeg-hint" id="hv-toevoeg-hint">Je kunt 1 game per week toevoegen</p>
-    </div>
-
-    <!-- Filter tabs -->
-    <div class="hv-filters">
-      <button class="hv-filter actief" data-hv-filter="all"    onclick="hvSetFilter('all')">Alle games</button>
-      <button class="hv-filter"        data-hv-filter="top"    onclick="hvSetFilter('top')">Meest gestemd</button>
-      <button class="hv-filter"        data-hv-filter="recent" onclick="hvSetFilter('recent')">Recent toegevoegd</button>
-    </div>
-
-    <!-- Games lijst -->
-    <div class="hv-games" id="hv-games">
-      <div class="hv-laden">Games laden…</div>
     </div>
 
   </div>
@@ -1757,24 +1741,8 @@ async function laadHeroStats() {
   function hvUpdateAuth() {
     const user  = window._ingelogdUser;
     const token = hvToken();
-    const uit   = document.getElementById('hv-auth-uit');
-    const inp   = document.getElementById('hv-auth-in');
-    if (!uit || !inp) return;
-
-    if (user && token) {
-      uit.style.display = 'none';
-      inp.style.display = 'flex';
-      const naam = document.getElementById('hv-naam');
-      const av   = document.getElementById('hv-avatar');
-      if (naam) naam.textContent = user.display_name || user.login;
-      if (av)   av.src = user.profile_image_url || '';
-      document.getElementById('hv-toevoeg').style.display = 'block';
-    } else {
-      uit.style.display = 'block';
-      inp.style.display = 'none';
-      const toevoeg = document.getElementById('hv-toevoeg');
-      if (toevoeg) toevoeg.style.display = 'none';
-    }
+    const toevoeg = document.getElementById('hv-toevoeg');
+    if (toevoeg) toevoeg.style.display = (user && token) ? 'block' : 'none';
     hvUpdateStemStatus();
     hvUpdateToevoegStatus();
   }
