@@ -431,6 +431,14 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
 .hv-toevoeg-hint{font-size:13px;color:var(--white3);margin-top:7px;text-align:center;}
 .hv-toevoeg-hint.ok{color:#2ecc71;}
 .hv-toevoeg-hint.fout{color:#ff2d1a;}
+.hv-admin{background:rgba(192,57,43,.06);border:1px solid #2a0808;border-radius:7px;padding:16px 20px;margin-top:16px;}
+.hv-admin-titel{font-family:'Creepster',cursive;font-size:20px;color:#ff2d1a;letter-spacing:.06em;margin-bottom:12px;}
+.hv-admin-game{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid rgba(42,8,8,.6);}
+.hv-admin-game:last-child{border-bottom:none;}
+.hv-admin-game-info{font-size:14px;color:var(--white2);flex:1;min-width:0;}
+.hv-admin-game-info span{display:block;font-size:11px;color:var(--white3);}
+.hv-admin-verwijder{background:none;border:1px solid #7a1a10;color:#ff2d1a;border-radius:4px;padding:4px 10px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.05em;cursor:pointer;white-space:nowrap;transition:background .15s;}
+.hv-admin-verwijder:hover{background:rgba(192,57,43,.2);}
 
 /* Filter tabs */
 .hv-filters{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap;}
@@ -1033,6 +1041,12 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
       </div>
       <button class="hv-toevoeg-knop" id="hv-toevoeg-knop" disabled onclick="hvVoegToe()">+ Voeg toe aan stemlijst</button>
       <p class="hv-toevoeg-hint" id="hv-toevoeg-hint">Je kunt 1 game per week toevoegen</p>
+    </div>
+
+    <!-- Admin: games beheren (alleen zichtbaar voor Morrog) -->
+    <div class="hv-admin" id="hv-admin" style="display:none">
+      <div class="hv-admin-titel">☠ Games Beheren</div>
+      <div id="hv-admin-lijst"></div>
     </div>
 
   </div>
@@ -1736,11 +1750,55 @@ async function laadHeroStats() {
   function hvUpdateAuth() {
     const user  = window._ingelogdUser;
     const token = hvToken();
+    const isAdmin = user && user.id === '65660593';
     const toevoeg = document.getElementById('hv-toevoeg');
     if (toevoeg) toevoeg.style.display = (user && token) ? 'block' : 'none';
+    const admin = document.getElementById('hv-admin');
+    if (admin) {
+      admin.style.display = isAdmin ? 'block' : 'none';
+      if (isAdmin) hvLaadAdminGames();
+    }
     hvUpdateStemStatus();
     hvUpdateToevoegStatus();
   }
+
+  async function hvLaadAdminGames() {
+    const token = hvToken();
+    const lijst = document.getElementById('hv-admin-lijst');
+    if (!lijst) return;
+    lijst.innerHTML = '<span style="font-size:13px;color:var(--white3)">Laden…</span>';
+    try {
+      const data = await hvApi('/api/horror-vrijdag/alle-games');
+      if (!data.games || !data.games.length) {
+        lijst.innerHTML = '<span style="font-size:13px;color:var(--white3)">Geen games</span>';
+        return;
+      }
+      lijst.innerHTML = data.games.map(g => `
+        <div class="hv-admin-game">
+          <div class="hv-admin-game-info">
+            ${hvEsc(g.naam)}
+            <span>door @${hvEsc(g.toegevoegd_door)} · week ${g.week_nummer}/${g.week_jaar} · ${g.stemmen} stem${g.stemmen !== 1 ? 'men' : ''}</span>
+          </div>
+          <button class="hv-admin-verwijder" onclick="hvVerwijderGame(${g.id})">Verwijderen</button>
+        </div>
+      `).join('');
+    } catch {
+      lijst.innerHTML = '<span style="font-size:13px;color:#ff2d1a">Fout bij laden</span>';
+    }
+  }
+
+  window.hvVerwijderGame = async function(id) {
+    const token = hvToken();
+    if (!confirm('Game verwijderen? Dit verwijdert ook alle stemmen erop.')) return;
+    try {
+      const data = await hvApi(`/api/horror-vrijdag/games/${id}`, { method: 'DELETE' });
+      if (data.error) { alert(data.error); return; }
+      hvLaadAdminGames();
+      hvLaadGames();
+    } catch {
+      alert('Fout bij verwijderen');
+    }
+  };
 
   function hvUpdateStemStatus() {
     const el = document.getElementById('hv-stem-status');
