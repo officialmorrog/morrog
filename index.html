@@ -380,6 +380,9 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
 .hv-title{font-family:'Creepster',cursive;font-size:clamp(42px,8vw,76px);letter-spacing:.06em;line-height:1;color:#ff2d1a;text-shadow:0 0 18px rgba(255,45,26,.8),0 0 50px rgba(192,57,43,.4),2px 2px 0 #3a0000;animation:hv-glitch 5s ease-in-out infinite;}
 @keyframes hv-glitch{0%,90%,100%{text-shadow:0 0 18px rgba(255,45,26,.8),0 0 50px rgba(192,57,43,.4),2px 2px 0 #3a0000}92%{text-shadow:-2px 0 #ff2d1a,0 0 18px rgba(255,45,26,.8);transform:translateX(-1px)}94%{text-shadow:2px 0 #c0392b,0 0 18px rgba(255,45,26,.8);transform:translateX(1px)}96%{text-shadow:none;transform:translateX(0)}}
 .hv-subtitle{font-family:'Barlow Condensed',sans-serif;font-size:15px;color:var(--white3);letter-spacing:.15em;text-transform:uppercase;margin-top:6px;}
+.hv-stream-tijd{display:inline-block;font-family:'Creepster',cursive;font-size:clamp(30px,6vw,50px);color:#ff2d1a;letter-spacing:.1em;margin-top:2px;text-shadow:0 0 12px rgba(255,45,26,.7),0 0 36px rgba(192,57,43,.3);}
+.hv-stream-tijd-label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--white3);margin-top:4px;margin-bottom:0;}
+.hv-toevoeg-waarschuwing{font-size:12px;color:var(--white3);margin-bottom:12px;line-height:1.5;border-left:3px solid #7a1a10;padding-left:10px;}
 
 /* Countdown */
 .hv-countdown{display:flex;justify-content:center;align-items:flex-end;gap:4px;margin-top:18px;}
@@ -985,7 +988,9 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
         <span class="hv-schedel">☠</span>
       </div>
       <div class="hv-title">HORROR VRIJDAG</div>
-      <div class="hv-subtitle">Stem op de games van de Vrijdagavondstream · 21:30</div>
+      <div class="hv-subtitle">Jij bepaalt de game.</div>
+      <span class="hv-stream-tijd-label">Vrijdagavondstream</span>
+      <span class="hv-stream-tijd">21:30</span>
       <div class="hv-countdown">
         <div class="hv-cd-blok"><span class="hv-cd-num" id="hv-cd-d">--</span><span class="hv-cd-label">dagen</span></div>
         <div class="hv-cd-sep">:</div>
@@ -1024,6 +1029,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
     <!-- Game toevoegen -->
     <div class="hv-toevoeg" id="hv-toevoeg" style="display:none">
       <div class="hv-toevoeg-titel">☠ Game Toevoegen</div>
+      <p class="hv-toevoeg-waarschuwing">Je kunt <strong style="color:#ddd0c8">1 game per week</strong> toevoegen. Na het toevoegen kun je de game <strong style="color:#ddd0c8">niet meer verwijderen</strong> — ook alle stemmen erop blijven staan.</p>
       <div class="hv-zoek-wrap">
         <span class="hv-zoek-icoon">🔍</span>
         <input type="text" id="hv-zoek" class="hv-zoek-input" placeholder="Zoek een Steam game..."
