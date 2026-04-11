@@ -1915,11 +1915,12 @@ async function laadHeroStats() {
       else if (isEigen){ knopTxt = '✓ Gestemd (intrekken)'; knopKls += ' actief'; knopFn = 'hvTrekIn()'; }
       else if (hvStem) { knopTxt = 'Wissel stem'; }
 
+      const steamUrl = g.steam_appid ? `https://store.steampowered.com/app/${g.steam_appid}` : null;
       return `<div class="hv-kaart${isEigen?' eigen-stem':''}">
         <div class="hv-rang ${rc}">${rang}</div>
-        ${cover}
+        ${steamUrl ? `<a href="${steamUrl}" target="_blank" rel="noopener" style="display:contents">${cover}</a>` : cover}
         <div class="hv-info">
-          <div class="hv-game-naam">${hvEsc(g.naam)}${g.stemmen>=50?'<span class="hv-populair">🔥 POPULAIR</span>':''}${hvRatingBadge(g.steam_score)}</div>
+          <div class="hv-game-naam">${steamUrl ? `<a href="${steamUrl}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">${hvEsc(g.naam)}</a>` : hvEsc(g.naam)}${g.stemmen>=50?'<span class="hv-populair">🔥 POPULAIR</span>':''}${hvRatingBadge(g.steam_score)}</div>
           <div class="hv-game-sub">door @${hvEsc(g.toegevoegd_door)}</div>
         </div>
         <div class="hv-rechts">
