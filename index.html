@@ -985,7 +985,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
         <span class="hv-schedel">☠</span>
       </div>
       <div class="hv-title">HORROR VRIJDAG</div>
-      <div class="hv-subtitle">Stem op de games van de Vrijdagavondstream · 20:00</div>
+      <div class="hv-subtitle">Stem op de games van de Vrijdagavondstream · 21:30</div>
       <div class="hv-countdown">
         <div class="hv-cd-blok"><span class="hv-cd-num" id="hv-cd-d">--</span><span class="hv-cd-label">dagen</span></div>
         <div class="hv-cd-sep">:</div>
@@ -1717,7 +1717,7 @@ async function laadHeroStats() {
       const uur = parseInt(parts.find(p=>p.type==='hour').value);
       const min = parseInt(parts.find(p=>p.type==='minute').value);
       let dagenTot = (5 - dag + 7) % 7;
-      if (dagenTot === 0 && (uur > 20 || (uur === 20 && min > 0))) dagenTot = 7;
+      if (dagenTot === 0 && (uur > 21 || (uur === 21 && min >= 30))) dagenTot = 7;
       const targetMs = nu.getTime() + dagenTot * 86400000;
       const target   = new Date(targetMs);
       const tp = new Intl.DateTimeFormat('en-US', {
@@ -1726,11 +1726,11 @@ async function laadHeroStats() {
       const tH = parseInt(tp.find(p=>p.type==='hour').value);
       const tM = parseInt(tp.find(p=>p.type==='minute').value);
       const tS = parseInt(tp.find(p=>p.type==='second').value);
-      return (target.getTime() + ((20-tH)*3600 - tM*60 - tS)*1000) - nu.getTime();
+      return (target.getTime() + ((21-tH)*3600 + (30-tM)*60 - tS)*1000) - nu.getTime();
     } catch {
       const d = nu.getDay(); let dt = (5-d+7)%7;
-      if (dt===0 && nu.getHours()>=20) dt=7;
-      const t = new Date(nu.getTime()+dt*86400000); t.setHours(19,0,0,0); return t-nu;
+      if (dt===0 && nu.getHours()>=21) dt=7;
+      const t = new Date(nu.getTime()+dt*86400000); t.setHours(20,30,0,0); return t-nu;
     }
   }
 
