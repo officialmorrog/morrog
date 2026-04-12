@@ -1071,58 +1071,28 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
 
 <script>
 const BACKEND     = 'https://morrog-loyalty-backend-production.up.railway.app';
-const TWITCH_CLIENT_ID = 'r6uuslartqla0c52af9wc4j7eobcnu';
-const REDIRECT_URI     = 'https://officialmorrog.github.io/morrog';
-const SESSION_VERSION  = '3';  // Verhoog dit om alle sessies te invalideren
+const MORROG_ID   = '65660593';
 
 function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-const MORROG_ID        = '65660593';
 
-// ── TWITCH AUTH ──────────────────────────────────────────
+// ── TWITCH AUTH (cookie-gebaseerd) ───────────────────────
 function twitchLogin() {
-  window.location.href =
-    `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}` +
-    `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-    `&response_type=token&scope=user%3Aread%3Afollows+moderator%3Aread%3Afollowers`;
+  window.location.href = BACKEND + '/api/auth/login?redirect=' + encodeURIComponent(window.location.href.split('#')[0]);
 }
 
-function uitloggen() {
-  localStorage.removeItem('twitch_token');
-  localStorage.removeItem('twitch_user');
-  localStorage.removeItem('loyalty_score');
+async function uitloggen() {
+  await fetch(BACKEND + '/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
   toonIngelogdUI(false);
 }
 
-async function verwerkTwitchCallback() {
-  const hash   = window.location.hash;
-  const params = new URLSearchParams(hash.replace('#', '?'));
-  const token  = params.get('access_token');
-  if (!token) return false;
-
-  // Verwijder hash uit URL
-  history.replaceState(null, '', window.location.pathname);
-
-  localStorage.setItem('twitch_token', token);
-  await laadGebruikersData(token);
-  return true;
-}
-
-async function laadGebruikersData(token) {
+async function laadGebruikersData() {
   try {
-    const res  = await fetch(BACKEND + '/api/auth/verify', {
-      method: 'POST',
-      headers: { 'x-twitch-token': token }
-    });
-    if (!res.ok) { uitloggen(); return; }
+    const res = await fetch(BACKEND + '/api/auth/me', { credentials: 'include' });
+    if (!res.ok) { toonIngelogdUI(false); return; }
     const data = await res.json();
-    localStorage.setItem('twitch_user', JSON.stringify(data.user));
-    if (data.score) localStorage.setItem('loyalty_score', JSON.stringify(data.score));
     toonIngelogdUI(true, data.user, data.score, data.isAdmin);
   } catch {
-    // stille fout — token blijft geldig
-    const cachedUser  = JSON.parse(localStorage.getItem('twitch_user') || 'null');
-    const cachedScore = JSON.parse(localStorage.getItem('loyalty_score') || 'null');
-    if (cachedUser) toonIngelogdUI(true, cachedUser, cachedScore, cachedUser.id === MORROG_ID);
+    toonIngelogdUI(false);
   }
 }
 
@@ -1701,13 +1671,11 @@ async function laadHeroStats() {
 
   function hvPad(n) { return String(n).padStart(2, '0'); }
 
-  function hvToken() { return localStorage.getItem('twitch_token'); }
+  function hvToken() { return !!window._ingelogdUser; }
 
   async function hvApi(pad, opts = {}) {
-    const token = hvToken();
     const headers = { 'Content-Type': 'application/json' };
-    if (token) headers['x-twitch-token'] = token;
-    const r = await fetch(BACKEND + pad, { headers, ...opts });
+    const r = await fetch(BACKEND + pad, { headers, credentials: 'include', ...opts });
     return r.json();
   }
 
@@ -1756,11 +1724,10 @@ async function laadHeroStats() {
 
   // ── Auth UI ──
   function hvUpdateAuth() {
-    const user  = window._ingelogdUser;
-    const token = hvToken();
+    const user    = window._ingelogdUser;
     const isAdmin = user && user.id === '65660593';
     const toevoeg = document.getElementById('hv-toevoeg');
-    if (toevoeg) toevoeg.style.display = (user && token) ? 'block' : 'none';
+    if (toevoeg) toevoeg.style.display = user ? 'block' : 'none';
     const admin = document.getElementById('hv-admin');
     if (admin) {
       admin.style.display = isAdmin ? 'block' : 'none';
@@ -1771,7 +1738,6 @@ async function laadHeroStats() {
   }
 
   async function hvLaadAdminGames() {
-    const token = hvToken();
     const lijst = document.getElementById('hv-admin-lijst');
     if (!lijst) return;
     lijst.innerHTML = '<span style="font-size:13px;color:var(--white3)">Laden…</span>';
@@ -1796,7 +1762,6 @@ async function laadHeroStats() {
   }
 
   window.hvVerwijderGame = async function(id) {
-    const token = hvToken();
     if (!confirm('Game verwijderen? Dit verwijdert ook alle stemmen erop.')) return;
     try {
       const data = await hvApi(`/api/horror-vrijdag/games/${id}`, { method: 'DELETE' });
@@ -1901,7 +1866,7 @@ async function laadHeroStats() {
       el.innerHTML = '<div class="hv-geen"><span>🎃</span>Nog geen games deze week — voeg de eerste toe!</div>';
       return;
     }
-    const token = hvToken();
+    const ingelogd = !!window._ingelogdUser;
     el.innerHTML = hvGames.map((g, i) => {
       const rang  = i + 1;
       const isEigen = hvStem && hvStem.game_id === g.id;
@@ -1912,7 +1877,7 @@ async function laadHeroStats() {
         : `<div class="hv-cover-ph">☠</div>`;
 
       let knopTxt = 'Stem', knopKls = 'hv-stem-knop', knopFn = `hvStemOp(${g.id})`, dis = '';
-      if (!token)      { knopTxt = 'Login om te stemmen'; dis = 'disabled'; }
+      if (!ingelogd)   { knopTxt = 'Login om te stemmen'; dis = 'disabled'; }
       else if (isEigen){ knopTxt = '✓ Gestemd (intrekken)'; knopKls += ' actief'; knopFn = 'hvTrekIn()'; }
       else if (hvStem) { knopTxt = 'Wissel stem'; }
 
@@ -2114,30 +2079,18 @@ async function laadHeroStats() {
 
 // ── INIT ──
 async function init() {
-  // Verwerk OAuth callback (als er een token in de hash zit)
-  const vanCallback = await verwerkTwitchCallback();
+  // Verwijder evt. oude localStorage tokens
+  localStorage.removeItem('twitch_token');
+  localStorage.removeItem('twitch_user');
+  localStorage.removeItem('loyalty_score');
+  localStorage.removeItem('session_version');
 
-  if (!vanCallback) {
-    // Invalideer sessie als versie niet overeenkomt
-    if (localStorage.getItem('session_version') !== SESSION_VERSION) {
-      localStorage.removeItem('twitch_token');
-      localStorage.removeItem('twitch_user');
-      localStorage.removeItem('loyalty_score');
-      localStorage.setItem('session_version', SESSION_VERSION);
-    }
+  // Haal sessie op via httpOnly cookie
+  await laadGebruikersData();
 
-    // Herstel sessie uit localStorage
-    const opgeslagenToken = localStorage.getItem('twitch_token');
-    const opgeslagenUser  = JSON.parse(localStorage.getItem('twitch_user') || 'null');
-    const opgeslagenScore = JSON.parse(localStorage.getItem('loyalty_score') || 'null');
-
-    if (opgeslagenToken && opgeslagenUser) {
-      toonIngelogdUI(true, opgeslagenUser, opgeslagenScore, opgeslagenUser.id === MORROG_ID);
-      // Refresh op de achtergrond
-      laadGebruikersData(opgeslagenToken);
-    } else {
-      document.getElementById('btn-login').style.display = 'flex';
-    }
+  // Foutmelding tonen als OAuth mislukt is
+  if (new URLSearchParams(window.location.search).get('auth_error')) {
+    history.replaceState(null, '', window.location.pathname + window.location.hash);
   }
 
   // Laad Twitch badges en emotes

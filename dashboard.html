@@ -933,60 +933,35 @@ nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.96);b
 </div>
 
 <script>
-const BACKEND          = 'https://morrog-loyalty-backend-production.up.railway.app';
-const TWITCH_CLIENT_ID = 'r6uuslartqla0c52af9wc4j7eobcnu';
-const REDIRECT_URI     = 'https://officialmorrog.github.io/morrog/dashboard.html';
-const MORROG_ID        = '65660593';
+const BACKEND   = 'https://morrog-loyalty-backend-production.up.railway.app';
+const MORROG_ID = '65660593';
 
-let twitchToken = null;
 let huidigKijker = null;
+
+// Verwijder evt. oude localStorage tokens
+localStorage.removeItem('dashboard_token');
 
 // ── AUTH ─────────────────────────────────────────────────
 function twitchLogin() {
-  window.location.href =
-    `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}` +
-    `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-    `&response_type=token&scope=user%3Aread%3Afollows+moderator%3Aread%3Afollowers`;
+  window.location.href = BACKEND + '/api/auth/login?redirect=' + encodeURIComponent(window.location.href.split('?')[0]);
 }
 
-function uitloggen() {
-  localStorage.removeItem('dashboard_token');
-  twitchToken = null;
+async function uitloggen() {
+  await fetch(BACKEND + '/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
   document.getElementById('auth-scherm').style.display    = 'flex';
   document.getElementById('dashboard-main').style.display = 'none';
 }
 
 async function init() {
-  // OAuth callback
-  const hash   = window.location.hash;
-  const params = new URLSearchParams(hash.replace('#', '?'));
-  const token  = params.get('access_token');
-
-  if (token) {
-    history.replaceState(null, '', window.location.pathname);
-    localStorage.setItem('dashboard_token', token);
-    twitchToken = token;
-  } else {
-    twitchToken = localStorage.getItem('dashboard_token');
-  }
-
-  if (!twitchToken) {
-    document.getElementById('auth-scherm').style.display = 'flex';
-    return;
-  }
-
-  // Verificeer token en check of het morrog is
   try {
-    const res = await fetch(BACKEND + '/api/auth/verify', {
-      method: 'POST',
-      headers: { 'x-twitch-token': twitchToken }
-    });
-    const data = await res.json();
+    const res  = await fetch(BACKEND + '/api/auth/me', { credentials: 'include' });
+    const data = res.ok ? await res.json() : null;
 
-    if (!data.isAdmin) {
-      localStorage.removeItem('dashboard_token');
+    if (!data?.isAdmin) {
       document.getElementById('auth-scherm').style.display = 'flex';
-      document.getElementById('auth-scherm').innerHTML += '<p style="color:var(--here);margin-top:8px;font-size:13px">Dit dashboard is alleen voor @morrog.</p>';
+      if (data && !data.isAdmin) {
+        document.getElementById('auth-scherm').innerHTML += '<p style="color:var(--here);margin-top:8px;font-size:13px">Dit dashboard is alleen voor @morrog.</p>';
+      }
       return;
     }
 
@@ -996,7 +971,6 @@ async function init() {
     document.getElementById('nav-avatar').src               = data.user.profile_image_url || '';
     document.getElementById('nav-username').textContent      = data.user.display_name;
 
-    // Laad initieel data
     laadGiveawayStatus();
     laadWinnaars();
     laadIwhStatus();
@@ -1005,19 +979,18 @@ async function init() {
     laadTmTijden();
     laadHofLijst();
     laadBattlepassTiers();
-
   } catch {
     document.getElementById('auth-scherm').style.display = 'flex';
   }
 }
 
-// Helper: admin API call
+// Helper: admin API call (cookie wordt automatisch meegestuurd)
 async function adminFetch(endpoint, options = {}) {
   return fetch(BACKEND + endpoint, {
     ...options,
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      'x-twitch-token': twitchToken,
       ...(options.headers || {}),
     },
   });

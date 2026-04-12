@@ -353,30 +353,18 @@ const TIERS = [
 // ── AUTH ────────────────────────────────────────────────────
 let gebruikerIwhCount = 0;
 
-function verwerkCallback() {
-  const hash = window.location.hash.substring(1);
-  if (!hash.includes('access_token=')) return;
-  const params = new URLSearchParams(hash);
-  const token  = params.get('access_token');
-  if (token) {
-    localStorage.setItem('twitch_token', token);
-    window.location.hash = '';
-  }
-}
+// Verwijder evt. oude localStorage tokens
+localStorage.removeItem('twitch_token');
+localStorage.removeItem('twitch_user');
+localStorage.removeItem('loyalty_score');
 
 async function laadGebruiker() {
-  const token = localStorage.getItem('twitch_token');
-  if (!token) {
-    document.getElementById('login-prompt').classList.remove('hidden');
-    return;
-  }
-
   try {
-    const res  = await fetch(BACKEND + '/api/auth/verify', {
-      method: 'POST',
-      headers: { 'x-twitch-token': token, 'Content-Type': 'application/json' },
-      body: '{}',
-    });
+    const res  = await fetch(BACKEND + '/api/auth/me', { credentials: 'include' });
+    if (!res.ok) {
+      document.getElementById('login-prompt').classList.remove('hidden');
+      return;
+    }
     const data = await res.json();
     if (!data.user) { document.getElementById('login-prompt').classList.remove('hidden'); return; }
 
@@ -472,16 +460,10 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
 // ── NAV AUTH ─────────────────────────────────────────────────
 function twitchLogin() {
-  const TWITCH_CLIENT_ID = 'r6uuslartqla0c52af9wc4j7eobcnu';
-  const REDIRECT_URI = 'https://officialmorrog.github.io/morrog/battlepass.html';
-  window.location.href = `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}`
-    + `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`
-    + `&response_type=token&scope=user%3Aread%3Afollows+moderator%3Aread%3Afollowers+user%3Aread%3Asubscriptions`;
+  window.location.href = BACKEND + '/api/auth/login?redirect=' + encodeURIComponent(window.location.href.split('?')[0]);
 }
-function uitloggen() {
-  localStorage.removeItem('twitch_token');
-  localStorage.removeItem('twitch_user');
-  localStorage.removeItem('loyalty_score');
+async function uitloggen() {
+  await fetch(BACKEND + '/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
   location.reload();
 }
 function toggleNavDropdown(e) {
@@ -491,7 +473,6 @@ function toggleNavDropdown(e) {
 document.addEventListener('click', () => document.getElementById('nav-user')?.classList.remove('open'));
 
 // ── INIT ─────────────────────────────────────────────────────
-verwerkCallback();
 renderTiers(); // eerst zonder login state
 laadGebruiker();
 </script>

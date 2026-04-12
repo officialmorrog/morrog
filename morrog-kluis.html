@@ -732,9 +732,7 @@ footer{
 
 <script>
 const API = 'https://morrog-loyalty-backend-production.up.railway.app';
-const TWITCH_CLIENT_ID = 'r6uuslartqla0c52af9wc4j7eobcnu';
-const REDIRECT_URI     = 'https://officialmorrog.github.io/morrog/morrog-kluis.html';
-const MORROG_ID        = '65660593';
+const MORROG_ID = '65660593';
 
 function toggleNavDropdown(e) {
   e.stopPropagation();
@@ -743,41 +741,22 @@ function toggleNavDropdown(e) {
 document.addEventListener('click', () => document.getElementById('nav-user')?.classList.remove('open'));
 
 function twitchLogin() {
-  window.location.href =
-    `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}` +
-    `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-    `&response_type=token&scope=user%3Aread%3Afollows`;
+  window.location.href = API + '/api/auth/login?redirect=' + encodeURIComponent(window.location.href.split('?')[0]);
 }
 
-function uitloggen() {
-  localStorage.removeItem('twitch_token');
-  localStorage.removeItem('twitch_user');
-  localStorage.removeItem('loyalty_score');
+async function uitloggen() {
+  await fetch(API + '/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
   toonIngelogdUI(false);
 }
 
-async function verwerkTwitchCallback() {
-  const params = new URLSearchParams(window.location.hash.replace('#', '?'));
-  const token  = params.get('access_token');
-  if (!token) return false;
-  history.replaceState(null, '', window.location.pathname);
-  localStorage.setItem('twitch_token', token);
-  await laadGebruikersData(token);
-  return true;
-}
-
-async function laadGebruikersData(token) {
+async function laadGebruikersData() {
   try {
-    const res  = await fetch(API + '/api/auth/verify', { method: 'POST', headers: { 'x-twitch-token': token } });
-    if (!res.ok) { uitloggen(); return; }
+    const res  = await fetch(API + '/api/auth/me', { credentials: 'include' });
+    if (!res.ok) { toonIngelogdUI(false); return; }
     const data = await res.json();
-    localStorage.setItem('twitch_user', JSON.stringify(data.user));
-    if (data.score) localStorage.setItem('loyalty_score', JSON.stringify(data.score));
     toonIngelogdUI(true, data.user, data.score);
   } catch {
-    const cachedUser  = JSON.parse(localStorage.getItem('twitch_user') || 'null');
-    const cachedScore = JSON.parse(localStorage.getItem('loyalty_score') || 'null');
-    if (cachedUser) toonIngelogdUI(true, cachedUser, cachedScore);
+    toonIngelogdUI(false);
   }
 }
 
@@ -798,41 +777,19 @@ function toonIngelogdUI(ingelogd, user = null, score = null) {
   }
 }
 
-async function controleerFollow(user) {
-  const token = localStorage.getItem('twitch_token');
-  if (!token) return;
-  try {
-    const res = await fetch(`https://api.twitch.tv/helix/channels/followed?user_id=${user.id}&broadcaster_id=${MORROG_ID}`, {
-      headers: { 'Authorization': `Bearer ${token}`, 'Client-Id': TWITCH_CLIENT_ID }
-    });
-    const data = await res.json();
-    const volgt = data.data && data.data.length > 0;
-    if (volgt) {
-      document.getElementById('kluisNumpadWrap').style.display = 'block';
-      document.getElementById('kluisLoginWall').style.display  = 'none';
-    } else {
-      document.getElementById('kluisNumpadWrap').style.display = 'none';
-      document.getElementById('kluisLoginWall').style.display  = 'block';
-      document.getElementById('kluisLoginMsg').textContent     = 'Je moet twitch.tv/Morrog volgen om mee te doen';
-    }
-  } catch {
-    // Bij fout: toon numpad toch (backend doet de echte check)
-    document.getElementById('kluisNumpadWrap').style.display = 'block';
-    document.getElementById('kluisLoginWall').style.display  = 'none';
-  }
+// Auth init — backend doet de echte follow check, toon numpad alvast
+function controleerFollow() {
+  document.getElementById('kluisNumpadWrap').style.display = 'block';
+  document.getElementById('kluisLoginWall').style.display  = 'none';
 }
 
-// Auth init
+// Verwijder evt. oude localStorage tokens
+localStorage.removeItem('twitch_token');
+localStorage.removeItem('twitch_user');
+localStorage.removeItem('loyalty_score');
+
 (async () => {
-  const isCallback = await verwerkTwitchCallback();
-  if (!isCallback) {
-    const token = localStorage.getItem('twitch_token');
-    if (token) {
-      await laadGebruikersData(token);
-    } else {
-      toonIngelogdUI(false);
-    }
-  }
+  await laadGebruikersData();
 })();
 const CODE_LEN = 6;
 
@@ -979,7 +936,6 @@ async function probeerCode() {
     return;
   }
 
-  const token = localStorage.getItem('twitch_token');
   const btn = document.getElementById('sendBtn');
   btn.disabled = true;
   btn.textContent = '...';
@@ -988,10 +944,8 @@ async function probeerCode() {
   try {
     const res = await fetch(`${API}/api/kluis/probeer`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { 'x-twitch-token': token } : {}),
-      },
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ code: currentCode }),
     });
     const data = await res.json();
