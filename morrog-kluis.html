@@ -511,6 +511,18 @@ footer{
   display:flex;align-items:center;justify-content:space-between;
   font-size:12px;color:var(--white3);
 }
+/* GDPR LOGIN MODAL */
+.gdpr-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;}
+.gdpr-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;max-width:420px;width:100%;padding:28px 28px 24px;}
+.gdpr-modal-titel{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--white);margin-bottom:12px;}
+.gdpr-modal-tekst{font-size:13px;color:var(--white3);line-height:1.6;margin-bottom:16px;}
+.gdpr-modal-tekst a{color:var(--gold);text-decoration:none;}
+.gdpr-modal-tekst a:hover{text-decoration:underline;}
+.gdpr-modal-btns{display:flex;gap:10px;justify-content:flex-end;}
+.gdpr-btn-annuleer{padding:8px 18px;background:transparent;border:1px solid var(--border2);color:var(--white3);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-radius:3px;cursor:pointer;transition:background .15s;}
+.gdpr-btn-annuleer:hover{background:var(--bg3);}
+.gdpr-btn-login{padding:8px 18px;background:rgba(145,71,255,.18);border:1px solid rgba(145,71,255,.4);color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-radius:3px;cursor:pointer;transition:background .15s;}
+.gdpr-btn-login:hover{background:rgba(145,71,255,.3);}
 </style>
 </head>
 <body>
@@ -727,7 +739,10 @@ footer{
 
 <footer>
   <span>© 2025 Morrog — Community Hub</span>
-  <span style="color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;">Kluis Systeem</span>
+  <span style="display:flex;align-items:center;gap:16px;">
+    <a href="privacy.html" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--white3);text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#CECECE'" onmouseout="this.style.color='#888888'">Privacybeleid</a>
+    <span style="color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;">Kluis Systeem</span>
+  </span>
 </footer>
 
 <script>
@@ -740,8 +755,19 @@ function toggleNavDropdown(e) {
 }
 document.addEventListener('click', () => document.getElementById('nav-user')?.classList.remove('open'));
 
+let _gdprRedirectUrl = null;
 function twitchLogin() {
-  window.location.href = API + '/api/auth/login?redirect=' + encodeURIComponent(window.location.href.split('?')[0]);
+  _gdprRedirectUrl = window.location.href.split('?')[0];
+  document.getElementById('gdpr-overlay').style.display = 'flex';
+  document.getElementById('gdpr-login-knop').onclick = gdprLogin;
+}
+function gdprSluit() {
+  document.getElementById('gdpr-overlay').style.display = 'none';
+  _gdprRedirectUrl = null;
+}
+function gdprLogin() {
+  document.getElementById('gdpr-overlay').style.display = 'none';
+  window.location.href = API + '/api/auth/login?redirect=' + encodeURIComponent(_gdprRedirectUrl || window.location.href.split('?')[0]);
 }
 
 async function uitloggen() {
@@ -1245,5 +1271,21 @@ window.addEventListener('load', () => {
   initSocket();
 });
 </script>
+
+<div class="gdpr-overlay" id="gdpr-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="gdpr-titel">
+  <div class="gdpr-modal">
+    <div class="gdpr-modal-titel" id="gdpr-titel">Inloggen met Twitch</div>
+    <div class="gdpr-modal-tekst">
+      Door in te loggen sla je je Twitch accountgegevens op voor het community loyaliteitsprogramma.
+      We verwerken je gebruikersnaam, volgdatum en activiteit om jouw loyaliteitsscore bij te houden.
+      We gebruiken uitsluitend een functionele sessiecookie — geen tracking.<br><br>
+      <a href="privacy.html" target="_blank">Lees het privacybeleid</a> · Je kunt je gegevens altijd laten verwijderen via het menu.
+    </div>
+    <div class="gdpr-modal-btns">
+      <button class="gdpr-btn-annuleer" onclick="gdprSluit()">Annuleren</button>
+      <button class="gdpr-btn-login" id="gdpr-login-knop">Inloggen met Twitch</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

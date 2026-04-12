@@ -171,6 +171,18 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
   footer{flex-direction:column;gap:12px;text-align:center;padding:24px 20px;}
   .progress-card,.login-prompt{padding:20px;}
 }
+/* GDPR LOGIN MODAL */
+.gdpr-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;}
+.gdpr-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;max-width:420px;width:100%;padding:28px 28px 24px;}
+.gdpr-modal-titel{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--white);margin-bottom:12px;}
+.gdpr-modal-tekst{font-size:13px;color:var(--white3);line-height:1.6;margin-bottom:16px;}
+.gdpr-modal-tekst a{color:var(--gold);text-decoration:none;}
+.gdpr-modal-tekst a:hover{text-decoration:underline;}
+.gdpr-modal-btns{display:flex;gap:10px;justify-content:flex-end;}
+.gdpr-btn-annuleer{padding:8px 18px;background:transparent;border:1px solid var(--border2);color:var(--white3);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-radius:3px;cursor:pointer;transition:background .15s;}
+.gdpr-btn-annuleer:hover{background:var(--bg3);}
+.gdpr-btn-login{padding:8px 18px;background:rgba(145,71,255,.18);border:1px solid rgba(145,71,255,.4);color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-radius:3px;cursor:pointer;transition:background .15s;}
+.gdpr-btn-login:hover{background:rgba(145,71,255,.3);}
 </style>
 </head>
 <body>
@@ -312,6 +324,7 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-i
   <div class="footer-links">
     <a class="footer-link" href="index.html">Community Hub</a>
     <a class="footer-link" href="charity.html">Charity</a>
+    <a class="footer-link" href="privacy.html">Privacybeleid</a>
     <a class="footer-link" href="https://twitch.tv/morrog" target="_blank">Twitch</a>
   </div>
 </footer>
@@ -457,8 +470,19 @@ const observer = new IntersectionObserver(entries => {
 document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
 // ── NAV AUTH ─────────────────────────────────────────────────
+let _gdprRedirectUrl = null;
 function twitchLogin() {
-  window.location.href = BACKEND + '/api/auth/login?redirect=' + encodeURIComponent(window.location.href.split('?')[0]);
+  _gdprRedirectUrl = window.location.href.split('?')[0];
+  document.getElementById('gdpr-overlay').style.display = 'flex';
+  document.getElementById('gdpr-login-knop').onclick = gdprLogin;
+}
+function gdprSluit() {
+  document.getElementById('gdpr-overlay').style.display = 'none';
+  _gdprRedirectUrl = null;
+}
+function gdprLogin() {
+  document.getElementById('gdpr-overlay').style.display = 'none';
+  window.location.href = BACKEND + '/api/auth/login?redirect=' + encodeURIComponent(_gdprRedirectUrl || window.location.href.split('?')[0]);
 }
 async function uitloggen() {
   await fetch(BACKEND + '/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
@@ -474,5 +498,21 @@ document.addEventListener('click', () => document.getElementById('nav-user')?.cl
 renderTiers(); // eerst zonder login state
 laadGebruiker();
 </script>
+
+<div class="gdpr-overlay" id="gdpr-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="gdpr-titel">
+  <div class="gdpr-modal">
+    <div class="gdpr-modal-titel" id="gdpr-titel">Inloggen met Twitch</div>
+    <div class="gdpr-modal-tekst">
+      Door in te loggen sla je je Twitch accountgegevens op voor het community loyaliteitsprogramma.
+      We verwerken je gebruikersnaam, volgdatum en activiteit om jouw loyaliteitsscore bij te houden.
+      We gebruiken uitsluitend een functionele sessiecookie — geen tracking.<br><br>
+      <a href="privacy.html" target="_blank">Lees het privacybeleid</a> · Je kunt je gegevens altijd laten verwijderen via het menu.
+    </div>
+    <div class="gdpr-modal-btns">
+      <button class="gdpr-btn-annuleer" onclick="gdprSluit()">Annuleren</button>
+      <button class="gdpr-btn-login" id="gdpr-login-knop">Inloggen met Twitch</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

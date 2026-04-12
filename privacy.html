@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacybeleid — Morrog Community Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#090909;--bg2:#111111;--bg3:#181818;--bg4:#202020;
+  --white:#FFFFFF;--white2:#CECECE;--white3:#888888;--dim:#333333;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --gold:#b17438;
+}
+body{background:var(--bg);color:var(--white2);font-family:'Barlow',sans-serif;font-size:15px;line-height:1.7;overflow-x:hidden;}
+nav{position:fixed;top:0;left:0;right:0;height:58px;background:rgba(9,9,9,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);z-index:100;display:flex;align-items:center;padding:0 40px;gap:0;}
+.nav-logo-fb{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;color:var(--white);text-transform:uppercase;}
+.nav-back{margin-left:24px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--white3);text-decoration:none;transition:color .15s;}
+.nav-back:hover{color:var(--white2);}
+main{max-width:760px;margin:0 auto;padding:100px 24px 80px;}
+h1{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--white);margin-bottom:8px;}
+.bijgewerkt{font-size:12px;color:var(--white3);margin-bottom:48px;}
+h2{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--gold);margin:40px 0 12px;border-bottom:1px solid var(--border);padding-bottom:8px;}
+p{margin-bottom:14px;color:var(--white2);}
+ul{margin:0 0 14px 20px;color:var(--white2);}
+li{margin-bottom:6px;}
+table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:14px;}
+th{text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--white3);border-bottom:1px solid var(--border2);padding:8px 12px;}
+td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--white2);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+a{color:var(--gold);text-decoration:none;}
+a:hover{text-decoration:underline;}
+.notice{background:var(--bg3);border:1px solid var(--border2);border-left:3px solid var(--gold);border-radius:4px;padding:14px 18px;margin:20px 0;font-size:14px;}
+footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;max-width:760px;margin:0 auto;}
+.footer-fb{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;letter-spacing:2px;color:var(--dim);text-transform:uppercase;}
+.footer-txt{font-size:12px;color:var(--dim);}
+.footer-links{display:flex;gap:20px;}
+.footer-link{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color .15s;}
+.footer-link:hover{color:var(--white3);}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo-fb">MORROG</span>
+  <a class="nav-back" href="index.html">← Terug naar hub</a>
+</nav>
+
+<main>
+  <h1>Privacybeleid</h1>
+  <p class="bijgewerkt">Laatst bijgewerkt: april 2025</p>
+
+  <p>
+    Dit privacybeleid legt uit welke gegevens we verzamelen wanneer je gebruikmaakt van de Morrog Community Hub
+    en de Horror Vrijdag stempagina, hoe we die gegevens gebruiken en welke rechten je hebt.
+  </p>
+
+  <h2>1. Wie is verantwoordelijk?</h2>
+  <p>
+    De verwerkingsverantwoordelijke is Morrog (te bereiken via
+    <a href="https://twitch.tv/morrog" target="_blank" rel="noopener">twitch.tv/morrog</a>).
+    Voor vragen over je gegevens kun je contact opnemen via het Twitch kanaal of Discord.
+  </p>
+
+  <h2>2. Welke gegevens verwerken we?</h2>
+  <p>We verwerken alleen gegevens die je actief verstrekt door in te loggen met je Twitch account:</p>
+  <table>
+    <tr><th>Gegeven</th><th>Bron</th><th>Doel</th></tr>
+    <tr><td>Twitch gebruikersnaam &amp; weergavenaam</td><td>Twitch OAuth</td><td>Identificatie in de community</td></tr>
+    <tr><td>Twitch gebruikers-ID</td><td>Twitch OAuth</td><td>Unieke koppeling van je account</td></tr>
+    <tr><td>Volgdatum (hoe lang je het kanaal volgt)</td><td>Twitch API</td><td>Berekening van loyaliteitsscore</td></tr>
+    <tr><td>Kijktijd (uren)</td><td>StreamElements</td><td>Berekening van loyaliteitsscore</td></tr>
+    <tr><td>Aantal chatberichten</td><td>Twitch chat (EventSub)</td><td>Berekening van loyaliteitsscore</td></tr>
+    <tr><td>"Ik Was Hier" check-ins</td><td>Jouw deelname tijdens stream</td><td>IWH-punten en Battle Pass</td></tr>
+    <tr><td>Abonnementsstatus</td><td>Twitch EventSub</td><td>Sub-badge weergave</td></tr>
+    <tr><td>Horror Vrijdag stemmen</td><td>Jouw stem op de pagina</td><td>Wekelijkse game stemming</td></tr>
+    <tr><td>Horror Vrijdag toegevoegde games</td><td>Door jou ingediend</td><td>Stemlijst aanvullen</td></tr>
+    <tr><td>IP-adres</td><td>Serverlog bij kluis gebruik</td><td>Beveiliging tegen misbruik</td></tr>
+  </table>
+  <p>We verzamelen <strong>geen</strong> locatiegegevens, betaalinformatie, e-mailadressen of gevoelige persoonsgegevens.</p>
+
+  <h2>3. Waarom verwerken we deze gegevens?</h2>
+  <ul>
+    <li><strong>Uitvoering van de dienst</strong> — het bijhouden en weergeven van jouw loyaliteitsscore, rang en statistieken.</li>
+    <li><strong>Community participatie</strong> — Horror Vrijdag stemmen, IWH check-ins en de Kluis.</li>
+    <li><strong>Beveiliging</strong> — IP-adressen worden tijdelijk opgeslagen om geautomatiseerde aanvallen op de Kluis te blokkeren.</li>
+  </ul>
+  <p>
+    De rechtsgrond voor verwerking is <strong>uitvoering van een overeenkomst</strong> (het aanbieden van het loyaliteitsprogramma
+    waar je voor kiest door in te loggen) en <strong>legitiem belang</strong> (beveiliging tegen misbruik).
+  </p>
+
+  <h2>4. Hoe lang bewaren we je gegevens?</h2>
+  <table>
+    <tr><th>Gegeven</th><th>Bewaartermijn</th></tr>
+    <tr><td>Accountgegevens &amp; loyaliteitscore</td><td>Zolang je actief bent in de community, of tot je verwijderingsverzoek</td></tr>
+    <tr><td>IP-adressen (kluis pogingen)</td><td>Maximaal 30 dagen, daarna automatisch verwijderd</td></tr>
+    <tr><td>Horror Vrijdag stemmen &amp; games</td><td>Per week — stemmen per week bijgehouden, historisch bewaard</td></tr>
+    <tr><td>Sessiecookie</td><td>Maximaal 24 uur, of totdat je uitlogt</td></tr>
+  </table>
+
+  <h2>5. Cookies</h2>
+  <div class="notice">
+    We gebruiken <strong>uitsluitend een functionele sessiecookie</strong> (<code>morrog_session</code>).
+    Deze cookie is strikt noodzakelijk om je ingelogd te houden en bevat geen trackinginformatie.
+    De cookie wordt verwijderd wanneer je uitlogt of na 24 uur. We gebruiken <strong>geen</strong>
+    analytics, advertentie- of trackingcookies.
+  </div>
+  <p>
+    Omdat deze cookie technisch noodzakelijk is voor de werking van de inlogfunctie, is er geen aparte
+    cookietoestemming vereist onder de ePrivacy-richtlijn.
+  </p>
+
+  <h2>6. Delen met derden</h2>
+  <p>We delen je gegevens niet met adverteerders of marketingpartijen. Technische dienstverleners die toegang
+  kunnen hebben tot gegevens zijn:</p>
+  <table>
+    <tr><th>Partij</th><th>Rol</th><th>Privacybeleid</th></tr>
+    <tr><td>Twitch Interactive Inc.</td><td>OAuth inloggen, volg- &amp; sub-informatie</td><td><a href="https://www.twitch.tv/p/nl-nl/legal/privacy-notice/" target="_blank" rel="noopener">twitch.tv</a></td></tr>
+    <tr><td>StreamElements</td><td>Kijktijd synchronisatie</td><td><a href="https://streamelements.com/privacy" target="_blank" rel="noopener">streamelements.com</a></td></tr>
+    <tr><td>Railway (hosting)</td><td>Server &amp; database hosting</td><td><a href="https://railway.app/legal/privacy" target="_blank" rel="noopener">railway.app</a></td></tr>
+    <tr><td>Steam / SteamSpy</td><td>Spelinfo ophalen (geen persoonsgegevens)</td><td><a href="https://store.steampowered.com/privacy_agreement/" target="_blank" rel="noopener">steampowered.com</a></td></tr>
+  </table>
+
+  <h2>7. Jouw rechten</h2>
+  <p>Als betrokkene heb je de volgende rechten onder de AVG:</p>
+  <ul>
+    <li><strong>Recht op inzage</strong> — je kunt je score en statistieken bekijken op de Community Hub nadat je ingelogd bent.</li>
+    <li><strong>Recht op verwijdering</strong> — je kunt al je gegevens laten verwijderen via de knop "Mijn data verwijderen" in het gebruikersmenu, of door contact op te nemen via Twitch.</li>
+    <li><strong>Recht op bezwaar</strong> — je kunt bezwaar maken tegen verwerking via Twitch of Discord.</li>
+    <li><strong>Recht op beperking</strong> — je kunt vragen om beperking van de verwerking zolang een verzoek in behandeling is.</li>
+  </ul>
+  <p>Voor uitoefening van je rechten: neem contact op via <a href="https://twitch.tv/morrog" target="_blank" rel="noopener">twitch.tv/morrog</a>.</p>
+  <p>
+    Als je van mening bent dat je gegevens onrechtmatig worden verwerkt, heb je het recht een klacht in te dienen bij de
+    <a href="https://autoriteitpersoonsgegevens.nl" target="_blank" rel="noopener">Autoriteit Persoonsgegevens</a>.
+  </p>
+
+  <h2>8. Beveiliging</h2>
+  <p>
+    We nemen technische maatregelen om je gegevens te beschermen, waaronder versleutelde verbindingen (HTTPS),
+    beveiliging van inlogcookies (httpOnly, Secure) en beperkte toegang tot de database.
+    Twitch-tokens worden nooit opgeslagen in je browser.
+  </p>
+
+  <h2>9. Wijzigingen</h2>
+  <p>
+    Dit privacybeleid kan worden aangepast. Bij wezenlijke wijzigingen word je geïnformeerd via het Twitch kanaal of Discord.
+    De datum bovenaan dit document geeft aan wanneer het voor het laatst is bijgewerkt.
+  </p>
+</main>
+
+<footer>
+  <div>
+    <div class="footer-fb">MORROG</div>
+    <div class="footer-txt">© 2025 Morrog · Community Hub</div>
+  </div>
+  <div class="footer-links">
+    <a class="footer-link" href="index.html">Hub</a>
+    <a class="footer-link" href="https://twitch.tv/morrog" target="_blank">Twitch</a>
+  </div>
+</footer>
+
+</body>
+</html>
