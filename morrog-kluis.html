@@ -488,32 +488,7 @@ main{position:relative;z-index:1;padding-top:58px;min-height:100vh;display:flex;
 .feed-item-time{font-size:10px;color:var(--dim);margin-left:auto;flex-shrink:0;}
 .feed-empty{padding:20px 16px;font-size:12px;color:var(--dim);text-align:center;}
 
-/* TEAMS */
-.teams-section{margin-bottom:28px;}
-.team-tabs{display:flex;gap:6px;margin-bottom:14px;}
-.team-tab{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--white3);cursor:pointer;transition:all .15s;}
-.team-tab.active{background:rgba(177,116,56,.15);border-color:var(--gold);color:var(--gold);}
-.team-panel{display:none;}
-.team-panel.active{display:block;}
-.team-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--white);font-family:'Barlow',sans-serif;font-size:14px;padding:10px 14px;outline:none;margin-bottom:8px;transition:border-color .15s;}
-.team-input:focus{border-color:rgba(177,116,56,.4);}
-.team-input::placeholder{color:var(--white3);}
-.team-btn{width:100%;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:10px;border-radius:4px;border:1px solid rgba(177,116,56,.4);background:rgba(177,116,56,.12);color:var(--gold);cursor:pointer;transition:all .15s;}
-.team-btn:hover{background:rgba(177,116,56,.22);}
-.team-status{font-size:12px;margin-top:8px;min-height:16px;}
-.team-status.ok{color:#3DAB6A;}
-.team-status.fout{color:#e05555;}
-.mijn-team-box{background:var(--bg3);border:1px solid rgba(177,116,56,.25);border-radius:8px;padding:14px 16px;margin-bottom:12px;}
-.mijn-team-naam{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
-.mijn-team-stats{font-size:12px;color:var(--white3);}
-.mijn-team-code{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;letter-spacing:4px;color:var(--white2);margin:6px 0 4px;}
-.mijn-team-leden{font-size:11px;color:var(--white3);margin-top:6px;}
 
-/* TEAM LEADERBOARD */
-.team-lb-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:6px;}
-.team-lb-pos{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:var(--white3);min-width:24px;text-align:center;}
-.team-lb-naam{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;text-transform:uppercase;color:var(--white);}
-.team-lb-stats{font-size:11px;color:var(--white3);text-align:right;}
 
 /* GEKRAAKT BROADCAST */
 .gekraakt-banner{
@@ -692,37 +667,6 @@ footer{
         </div>
       </div>
 
-      <!-- TEAMS -->
-      <div class="teams-section">
-        <div class="section-title">Teams</div>
-        <div id="mijnTeamWrap" style="display:none">
-          <div class="mijn-team-box">
-            <div class="mijn-team-naam" id="mijnTeamNaam">—</div>
-            <div class="mijn-team-code" id="mijnTeamCode">——</div>
-            <div class="mijn-team-stats" id="mijnTeamStats">0 pogingen · 0 leden</div>
-            <div class="mijn-team-leden" id="mijnTeamLeden"></div>
-          </div>
-        </div>
-        <div id="teamFormWrap">
-          <div class="team-tabs">
-            <button class="team-tab active" onclick="teamTab(this,'aanmaken')">Team aanmaken</button>
-            <button class="team-tab" onclick="teamTab(this,'joinen')">Joinen via code</button>
-          </div>
-          <div class="team-panel active" id="panel-aanmaken">
-            <input class="team-input" type="text" id="teamNaamInput" placeholder="Teamnaam (bijv. TeamNL)" maxlength="30">
-            <button class="team-btn" onclick="teamAanmaken()">Team aanmaken</button>
-            <div class="team-status" id="teamAanmakenStatus"></div>
-          </div>
-          <div class="team-panel" id="panel-joinen">
-            <input class="team-input" type="text" id="teamCodeInput" placeholder="6-cijferige teamcode" maxlength="6" style="text-transform:uppercase;letter-spacing:3px;">
-            <button class="team-btn" onclick="teamJoinen()">Joinen</button>
-            <div class="team-status" id="teamJoinenStatus"></div>
-          </div>
-        </div>
-
-        <div class="section-title" style="margin-top:20px;">Team Leaderboard</div>
-        <div id="teamLeaderboard"><div style="color:var(--white3);font-size:12px;">Laden...</div></div>
-      </div>
 
       <div class="section-title">Hints</div>
       <div class="hints-grid" id="hintsGrid">
@@ -1243,7 +1187,7 @@ function renderKrakers(krakers) {
     row.className = 'kraker-row';
     row.innerHTML = `
       <div class="kraker-pos ${posClass}">#${k.positie}</div>
-      <div class="kraker-name">${k.kijker_username}</div>
+      <div class="kraker-name">${esc(k.kijker_username)}</div>
       <div class="kraker-time">${tijdstip}</div>
     `;
     list.appendChild(row);
@@ -1266,14 +1210,13 @@ function initSocket() {
   });
 
   socket.on('kluis:poging', data => {
-    voegFeedItemToe(`🎮 ${data.user} probeerde ${data.code}`, data.correct);
+    voegFeedItemToe(`🎮 ${esc(data.user)} probeerde ${esc(data.code)}`, data.correct);
   });
 
   socket.on('kluis:gekraakt', data => {
     toonGebraaktBanner(data.user, data.positie);
     confettiBurst();
     laadKluis();
-    laadTeamLeaderboard();
   });
 }
 
@@ -1341,100 +1284,11 @@ function confettiBurst() {
   drawConfetti();
 }
 
-// ── TEAMS ──────────────────────────────────────────────────
-function teamTab(btn, panel) {
-  document.querySelectorAll('.team-tab').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.team-panel').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('panel-' + panel).classList.add('active');
-}
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-function getUsernameVoorTeams() {
-  const cached = JSON.parse(localStorage.getItem('twitch_user') || 'null');
-  return cached?.login || null;
-}
-
-async function teamAanmaken() {
-  const naam = document.getElementById('teamNaamInput').value.trim();
-  const username = getUsernameVoorTeams();
-  const status = document.getElementById('teamAanmakenStatus');
-  if (!naam) { status.textContent = 'Vul een teamnaam in'; status.className = 'team-status fout'; return; }
-  if (!username) { status.textContent = 'Vul eerst je gebruikersnaam in'; status.className = 'team-status fout'; return; }
-
-  try {
-    const r = await fetch(`${API}/api/kluis/team/aanmaken`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ naam, username }),
-    });
-    const d = await r.json();
-    if (!r.ok) { status.textContent = d.error; status.className = 'team-status fout'; return; }
-    status.textContent = `Team aangemaakt! Code: ${d.team.code}`;
-    status.className = 'team-status ok';
-    laadMijnTeam(username);
-    laadTeamLeaderboard();
-  } catch { status.textContent = 'Verbindingsfout'; status.className = 'team-status fout'; }
-}
-
-async function teamJoinen() {
-  const code = document.getElementById('teamCodeInput').value.trim().toUpperCase();
-  const username = getUsernameVoorTeams();
-  const status = document.getElementById('teamJoinenStatus');
-  if (!code) { status.textContent = 'Vul een teamcode in'; status.className = 'team-status fout'; return; }
-  if (!username) { status.textContent = 'Vul eerst je gebruikersnaam in'; status.className = 'team-status fout'; return; }
-
-  try {
-    const r = await fetch(`${API}/api/kluis/team/joinen`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, username }),
-    });
-    const d = await r.json();
-    if (!r.ok) { status.textContent = d.error; status.className = 'team-status fout'; return; }
-    status.textContent = `Gejoined bij ${d.team.naam}!`;
-    status.className = 'team-status ok';
-    laadMijnTeam(username);
-    laadTeamLeaderboard();
-  } catch { status.textContent = 'Verbindingsfout'; status.className = 'team-status fout'; }
-}
-
-async function laadMijnTeam(username) {
-  if (!username) return;
-  try {
-    const r = await fetch(`${API}/api/kluis/team/mijn?username=${encodeURIComponent(username)}`);
-    const d = await r.json();
-    if (!d) return;
-    document.getElementById('mijnTeamNaam').textContent = d.naam;
-    document.getElementById('mijnTeamCode').textContent = d.code;
-    document.getElementById('mijnTeamStats').textContent = `${d.pogingen} pogingen · ${d.leden_count} leden`;
-    document.getElementById('mijnTeamLeden').textContent = 'Leden: ' + (d.leden || []).join(', ');
-    document.getElementById('mijnTeamWrap').style.display = 'block';
-    document.getElementById('teamFormWrap').style.display = 'none';
-  } catch {}
-}
-
-async function laadTeamLeaderboard() {
-  try {
-    const r = await fetch(`${API}/api/kluis/teams/leaderboard`);
-    const teams = await r.json();
-    const el = document.getElementById('teamLeaderboard');
-    if (!teams.length) { el.innerHTML = '<div style="color:var(--white3);font-size:12px;">Nog geen teams</div>'; return; }
-    el.innerHTML = teams.map((t, i) => `
-      <div class="team-lb-item">
-        <div class="team-lb-pos">${i + 1}</div>
-        <div class="team-lb-naam">${esc(t.naam)}</div>
-        <div class="team-lb-stats">${t.pogingen} pogingen<br>${t.leden} leden</div>
-      </div>
-    `).join('');
-  } catch {}
-}
-
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-// Init socket + teams na laden
+// Init socket na laden
 window.addEventListener('load', () => {
   initSocket();
-  laadTeamLeaderboard();
-  const cached = JSON.parse(localStorage.getItem('twitch_user') || 'null');
-  if (cached?.login) laadMijnTeam(cached.login);
 });
 </script>
 </body>
